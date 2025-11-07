@@ -3,7 +3,7 @@
 const defaultConfig = {
     server_name: "CornMiner.top",
     server_ip: "cornminer.top",
-    discord_link: "https://discord.gg/cornminer",
+    discord_link: "https://discord.gg/cUsA2K4Cpz",
     welcome_title: "Chào mừng đến với CornMiner.top",
     welcome_description: "Thế giới sinh tồn đầy thử thách và sáng tạo! Tại đây, bạn có thể khám phá thông tin về máy chủ, hướng dẫn người chơi mới, xem hình ảnh và công trình nổi bật trong server."
 };
