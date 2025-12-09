@@ -213,15 +213,33 @@
                                 d="M4 6h16M4 12h16M4 18h16"></path>
                         </svg></button></div>
             </div>
-            <div id="mobile-menu" class="md:hidden hidden bg-black/90 rounded-xl mt-2 border border-gray-800">
-                <div class="px-2 pt-2 pb-3 space-y-1">
+            <div id="mobile-menu"
+                class="md:hidden hidden bg-black/95 rounded-xl mt-2 border border-red-500/30 backdrop-blur-xl">
+                <div class="px-4 pt-4 pb-6 space-y-2">
                     <button onclick="showSection('home')"
-                        class="block px-4 py-3 text-base font-bold text-gray-300 w-full text-left">Trang chủ</button>
+                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">🏠
+                        Trang chủ</button>
+                    <button onclick="showSection('map')"
+                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">🗺️
+                        Bản đồ</button>
+                    <button onclick="showSection('leaderboard')"
+                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">🏆
+                        Xếp hạng</button>
+                    <button onclick="showSection('news')"
+                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">📰
+                        Tin tức</button>
+                    <button onclick="showSection('guide')"
+                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">📘
+                        Hướng dẫn</button>
                     <button onclick="showSection('forum')"
-                        class="block px-4 py-3 text-base font-bold text-orange-400 w-full text-left">Diễn đàn</button>
-                    <button onclick="toggleAuthModal()"
-                        class="block w-full mt-3 corn-gradient text-white px-6 py-3 rounded-xl font-bold">Đăng
-                        nhập</button>
+                        class="block w-full text-left px-4 py-3 text-base font-bold text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg mt-2">💬
+                        Diễn đàn</button>
+
+                    <div class="border-t border-gray-700 my-2 pt-2">
+                        <button onclick="toggleAuthModal()"
+                            class="block w-full mt-2 corn-gradient text-white px-6 py-3 rounded-xl font-bold shadow-lg text-center">🔑
+                            Đăng nhập / Đăng ký</button>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -234,7 +252,7 @@
                 <div class="absolute inset-0 corn-gradient opacity-10"></div>
                 <div class="relative z-10 text-center">
                     <h2 id="hero-title" class="text-6xl md:text-7xl font-bold minecraft-font mb-6 corn-text">
-                        𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐓𝐨 𝐂𝐎𝐑𝐍 𝐌𝐈𝐍𝐄𝐑</h2>
+                        𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐓𝐎 𝐂𝐎𝐑𝐍 𝐌𝐈𝐍𝐄𝐑</h2>
                     <p id="hero-description" class="text-2xl text-gray-200 mb-10 max-w-4xl mx-auto leading-relaxed">Thế
                         giới sinh tồn đầy thử thách và sáng tạo!</p>
                     <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">

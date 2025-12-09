@@ -1001,4 +1001,23 @@ window.deleteComment = async (postId, commentId) => {
     } catch(e) { alert("Lỗi: " + e.message); }
 };
 
+function createSnowflake() {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snowflake');
+        snowflake.innerHTML = '❄'; // Có thể đổi thành ❅ hoặc ❆
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDuration = Math.random() * 3 + 5 + 's'; // Tốc độ rơi 5-8s
+        snowflake.style.fontSize = Math.random() * 10 + 10 + 'px'; // Kích thước
+        snowflake.style.opacity = Math.random();
+        
+        document.body.appendChild(snowflake);
+
+        // Xóa tuyết sau khi rơi xong để nhẹ máy
+        setTimeout(() => {
+            snowflake.remove();
+        }, 8000);
+    }
+    // Tạo tuyết mỗi 200ms
+    setInterval(createSnowflake, 200);
+
 showSection('home');

@@ -163,12 +163,43 @@ body {
 }
 .role-select:focus { border-color: #ff6b35; outline: none; }
 
-.halloween-bg {
-    background: linear-gradient(135deg, #1a0b2e 0%, #2d1b3d 25%, #4a2c5a 50%, #6b3e7a 75%, #8b4f9b 100%);
+.halloween-bg, .christmas-bg {
+    /* Xanh Đen (Bầu trời đêm) -> Xanh Than (Núi đá) -> Xanh Ngọc Đậm (Băng giá) */
+    background: linear-gradient(135deg, #020024 0%, #09203f 50%, #004e92 100%);
+    background-attachment: fixed;
 }
 
+/* KẾT HỢP: Giữ nguyên nút màu Cam/Vàng của bạn, nó sẽ cực kỳ nổi trên nền xanh này */
 .corn-gradient {
-    background: linear-gradient(135deg, #ff6b35 0%, #f7931e 50%, #ffcc02 100%);
+    background: linear-gradient(135deg, #ea580c 0%, #facc15 50%, #ffe066 100%);
+    box-shadow: 0 4px 15px rgba(250, 204, 21, 0.2); 
+    color: #3f1d0b; /* Chữ màu nâu đậm */
+}
+
+/* Chữ Corn-text cũng đổi sang màu cực quang cho đồng bộ */
+.corn-text {
+    background: linear-gradient(135deg, #00f260, #0575e6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 5px rgba(0, 242, 96, 0.5));
+}
+
+/* Sửa lại card Halloween thành card Christmas (Kính mờ + viền đỏ/xanh) */
+.halloween-card {
+    background: linear-gradient(135deg, rgba(20, 83, 45, 0.2), rgba(185, 28, 28, 0.1));
+    border: 1px solid rgba(22, 163, 74, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Hiệu ứng tuyết phủ lên card (Tuỳ chọn) */
+.halloween-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.7);
+    box-shadow: 0 0 10px white;
 }
 
 .glass-effect {
@@ -393,7 +424,7 @@ body {
     }
 }
 
-.corn-text {
+/* .corn-text {
     background: linear-gradient(135deg, #ff6b35, #ffcc02);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -403,7 +434,7 @@ body {
 .halloween-card {
     background: linear-gradient(135deg, rgba(139, 79, 155, 0.1), rgba(45, 27, 61, 0.2));
     border: 1px solid rgba(139, 79, 155, 0.3);
-}
+} */
 
 .achievement-badge {
     background: linear-gradient(135deg, #ff6b35, #ffcc02);
@@ -542,3 +573,22 @@ body {
     color: white;
     transform: scale(1.05);
 }
+
+.snowflake {
+        position: fixed;
+        top: -10px;
+        z-index: 9999;
+        user-select: none;
+        cursor: default;
+        animation-name: snowfall;
+        animation-duration: 10s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        opacity: 0.8;
+        color: #FFF;
+        font-size: 1em;
+    }
+    @keyframes snowfall {
+        0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+        100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    }
