@@ -8,11 +8,130 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="/_sdk/element_sdk.js"></script>
     <link rel="icon" type="image/png" href="/assets/icon/logo2bx.png">
-    <link rel="stylesheet" href="/assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/style.css">
     <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
 </head>
 
-<body class="h-full halloween-bg text-white font-sans"><!-- Navigation Header -->
+<body class="h-full halloween-bg text-white font-sans relative">
+
+    <div id="authModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-8 relative">
+            <button onclick="toggleAuthModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">✕</button>
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-2">🎃</div>
+                <h2 class="text-2xl font-bold corn-text minecraft-font">CORN ID LOGIN</h2>
+            </div>
+
+            <div id="loginForm" class="space-y-4">
+                <button id="googleLoginBtn" class="google-btn">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
+                    <span>Tiếp tục với Google</span>
+                </button>
+
+                <div class="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase my-4">
+                    <div class="h-px bg-gray-700 flex-1"></div> HOẶC <div class="h-px bg-gray-700 flex-1"></div>
+                </div>
+
+                <form id="emailLoginForm" class="space-y-4">
+                    <input type="text" id="loginUser"
+                        class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none"
+                        placeholder="Tên nhân vật (Ingame)">
+                    <input type="password" id="loginPass"
+                        class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none"
+                        placeholder="Mật khẩu">
+                    <button type="submit"
+                        class="w-full corn-gradient text-white font-bold py-3 rounded-xl hover:opacity-90 pulse-glow transition-all">ĐĂNG
+                        NHẬP</button>
+                </form>
+                <p class="text-center text-sm text-gray-400 mt-4 cursor-pointer hover:text-orange-400"
+                    onclick="switchAuthMode('register')">Chưa có tài khoản? <b>Đăng ký ngay</b></p>
+            </div>
+
+            <form id="registerForm" class="space-y-4 hidden-force">
+                <input type="text" id="regUser"
+                    class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none"
+                    placeholder="Tên nhân vật (Ingame)">
+                <input type="password" id="regPass"
+                    class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none"
+                    placeholder="Mật khẩu bảo vệ">
+                <button type="submit"
+                    class="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition-all">TẠO
+                    TÀI KHOẢN</button>
+                <p class="text-center text-sm text-gray-400 mt-4 cursor-pointer hover:text-orange-400"
+                    onclick="switchAuthMode('login')">Đã có tài khoản? <b>Đăng nhập</b></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="createPostModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-2xl rounded-2xl p-8 relative shadow-2xl">
+            <button onclick="togglePostModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">✕</button>
+            <h2 class="text-2xl font-bold corn-text mb-4" id="postModalTitle">Đăng bài mới</h2>
+            <form id="createPostForm" class="space-y-4">
+                <input type="hidden" id="postType" value="forum">
+                <div><label class="block text-gray-400 text-sm mb-1">Tiêu đề</label><input type="text" id="postTitle"
+                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none"
+                        required></div>
+                <div><label class="block text-gray-400 text-sm mb-1">Nội dung</label><textarea id="postContent" rows="6"
+                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none"
+                        required></textarea></div>
+                <div id="adminCategorySelect" class="hidden-force"><label class="block text-gray-400 text-sm mb-1">Danh
+                        mục</label><select id="postCategory"
+                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-2 text-white">
+                        <option value="Sự kiện">Sự kiện</option>
+                        <option value="Update">Cập nhật</option>
+                        <option value="Thông báo">Thông báo</option>
+                    </select></div>
+                <button type="submit"
+                    class="w-full corn-gradient text-white font-bold py-3 rounded-xl hover:opacity-90">ĐĂNG BÀI</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="adminUsersModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4">
+        <div class="glass-panel admin-panel-container w-full max-w-5xl rounded-2xl p-6 relative h-[85vh] flex flex-col">
+
+            <button onclick="document.getElementById('adminUsersModal').classList.add('hidden-force')"
+                class="absolute top-5 right-5 text-gray-400 hover:text-white hover:bg-red-500/20 w-8 h-8 rounded-full flex items-center justify-center transition-all">✕</button>
+
+            <div class="admin-header">
+                <div>
+                    <h2 class="text-2xl font-bold corn-text minecraft-font flex items-center gap-2">
+                        <span class="text-3xl">🛡️</span> QUẢN TRỊ VIÊN
+                    </h2>
+                    <p class="text-xs text-gray-400 mt-1">Quản lý quyền hạn và thành viên</p>
+                </div>
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="userSearchInput" onkeyup="filterUsers()"
+                        placeholder="Tìm theo tên hoặc email...">
+                </div>
+            </div>
+
+            <div class="table-wrapper flex-1 custom-scrollbar">
+                <table class="styled-table">
+                    <thead>
+                        <tr>
+                            <th>Người chơi</th>
+                            <th>Email / ID</th>
+                            <th>Ngày tham gia</th>
+                            <th>Vai trò (Role)</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-user-list">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 text-right text-xs text-gray-500 border-t border-gray-700 pt-3">
+                Tổng thành viên: <span id="total-users-count" class="text-white font-bold">0</span>
+            </div>
+        </div>
+    </div>
+
     <header class="glass-effect sticky top-0 z-50">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-18">
@@ -25,80 +144,110 @@
                         <p class="text-xs text-gray-300">Máy chủ Minecraft Việt Nam</p>
                     </div>
                 </div>
+
                 <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-8"><button onclick="showSection('home')"
-                            class="nav-link px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white">Trang
-                            chủ</button> <button onclick="showSection('map')"
-                            class="nav-link px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white">Bản
-                            đồ</button> <button onclick="showSection('leaderboard')"
-                            class="nav-link px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white">Xếp
-                            hạng</button> <button onclick="showSection('news')"
-                            class="nav-link px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white">Tin
-                            tức</button> <button onclick="showSection('guide')"
-                            class="nav-link px-4 py-2 text-sm font-semibold text-gray-300 hover:text-white">Hướng
+                    <div class="ml-10 flex items-baseline space-x-6">
+                        <button onclick="showSection('home')"
+                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Trang
+                            chủ</button>
+                        <button onclick="showSection('map')"
+                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Bản
+                            đồ</button>
+                        <button onclick="showSection('leaderboard')"
+                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Xếp
+                            hạng</button>
+                        <button onclick="showSection('news')"
+                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Tin
+                            tức</button>
+                        <button onclick="showSection('guide')"
+                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Hướng
                             dẫn</button>
+                        <button onclick="showSection('forum')"
+                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-orange-400 border border-orange-500/30 rounded hover:bg-orange-500/10">Diễn
+                            đàn</button>
                     </div>
                 </div>
+
                 <div class="hidden md:flex items-center space-x-4">
-                    <div class="server-status status-online">
-                        <div class="status-dot"></div><span>Đang hoạt động</span>
-                    </div><button onclick="copyServerIP()"
-                        class="corn-gradient text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all pulse-glow">
-                        Tham gia ngay </button>
-                </div><!-- Mobile menu button -->
-                <div class="md:hidden"><button onclick="toggleMobileMenu()"
-                        class="text-gray-300 hover:text-white focus:outline-none">
-                        <svg class="h-6 w-6" fill="none" viewbox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16" />
-                        </svg></button>
+                    <div id="guest-actions" class="flex items-center gap-4">
+                        <div
+                            class="server-status status-online flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
+                            <div class="status-dot w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span
+                                class="text-xs font-bold text-green-400">Online</span>
+                        </div>
+                        <button onclick="toggleAuthModal()"
+                            class="corn-gradient text-white px-6 py-2 rounded-xl font-bold hover:shadow-lg transition-all text-sm uppercase">🔑
+                            Đăng nhập</button>
+                    </div>
+                    <div id="user-actions" class="hidden-force user-menu-container">
+                        <button class="user-btn" onclick="toggleUserDropdown()">
+                            <img id="user-avatar" src="" class="w-8 h-8 rounded-full border border-gray-500">
+                            <span id="user-name" class="font-bold text-sm">...</span>
+                            <span class="text-xs">▼</span>
+                        </button>
+
+                        <div id="user-dropdown-menu" class="user-dropdown hidden-force">
+                            <div class="px-3 py-2 border-b border-gray-700 mb-2">
+                                <p class="text-xs text-gray-400">Vai trò của bạn</p>
+                                <span id="user-role" class="role-badge mt-1 ml-0">Loading...</span>
+                            </div>
+
+                            <button id="btn-admin-panel" class="menu-item hidden-force" onclick="openAdminUsersModal()">
+                                <span>🛠️ Quản lý người dùng</span>
+                            </button>
+
+                            <button class="menu-item" onclick="alert('Tính năng đang phát triển!')">
+                                <span>👤 Hồ sơ cá nhân</span>
+                            </button>
+
+                            <button onclick="handleLogout()" class="menu-item logout">
+                                <span>⏏ Đăng xuất</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div><!-- Mobile menu -->
-            <div id="mobile-menu" class="md:hidden hidden">
-                <div class="px-2 pt-2 pb-3 space-y-1 bg-black bg-opacity-60 rounded-xl mt-2"><button
-                        onclick="showSection('home')"
-                        class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white w-full text-left">Trang
-                        chủ</button> <button onclick="showSection('map')"
-                        class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white w-full text-left">Bản
-                        đồ</button> <button onclick="showSection('leaderboard')"
-                        class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white w-full text-left">Xếp
-                        hạng</button> <button onclick="showSection('news')"
-                        class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white w-full text-left">Tin
-                        tức</button> <button onclick="showSection('guide')"
-                        class="block px-4 py-3 text-base font-medium text-gray-300 hover:text-white w-full text-left">Hướng
-                        dẫn</button> <button onclick="copyServerIP()"
-                        class="block w-full mt-3 corn-gradient text-white px-6 py-3 rounded-xl font-bold">Tham gia
-                        ngay</button>
+
+                <div class="md:hidden"><button onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white"><svg
+                            class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg></button></div>
+            </div>
+            <div id="mobile-menu" class="md:hidden hidden bg-black/90 rounded-xl mt-2 border border-gray-800">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <button onclick="showSection('home')"
+                        class="block px-4 py-3 text-base font-bold text-gray-300 w-full text-left">Trang chủ</button>
+                    <button onclick="showSection('forum')"
+                        class="block px-4 py-3 text-base font-bold text-orange-400 w-full text-left">Diễn đàn</button>
+                    <button onclick="toggleAuthModal()"
+                        class="block w-full mt-3 corn-gradient text-white px-6 py-3 rounded-xl font-bold">Đăng
+                        nhập</button>
                 </div>
             </div>
         </nav>
     </header>
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8"><!-- Home Section -->
-        <section id="home-section" class="fade-in"><!-- Hero Section -->
-            <div class="glass-effect rounded-3xl p-10 mb-10 relative overflow-hidden">
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section id="home-section" class="fade-in">
+            <div class="glass-effect rounded-3xl p-10 mb-10 relative overflow-hidden border border-orange-500/10">
                 <div class="absolute inset-0 corn-gradient opacity-10"></div>
-                <div class="relative z-10">
-                    <div class="text-center mb-10">
-                        <!-- <div class="floating-icon text-8xl mb-6">
-                            <img src="/assets/icon/cornlogo.png" alt="logo" class="w-64 h-32 display: inline-flex">
-                        </div> -->
-                        <h2 id="hero-title" class="text-6xl md:text-7xl font-bold minecraft-font mb-6 corn-text">𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐓𝐨 𝐂𝐎𝐑𝐍 𝐌𝐈𝐍𝐄𝐑</h2>
-                        <p id="hero-description" class="text-2xl text-gray-200 mb-10 max-w-4xl mx-auto leading-relaxed">
-                            Thế giới sinh tồn đầy thử thách và sáng tạo! Tại đây, bạn có thể khám phá thông tin về máy
-                            chủ, hướng dẫn người chơi mới, xem hình ảnh và công trình nổi bật trong server.</p>
-                        <div class="flex flex-col sm:flex-row gap-6 justify-center items-center"><button
-                                onclick="copyServerIP()"
-                                class="corn-gradient text-white px-10 py-5 rounded-xl font-bold text-xl hover:shadow-2xl transition-all pulse-glow">
-                                🎮 Tham gia ngay - <span id="server-ip-display">cornminer.top</span> </button> <button
-                                onclick="openDiscord()"
-                                class="glass-effect text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/20 transition-all">
-                                💬 Discord CornMiner </button>
-                        </div>
-                        <p class="text-lg text-orange-300 mt-6 font-semibold">👉 Tham gia ngay để cùng bạn bè xây dựng,
-                            chiến đấu và phiêu lưu trong thế giới CornMiner!</p>
+                <div class="relative z-10 text-center">
+                    <h2 id="hero-title" class="text-6xl md:text-7xl font-bold minecraft-font mb-6 corn-text">
+                        𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐓𝐨 𝐂𝐎𝐑𝐍 𝐌𝐈𝐍𝐄𝐑</h2>
+                    <p id="hero-description" class="text-2xl text-gray-200 mb-10 max-w-4xl mx-auto leading-relaxed">Thế
+                        giới sinh tồn đầy thử thách và sáng tạo!</p>
+                    <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
+                        <button onclick="copyServerIP()"
+                            class="corn-gradient text-white px-10 py-5 rounded-xl font-bold text-xl hover:shadow-2xl pulse-glow">🎮
+                            Tham gia ngay</button>
+                        <button onclick="openDiscord()"
+                            class="glass-effect text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/20">💬
+                            Discord</button>
                     </div>
                 </div>
-            </div><!-- Server Stats -->
+            </div>
+
             <div class="stats-grid mb-12">
                 <div class="glass-effect rounded-2xl p-8 card-hover">
                     <div class="flex items-center justify-between">
@@ -145,6 +294,7 @@
                     </div>
                 </div>
             </div><!-- Features Grid -->
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
                 <div class="halloween-card rounded-2xl p-8 card-hover">
                     <div class="text-center">
@@ -176,7 +326,8 @@
                             nghiệp trong nền kinh tế do người chơi điều khiển.</p>
                     </div>
                 </div>
-            </div><!-- Screenshot Gallery -->
+            </div>
+
             <div class="glass-effect rounded-2xl p-8 mb-10">
                 <h2 class="text-3xl font-bold minecraft-font mb-8 text-center corn-text">Tài Nguyên Máy Chủ</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -218,485 +369,81 @@
                     </div>
                 </div>
             </div>
-        </section><!-- Map Section -->
-        <section id="map-section" class="section-hidden fade-in">
-            <div class="mb-10">
-                <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">Bản đồ thế giới CornMiner</h1>
-                <p class="text-xl text-gray-300">Xem bản đồ thế giới CornMiner trực tiếp! Quan sát khu vực, nhà, công
-                    trình và vị trí người chơi đang online – tất cả được cập nhật theo thời gian thực nhờ Dynmap.</p>
-            </div>
-            <div class="glass-effect rounded-2xl p-8 mb-10">
-                <div class="map-container">
-                    <div class="map-placeholder">
-                        <div class="text-8xl mb-6 floating-icon">
-                            🗺️
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 corn-text">Bản đồ tương tác thế giới</h3>
-                        <p class="text-gray-400 mb-6 text-lg">Tích hợp Dynmap sẽ được nhúng tại đây</p>
-                        <div class="text-base text-gray-400 space-y-2">
-                            <p>🔎 Phóng to, thu nhỏ, và khám phá toàn bộ bản đồ ngay trên trình duyệt</p>
-                            <p>👥 Xem vị trí người chơi theo thời gian thực</p>
-                            <p>🏗️ Khám phá các công trình và địa danh nổi bật</p>
-                            <p>🌍 Điều hướng đến các chiều không gian khác nhau</p>
-                        </div>
-                    </div>
+        </section>
+
+        <section id="map-section" class="section-hidden fade-in text-center">
+            <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">Bản đồ thế giới</h1>
+            <div
+                class="glass-effect rounded-2xl p-4 mb-10 border border-gray-800 h-[500px] flex items-center justify-center bg-black/50">
+                <div>
+                    <div class="text-8xl mb-6 animate-pulse">🗺️</div>
+                    <h3 class="text-2xl font-bold mb-4 corn-text">Dynmap Live</h3>
+                    <p class="text-gray-400">Đang kết nối tới vệ tinh...</p>
                 </div>
-            </div><!-- Map Controls -->
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <h3 class="text-xl font-bold mb-6 minecraft-font corn-text">🌍 Thế giới chính</h3>
-                    <p class="text-gray-300 mb-6 leading-relaxed">Thế giới sinh tồn chính nơi hầu hết người chơi xây
-                        dựng và khám phá.</p><button
-                        class="w-full corn-gradient text-white py-3 px-6 rounded-xl font-bold hover:shadow-lg transition-all">
-                        Xem thế giới chính </button>
+                    <h3 class="text-xl font-bold mb-4 corn-text">🌍 Overworld</h3><button
+                        class="w-full corn-gradient text-white py-2 rounded-lg font-bold">Xem ngay</button>
                 </div>
                 <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <h3 class="text-xl font-bold mb-6 minecraft-font corn-text">🔥 Nether</h3>
-                    <p class="text-gray-300 mb-6 leading-relaxed">Chiều không gian nguy hiểm đầy tài nguyên độc đáo và
-                        thử thách khó khăn.</p><button
-                        class="w-full bg-red-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-red-700 transition-colors">
-                        Xem Nether </button>
+                    <h3 class="text-xl font-bold mb-4 text-red-500">🔥 Nether</h3><button
+                        class="w-full bg-red-600 text-white py-2 rounded-lg font-bold">Xem ngay</button>
                 </div>
                 <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <h3 class="text-xl font-bold mb-6 minecraft-font corn-text">🌟 The End</h3>
-                    <p class="text-gray-300 mb-6 leading-relaxed">Nơi ở của Ender Dragon và những thành phố End bí ẩn.
-                    </p><button
-                        class="w-full bg-purple-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-purple-700 transition-colors">
-                        Xem The End </button>
-                </div>
-            </div>
-        </section><!-- Leaderboards Section -->
-        <section id="leaderboard-section" class="section-hidden fade-in">
-            <div class="mb-10">
-                <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">Bảng xếp hạng máy chủ</h1>
-                <p class="text-xl text-gray-300">Cạnh tranh cùng bạn bè và trở thành người đứng đầu CornMiner.top! Bảng
-                    xếp hạng được cập nhật thường xuyên.</p>
-            </div><!-- Leaderboard Categories -->
-            <div class="mb-10">
-                <div class="flex flex-wrap gap-4"><button onclick="showLeaderboard('playtime')"
-                        class="corn-gradient text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all">
-                        ⏱️ Top thời gian chơi </button> <button onclick="showLeaderboard('kills')"
-                        class="glass-effect text-white px-6 py-3 rounded-xl hover:bg-white/20 transition-colors font-semibold">
-                        🗡️ Top tiêu diệt </button> <button onclick="showLeaderboard('money')"
-                        class="glass-effect text-white px-6 py-3 rounded-xl hover:bg-white/20 transition-colors font-semibold">
-                        💰 Top tài sản </button> <button onclick="showLeaderboard('achievements')"
-                        class="glass-effect text-white px-6 py-3 rounded-xl hover:bg-white/20 transition-colors font-semibold">
-                        🧱 Top thành tựu </button>
-                </div>
-            </div><!-- Leaderboard Content -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10"><!-- Main Leaderboard -->
-                <div class="glass-effect rounded-2xl p-8">
-                    <h2 id="leaderboard-title" class="text-2xl font-bold minecraft-font mb-8 corn-text">⏱️ Top thời gian
-                        chơi</h2>
-                    <div id="leaderboard-content" class="space-y-5">
-                        <div class="leaderboard-item rank-1 rounded-xl p-6">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center"><span class="text-3xl mr-4">🥇</span>
-                                    <div>
-                                        <p class="font-bold text-lg">CornKing_VN</p>
-                                        <p class="text-sm text-gray-400">Cấp 92 • Huyền thoại</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-yellow-400 text-lg">1,847 giờ</p>
-                                    <p class="text-sm text-gray-400">Từ 2022</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="leaderboard-item rank-2 rounded-xl p-6">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center"><span class="text-3xl mr-4">🥈</span>
-                                    <div>
-                                        <p class="font-bold text-lg">BuilderPro</p>
-                                        <p class="text-sm text-gray-400">Cấp 78 • Kiến trúc sư</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-gray-300 text-lg">1,456 giờ</p>
-                                    <p class="text-sm text-gray-400">Từ 2022</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="leaderboard-item rank-3 rounded-xl p-6">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center"><span class="text-3xl mr-4">🥉</span>
-                                    <div>
-                                        <p class="font-bold text-lg">RedstoneVN</p>
-                                        <p class="text-sm text-gray-400">Cấp 69 • Kỹ sư</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold text-orange-400 text-lg">1,223 giờ</p>
-                                    <p class="text-sm text-gray-400">Từ 2023</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="leaderboard-item rank-other rounded-xl p-6">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center"><span
-                                        class="text-xl mr-4 text-gray-400 font-bold">4</span>
-                                    <div>
-                                        <p class="font-bold text-lg">CraftMaster</p>
-                                        <p class="text-sm text-gray-400">Cấp 61 • Thợ thủ công</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold corn-text text-lg">954 giờ</p>
-                                    <p class="text-sm text-gray-400">Từ 2023</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="leaderboard-item rank-other rounded-xl p-6">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center"><span
-                                        class="text-xl mr-4 text-gray-400 font-bold">5</span>
-                                    <div>
-                                        <p class="font-bold text-lg">PvPWarrior</p>
-                                        <p class="text-sm text-gray-400">Cấp 55 • Chiến binh</p>
-                                    </div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="font-bold corn-text text-lg">832 giờ</p>
-                                    <p class="text-sm text-gray-400">Từ 2023</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div><!-- Statistics Panel -->
-                <div class="space-y-8">
-                    <div class="halloween-card rounded-2xl p-8">
-                        <h3 class="text-xl font-bold minecraft-font mb-6 corn-text">📊 Thống kê máy chủ</h3>
-                        <div class="space-y-5">
-                            <div class="flex justify-between items-center"><span
-                                    class="text-gray-400 font-semibold">Tổng khối đã đặt:</span> <span
-                                    class="font-bold corn-text text-lg">23,847,291</span>
-                            </div>
-                            <div class="flex justify-between items-center"><span
-                                    class="text-gray-400 font-semibold">Tổng số lần chết:</span> <span
-                                    class="font-bold text-red-400 text-lg">456,789</span>
-                            </div>
-                            <div class="flex justify-between items-center"><span
-                                    class="text-gray-400 font-semibold">Quái vật đã tiêu diệt:</span> <span
-                                    class="font-bold text-orange-400 text-lg">1,847,293</span>
-                            </div>
-                            <div class="flex justify-between items-center"><span class="text-gray-400 font-semibold">Vật
-                                    phẩm đã chế tạo:</span> <span
-                                    class="font-bold text-blue-400 text-lg">8,923,847</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="halloween-card rounded-2xl p-8">
-                        <h3 class="text-xl font-bold minecraft-font mb-6 corn-text">🏆 Thành tựu gần đây</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center"><span class="text-3xl mr-4">🎯</span>
-                                <div>
-                                    <p class="font-bold">CornKing_VN</p>
-                                    <p class="text-sm text-gray-400">Đánh bại Ender Dragon</p>
-                                </div>
-                                <div class="achievement-badge ml-auto">
-                                    Mới
-                                </div>
-                            </div>
-                            <div class="flex items-center"><span class="text-3xl mr-4">💎</span>
-                                <div>
-                                    <p class="font-bold">MinerExpert</p>
-                                    <p class="text-sm text-gray-400">Tìm được 1000 kim cương</p>
-                                </div>
-                                <div class="achievement-badge ml-auto">
-                                    Hiếm
-                                </div>
-                            </div>
-                            <div class="flex items-center"><span class="text-3xl mr-4">🏰</span>
-                                <div>
-                                    <p class="font-bold">BuilderPro</p>
-                                    <p class="text-sm text-gray-400">Xây dựng siêu công trình</p>
-                                </div>
-                                <div class="achievement-badge ml-auto">
-                                    Epic
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section><!-- News & Updates Section -->
-        <section id="news-section" class="section-hidden fade-in">
-            <div class="mb-10">
-                <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">Tin tức &amp; Cập nhật</h1>
-                <p class="text-xl text-gray-300">Luôn cập nhật những thay đổi mới nhất trong CornMiner.top! Các bản cập
-                    nhật, chỉnh sửa và sự kiện đặc biệt.</p>
-            </div><!-- Featured Update -->
-            <div class="glass-effect rounded-2xl p-10 mb-10 card-hover">
-                <div class="flex items-start justify-between mb-6">
-                    <div><span class="corn-gradient text-white px-4 py-2 rounded-full text-sm font-bold">SỰ KIỆN NỔI
-                            BẬT</span>
-                        <h2 class="text-3xl font-bold minecraft-font mt-4 corn-text">Lễ hội Halloween CornMiner 2024
-                        </h2>
-                        <p class="text-gray-400 text-base mt-2">15 tháng 10, 2024 • Phiên bản 1.20.4</p>
-                    </div>
-                    <div class="text-6xl floating-icon">
-                        🎃
-                    </div>
-                </div>
-                <p class="text-gray-300 mb-6 text-lg leading-relaxed">Tham gia lễ hội Halloween lớn nhất từ trước đến
-                    nay! Khám phá Vương quốc Ma quái mới, tham gia các trận chiến với quái vật Halloween, xây dựng những
-                    tác phẩm kinh dị và nhận những phần thưởng độc quyền theo chủ đề Halloween. Sự kiện kéo dài đến 15
-                    tháng 11 với các thử thách hàng ngày!</p>
-                <div class="flex flex-wrap gap-3"><span
-                        class="bg-orange-500/20 text-orange-300 px-3 py-2 rounded-xl text-sm font-semibold">Khu vực
-                        mới</span> <span
-                        class="bg-purple-500/20 text-purple-300 px-3 py-2 rounded-xl text-sm font-semibold">Vật phẩm đặc
-                        biệt</span> <span
-                        class="bg-red-500/20 text-red-300 px-3 py-2 rounded-xl text-sm font-semibold">Có thời hạn</span>
-                </div>
-            </div><!-- News Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="news-card rounded-2xl p-8 card-hover">
-                    <div class="flex items-start justify-between mb-6">
-                        <div>
-                            <h3 class="text-xl font-bold minecraft-font corn-text">Cân bằng hệ thống kinh tế</h3>
-                            <p class="text-gray-400 text-sm mt-2">10 tháng 10, 2024 • Bản vá 1.20.3b</p>
-                        </div>
-                        <div class="text-3xl">
-                            💰
-                        </div>
-                    </div>
-                    <p class="text-gray-300 text-base mb-6 leading-relaxed">Chúng tôi đã điều chỉnh giá cả cửa hàng và
-                        cơ chế giao dịch để tạo ra một nền kinh tế cân bằng hơn. Giá kim cương đã giảm 15% và thêm nhiều
-                        cơ hội giao dịch mới.</p>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-2"><span
-                                class="bg-orange-500/20 text-orange-300 px-2 py-1 rounded text-xs font-semibold">Kinh
-                                tế</span> <span
-                                class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs font-semibold">Cân
-                                bằng</span>
-                        </div><button class="corn-text hover:text-orange-300 text-sm font-semibold">Đọc thêm →</button>
-                    </div>
-                </div>
-                <div class="news-card rounded-2xl p-8 card-hover">
-                    <div class="flex items-start justify-between mb-6">
-                        <div>
-                            <h3 class="text-xl font-bold minecraft-font corn-text">Đấu trường PvP mới</h3>
-                            <p class="text-gray-400 text-sm mt-2">8 tháng 10, 2024 • Cập nhật nội dung</p>
-                        </div>
-                        <div class="text-3xl">
-                            ⚔️
-                        </div>
-                    </div>
-                    <p class="text-gray-300 text-base mb-6 leading-relaxed">Đấu trường Colosseum đã mở cửa cho các trận
-                        chiến PvP hoành tráng! Có nhiều chế độ game bao gồm đấu tay đôi 1v1, chiến đấu đội nhóm và thi
-                        đấu vua của ngọn đồi.</p>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-2"><span
-                                class="bg-red-500/20 text-red-300 px-2 py-1 rounded text-xs font-semibold">PvP</span>
-                            <span class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs font-semibold">Đấu
-                                trường</span>
-                        </div><button class="corn-text hover:text-orange-300 text-sm font-semibold">Đọc thêm →</button>
-                    </div>
-                </div>
-                <div class="news-card rounded-2xl p-8 card-hover">
-                    <div class="flex items-start justify-between mb-6">
-                        <div>
-                            <h3 class="text-xl font-bold minecraft-font corn-text">Phù phép tùy chỉnh mới</h3>
-                            <p class="text-gray-400 text-sm mt-2">5 tháng 10, 2024 • Cập nhật tính năng</p>
-                        </div>
-                        <div class="text-3xl">
-                            ✨
-                        </div>
-                    </div>
-                    <p class="text-gray-300 text-base mb-6 leading-relaxed">Khám phá 15 phù phép tùy chỉnh mới bao gồm
-                        Telekinesis, Auto-Smelt và Lightning Strike. Tìm sách phù phép trong kho báu dungeon hoặc giao
-                        dịch với NPC Enchanter mới.</p>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-2"><span
-                                class="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs font-semibold">Phù
-                                phép</span> <span
-                                class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs font-semibold">Tùy
-                                chỉnh</span>
-                        </div><button class="corn-text hover:text-orange-300 text-sm font-semibold">Đọc thêm →</button>
-                    </div>
-                </div>
-                <div class="news-card rounded-2xl p-8 card-hover">
-                    <div class="flex items-start justify-between mb-6">
-                        <div>
-                            <h3 class="text-xl font-bold minecraft-font corn-text">Tăng hiệu suất máy chủ</h3>
-                            <p class="text-gray-400 text-sm mt-2">1 tháng 10, 2024 • Cập nhật kỹ thuật</p>
-                        </div>
-                        <div class="text-3xl">
-                            ⚡
-                        </div>
-                    </div>
-                    <p class="text-gray-300 text-base mb-6 leading-relaxed">Các tối ưu hóa máy chủ lớn đã được triển
-                        khai, giảm lag 45% và cải thiện tốc độ tải chunk. Tận hưởng gameplay mượt mà hơn và khám phá thế
-                        giới nhanh hơn!</p>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-2"><span
-                                class="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs font-semibold">Hiệu
-                                suất</span> <span
-                                class="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs font-semibold">Tối ưu
-                                hóa</span>
-                        </div><button class="corn-text hover:text-orange-300 text-sm font-semibold">Đọc thêm →</button>
-                    </div>
-                </div>
-            </div>
-        </section><!-- Guide Section -->
-        <section id="guide-section" class="section-hidden fade-in">
-            <div class="mb-10">
-                <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">Hướng dẫn người chơi</h1>
-                <p class="text-xl text-gray-300">Mọi thứ bạn cần biết để bắt đầu và làm chủ máy chủ CornMiner của chúng
-                    tôi</p>
-            </div><!-- Quick Start Guide -->
-            <div class="glass-effect rounded-2xl p-10 mb-10">
-                <h2 class="text-3xl font-bold minecraft-font mb-8 corn-text">🚀 Hướng dẫn bắt đầu nhanh</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-                    <div>
-                        <h3 class="text-xl font-bold mb-6 corn-text">Bắt đầu chơi</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-start"><span
-                                    class="corn-gradient text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-1">1</span>
-                                <div>
-                                    <p class="font-bold text-lg">Tham gia máy chủ</p>
-                                    <p class="text-gray-400">Sử dụng IP: <span id="guide-server-ip"
-                                            class="corn-text font-semibold">cornminer.top</span></p>
-                                </div>
-                            </div>
-                            <div class="flex items-start"><span
-                                    class="corn-gradient text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-1">2</span>
-                                <div>
-                                    <p class="font-bold text-lg">Đọc luật chơi</p>
-                                    <p class="text-gray-400">Gõ <code
-                                            class="bg-gray-800 px-2 py-1 rounded text-orange-300">/rules</code> trong
-                                        chat</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start"><span
-                                    class="corn-gradient text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-1">3</span>
-                                <div>
-                                    <p class="font-bold text-lg">Bảo vệ đất đai</p>
-                                    <p class="text-gray-400">Sử dụng <code
-                                            class="bg-gray-800 px-2 py-1 rounded text-orange-300">/claim</code> để bảo
-                                        vệ công trình</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start"><span
-                                    class="corn-gradient text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold mr-4 mt-1">4</span>
-                                <div>
-                                    <p class="font-bold text-lg">Bắt đầu xây dựng</p>
-                                    <p class="text-gray-400">Tìm một vị trí đẹp và tạo căn cứ đầu tiên của bạn</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-bold mb-6 corn-text">Lệnh cần thiết</h3>
-                        <div class="space-y-3">
-                            <div class="bg-gray-800 rounded-xl p-4"><code
-                                    class="text-orange-400 font-bold">/spawn</code> <span class="text-gray-400 ml-3">-
-                                    Quay về điểm spawn</span>
-                            </div>
-                            <div class="bg-gray-800 rounded-xl p-4"><code
-                                    class="text-orange-400 font-bold">/home set [tên]</code> <span
-                                    class="text-gray-400 ml-3">- Đặt vị trí nhà</span>
-                            </div>
-                            <div class="bg-gray-800 rounded-xl p-4"><code
-                                    class="text-orange-400 font-bold">/tpa [người chơi]</code> <span
-                                    class="text-gray-400 ml-3">- Yêu cầu dịch chuyển đến người chơi</span>
-                            </div>
-                            <div class="bg-gray-800 rounded-xl p-4"><code class="text-orange-400 font-bold">/shop</code>
-                                <span class="text-gray-400 ml-3">- Mở cửa hàng máy chủ</span>
-                            </div>
-                            <div class="bg-gray-800 rounded-xl p-4"><code
-                                    class="text-orange-400 font-bold">/balance</code> <span class="text-gray-400 ml-3">-
-                                    Kiểm tra số tiền của bạn</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div><!-- Guide Categories -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-5xl mb-6 floating-icon">
-                            🏠
-                        </div>
-                        <h3 class="text-xl font-bold minecraft-font mb-4 corn-text">Xây dựng &amp; Bảo vệ</h3>
-                        <p class="text-gray-300 text-base mb-6 leading-relaxed">Học cách bảo vệ công trình và tạo ra
-                            những cấu trúc tuyệt vời</p><button
-                            class="w-full corn-gradient text-white py-3 px-6 rounded-xl font-bold hover:shadow-lg transition-all">
-                            Đọc hướng dẫn </button>
-                    </div>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-5xl mb-6 floating-icon">
-                            💰
-                        </div>
-                        <h3 class="text-xl font-bold minecraft-font mb-4 corn-text">Hệ thống kinh tế</h3>
-                        <p class="text-gray-300 text-base mb-6 leading-relaxed">Làm chủ giao dịch, cửa hàng và chiến
-                            lược kiếm tiền</p><button
-                            class="w-full bg-green-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-green-700 transition-colors">
-                            Đọc hướng dẫn </button>
-                    </div>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-5xl mb-6 floating-icon">
-                            ⚔️
-                        </div>
-                        <h3 class="text-xl font-bold minecraft-font mb-4 corn-text">PvP &amp; Chiến đấu</h3>
-                        <p class="text-gray-300 text-base mb-6 leading-relaxed">Trở thành chiến binh bậc thầy với mẹo và
-                            chiến thuật chiến đấu</p><button
-                            class="w-full bg-red-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-red-700 transition-colors">
-                            Đọc hướng dẫn </button>
-                    </div>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-5xl mb-6 floating-icon">
-                            🎭
-                        </div>
-                        <h3 class="text-xl font-bold minecraft-font mb-4 corn-text">Sự kiện &amp; Minigame</h3>
-                        <p class="text-gray-300 text-base mb-6 leading-relaxed">Tham gia các sự kiện máy chủ và minigame
-                            cạnh tranh</p><button
-                            class="w-full bg-purple-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-purple-700 transition-colors">
-                            Đọc hướng dẫn </button>
-                    </div>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-5xl mb-6 floating-icon">
-                            🔧
-                        </div>
-                        <h3 class="text-xl font-bold minecraft-font mb-4 corn-text">Tính năng tùy chỉnh</h3>
-                        <p class="text-gray-300 text-base mb-6 leading-relaxed">Khám phá các plugin độc đáo và cơ chế
-                            tùy chỉnh của máy chủ</p><button
-                            class="w-full bg-orange-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-orange-700 transition-colors">
-                            Đọc hướng dẫn </button>
-                    </div>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-5xl mb-6 floating-icon">
-                            📋
-                        </div>
-                        <h3 class="text-xl font-bold minecraft-font mb-4 corn-text">Luật &amp; Hướng dẫn</h3>
-                        <p class="text-gray-300 text-base mb-6 leading-relaxed">Luật máy chủ quan trọng và hướng dẫn
-                            cộng đồng</p><button
-                            class="w-full bg-gray-600 text-white py-3 px-6 rounded-xl font-bold hover:bg-gray-700 transition-colors">
-                            Đọc hướng dẫn </button>
-                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-purple-400">🌟 The End</h3><button
+                        class="w-full bg-purple-600 text-white py-2 rounded-lg font-bold">Xem ngay</button>
                 </div>
             </div>
         </section>
-    </main><!-- Success Message -->
-    <div id="success-message"
-        class="fixed bottom-6 right-6 corn-gradient text-white px-8 py-4 rounded-xl shadow-2xl section-hidden">
-        <div class="flex items-center"><span class="mr-3 text-xl">✓</span> <span id="success-text"
-                class="font-bold">Thành công!</span>
-        </div>
-    </div>
-    <script src="/assets/js/main.js"></script>
-    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'9961dcb46034fd32',t:'MTc2MTczMjQwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+
+        <section id="leaderboard-section" class="section-hidden fade-in text-center">
+            <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">Bảng Xếp Hạng</h1>
+            <div class="mb-10 flex justify-center flex-wrap gap-4">
+                <button onclick="showLeaderboard('playtime')"
+                    class="corn-gradient text-white px-6 py-2 rounded-xl font-bold">⏱️ Online</button>
+                <button onclick="showLeaderboard('kills')"
+                    class="glass-effect text-white px-6 py-2 rounded-xl font-bold">🗡️ Kills</button>
+                <button onclick="showLeaderboard('money')"
+                    class="glass-effect text-white px-6 py-2 rounded-xl font-bold">💰 Money</button>
+            </div>
+            <div class="glass-effect rounded-2xl p-8 border border-gray-800">
+                <h2 id="leaderboard-title" class="text-2xl font-bold mb-4 corn-text">⏱️ Top thời gian chơi</h2>
+                <p class="text-gray-300">Dữ liệu đang được đồng bộ...</p>
+            </div>
+        </section>
+
+        <section id="news-section" class="section-hidden fade-in">
+        </section>
+
+        <section id="guide-section" class="section-hidden fade-in">
+            <div id="guide-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+        </section>
+
+        <section id="forum-section" class="section-hidden fade-in">
+            <div class="mb-8 text-center">
+                <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">DIỄN ĐÀN CỘNG ĐỒNG</h1>
+                <p class="text-gray-300">Thảo luận - Chém gió - Góp ý (Admin/Dev duyệt bài)</p>
+            </div>
+            <div class="flex justify-between items-center mb-8 glass-effect p-4 rounded-xl border border-gray-800">
+                <div class="flex gap-2">
+                    <button class="px-4 py-2 rounded-lg bg-orange-600 text-white font-bold"
+                        onclick="filterForum('approved')">Bài viết</button>
+                    <button id="btn-pending-posts"
+                        class="hidden-force px-4 py-2 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600"
+                        onclick="filterForum('pending')">Duyệt bài ⚠️</button>
+                </div>
+                <button onclick="openPostModal('forum')"
+                    class="corn-gradient text-white px-6 py-2 rounded-xl font-bold hover:shadow-lg">✍️ Đăng bài</button>
+            </div>
+            <div id="forum-container" class="grid gap-4">
+                <div class="text-center py-10 text-gray-500">Đang tải thảo luận...</div>
+            </div>
+        </section>
+
+    </main>
+
+    <script type="module" src="assets/js/main.js"></script>
 </body>
 
 </html>
