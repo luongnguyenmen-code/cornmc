@@ -234,21 +234,47 @@ window.changeUserRole = async (uid, newRole) => {
 // C. AUTH LOGIC (ĐĂNG NHẬP / ROLE)
 // ==========================================
 
+// --- BẮT ĐẦU ĐOẠN CODE MỚI ---
 onAuthStateChanged(auth, async (user) => {
+    // 1. KHAI BÁO BIẾN CHO CẢ DESKTOP VÀ MOBILE
     const guestActions = document.getElementById('guest-actions');
     const userActions = document.getElementById('user-actions');
+    
+    // Các biến cho Mobile (Mới thêm)
+    const mobileGuest = document.getElementById('mobile-guest-action');
+    const mobileUser = document.getElementById('mobile-user-action');
 
     if (user) {
-        // --- ĐÃ ĐĂNG NHẬP ---
-        guestActions.classList.add('hidden-force');
-        userActions.classList.remove('hidden-force');
+        // ==============================
+        // TRƯỜNG HỢP: ĐÃ ĐĂNG NHẬP
+        // ==============================
         
-        document.getElementById('user-name').textContent = user.displayName;
-        const avatar = user.photoURL || `https://mc-heads.net/avatar/${user.displayName}`;
-        document.getElementById('user-avatar').src = avatar;
+        // A. Ẩn/Hiện Nút Đăng nhập/User
+        // Desktop
+        if(guestActions) guestActions.classList.add('hidden-force');
+        if(userActions) userActions.classList.remove('hidden-force');
+        // Mobile (MỚI)
+        if(mobileGuest) mobileGuest.classList.add('hidden-force');
+        if(mobileUser) mobileUser.classList.remove('hidden-force');
+
+        // B. Cập nhật Avatar và Tên hiển thị
+        const displayName = user.displayName || "Người chơi";
+        const avatar = user.photoURL || `https://mc-heads.net/avatar/${displayName}`;
+        
+        // Điền vào Desktop
+        const desktopName = document.getElementById('user-name');
+        const desktopAvatar = document.getElementById('user-avatar');
+        if(desktopName) desktopName.textContent = displayName;
+        if(desktopAvatar) desktopAvatar.src = avatar;
+
+        // Điền vào Mobile (MỚI)
+        const mobName = document.getElementById('mobile-user-name');
+        const mobAvatar = document.getElementById('mobile-user-avatar');
+        if(mobName) mobName.textContent = displayName;
+        if(mobAvatar) mobAvatar.src = avatar;
 
         try {
-            // Lấy role từ database
+            // C. Lấy Role từ Database
             const userRef = doc(db, "users", user.uid);
             const snap = await getDoc(userRef);
             
@@ -256,39 +282,57 @@ onAuthStateChanged(auth, async (user) => {
                 window.currentUserRole = snap.data().role || 'member';
             } else {
                 window.currentUserRole = 'member';
-                // Tạo user nếu chưa có (Backup)
+                // Tạo user backup nếu lỡ bị xóa
                 await setDoc(userRef, {
-                    username: user.displayName, email: user.email, photoURL: user.photoURL, role: 'member', joinedAt: serverTimestamp()
+                    username: displayName, email: user.email, photoURL: user.photoURL, role: 'member', joinedAt: serverTimestamp()
                 });
             }
             
-            document.getElementById('user-role').textContent = window.currentUserRole;
-            document.getElementById('user-role').className = `role-badge role-${window.currentUserRole} mt-1 ml-0`;
+            // D. Hiển thị Role lên màn hình
+            // Desktop
+            const roleBadge = document.getElementById('user-role');
+            if(roleBadge) {
+                roleBadge.textContent = window.currentUserRole;
+                roleBadge.className = `role-badge role-${window.currentUserRole} mt-1 ml-0`;
+            }
+
+            // Mobile (MỚI)
+            const mobRole = document.getElementById('mobile-user-role');
+            if(mobRole) {
+                mobRole.textContent = window.currentUserRole.toUpperCase();
+                mobRole.className = `text-xs px-2 py-0.5 rounded font-bold uppercase role-${window.currentUserRole}`;
+            }
             
-            // Cập nhật giao diện Admin (Nút đăng bài, menu...)
+            // E. Cập nhật quyền Admin (để hiện nút đăng bài)
             updateAdminUI();
 
-            // --- [QUAN TRỌNG] TỰ ĐỘNG TẢI LẠI FORUM KHI ĐÃ CÓ QUYỀN ---
-            // Nếu đang mở tab diễn đàn, hãy tải lại ngay lập tức để hiện nút Duyệt
+            // F. Tải lại diễn đàn nếu đang xem (để hiện nút duyệt bài cho admin)
             const forumSection = document.getElementById('forum-section');
             if (forumSection && !forumSection.classList.contains('section-hidden')) {
-                // Kiểm tra xem đang ở tab nào (Approved hay Pending) để load lại đúng tab đó
                 const isPendingTab = document.getElementById('btn-pending-posts')?.classList.contains('bg-yellow-600');
                 loadForum(isPendingTab ? 'pending' : 'approved');
             }
-            // -----------------------------------------------------------
 
         } catch (e) { 
             console.error("Lỗi sync user:", e);
         }
     } else {
-        // --- CHƯA ĐĂNG NHẬP ---
+        // ==============================
+        // TRƯỜNG HỢP: CHƯA ĐĂNG NHẬP (GUEST)
+        // ==============================
         window.currentUserRole = 'guest';
-        guestActions.classList.remove('hidden-force');
-        userActions.classList.add('hidden-force');
+        
+        // Reset Desktop
+        if(guestActions) guestActions.classList.remove('hidden-force');
+        if(userActions) userActions.classList.add('hidden-force');
+        
+        // Reset Mobile (MỚI) - Hiện nút đăng nhập, ẩn thông tin user
+        if(mobileGuest) mobileGuest.classList.remove('hidden-force');
+        if(mobileUser) mobileUser.classList.add('hidden-force');
+
         updateAdminUI();
         
-        // Nếu đang ở tab Duyệt bài mà đăng xuất -> Load lại để ẩn đi
+        // Nếu đang ở tab Duyệt bài mà đăng xuất -> Load lại về bài đã duyệt
         loadForum('approved'); 
     }
 });
