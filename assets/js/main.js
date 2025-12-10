@@ -67,7 +67,7 @@ window.showSection = (sectionName) => {
     if (sectionName === 'news') loadNews();
     if (sectionName === 'guide') loadGuides();
     if (sectionName === 'forum') loadForum('approved');
-    
+
     // Đóng mobile menu
     document.getElementById('mobile-menu').classList.add('hidden');
 };
@@ -100,10 +100,10 @@ window.switchAuthMode = (mode) => {
 // Mở Modal Đăng bài
 window.openPostModal = (type) => {
     if (!auth.currentUser) return alert("Vui lòng đăng nhập!");
-    
+
     // --- SỬA Ở ĐÂY: Thêm window. vào trước biến ---
-    const role = window.currentUserRole || 'guest'; 
-    
+    const role = window.currentUserRole || 'guest';
+
     if (type === 'news' && !['admin', 'dev'].includes(role)) return alert("Chỉ Admin mới được đăng tin!");
     if (type === 'guide' && !['admin', 'dev', 'helper'].includes(role)) return alert("Chỉ Helper/Admin mới được đăng hướng dẫn!");
 
@@ -114,7 +114,7 @@ window.openPostModal = (type) => {
 };
 
 window.showLeaderboard = (category) => {
-    document.querySelectorAll('#leaderboard-section button').forEach(btn => 
+    document.querySelectorAll('#leaderboard-section button').forEach(btn =>
         btn.className = 'glass-effect text-white px-6 py-3 rounded-xl hover:bg-white/20 transition-colors font-semibold'
     );
     event.target.className = 'corn-gradient text-white px-6 py-3 rounded-xl font-bold hover:shadow-lg transition-all';
@@ -130,14 +130,14 @@ window.showLeaderboard = (category) => {
 window.openAdminUsersModal = async () => {
     document.getElementById('adminUsersModal').classList.remove('hidden-force');
     window.toggleUserDropdown(); // Đóng menu nhỏ
-    
+
     const tbody = document.getElementById('admin-user-list');
     tbody.innerHTML = '<tr><td colspan="5" class="text-center py-10"><div class="loader"></div><p class="mt-2 text-gray-400">Đang tải dữ liệu...</p></td></tr>';
-    
+
     try {
         const q = query(collection(db, "users"), orderBy("joinedAt", "desc"));
         const snap = await getDocs(q);
-        
+
         let html = '';
         let count = 0;
 
@@ -145,16 +145,16 @@ window.openAdminUsersModal = async () => {
             const u = doc.data();
             count++;
             const isMe = auth.currentUser.uid === doc.id;
-            
+
             // Format ngày tham gia
             const joinedDate = u.joinedAt ? new Date(u.joinedAt.seconds * 1000).toLocaleDateString('vi-VN') : 'N/A';
-            
+
             // Avatar
             const avatarUrl = u.photoURL || `https://mc-heads.net/avatar/${u.username}`;
 
             // Select Role
             const roles = ['member', 'vip', 'media', 'helper', 'dev', 'admin'];
-            let options = roles.map(r => 
+            let options = roles.map(r =>
                 `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`
             ).join('');
 
@@ -188,13 +188,13 @@ window.openAdminUsersModal = async () => {
                 </td>
             </tr>`;
         });
-        
+
         tbody.innerHTML = html;
         document.getElementById('total-users-count').innerText = count;
 
-    } catch (e) { 
+    } catch (e) {
         console.error(e);
-        tbody.innerHTML = `<tr><td colspan="5" class="text-red-500 text-center py-4">Lỗi: ${e.message} (Có thể cần tạo Index)</td></tr>`; 
+        tbody.innerHTML = `<tr><td colspan="5" class="text-red-500 text-center py-4">Lỗi: ${e.message} (Có thể cần tạo Index)</td></tr>`;
     }
 };
 
@@ -214,20 +214,20 @@ window.filterUsers = () => {
 };
 
 window.deleteUserDB = async (uid, name) => {
-    if(!confirm(`CẢNH BÁO: Bạn có chắc muốn xóa data của [${name}] khỏi danh sách? (User vẫn có thể đăng nhập lại nhưng sẽ mất Role/Stats)`)) return;
+    if (!confirm(`CẢNH BÁO: Bạn có chắc muốn xóa data của [${name}] khỏi danh sách? (User vẫn có thể đăng nhập lại nhưng sẽ mất Role/Stats)`)) return;
     try {
         await deleteDoc(doc(db, "users", uid));
         openAdminUsersModal();
-    } catch(e) { alert("Lỗi: " + e.message); }
+    } catch (e) { alert("Lỗi: " + e.message); }
 };
 
 window.changeUserRole = async (uid, newRole) => {
-    if(!confirm(`Xác nhận cấp quyền [${newRole.toUpperCase()}] cho user này?`)) return;
+    if (!confirm(`Xác nhận cấp quyền [${newRole.toUpperCase()}] cho user này?`)) return;
     try {
         await updateDoc(doc(db, "users", uid), { role: newRole });
         alert("✅ Cập nhật quyền thành công!");
-        window.openAdminUsersModal(); 
-    } catch(e) { alert("Lỗi: " + e.message); }
+        window.openAdminUsersModal();
+    } catch (e) { alert("Lỗi: " + e.message); }
 };
 
 // ==========================================
@@ -239,7 +239,7 @@ onAuthStateChanged(auth, async (user) => {
     // 1. KHAI BÁO BIẾN CHO CẢ DESKTOP VÀ MOBILE
     const guestActions = document.getElementById('guest-actions');
     const userActions = document.getElementById('user-actions');
-    
+
     // Các biến cho Mobile (Mới thêm)
     const mobileGuest = document.getElementById('mobile-guest-action');
     const mobileUser = document.getElementById('mobile-user-action');
@@ -248,36 +248,36 @@ onAuthStateChanged(auth, async (user) => {
         // ==============================
         // TRƯỜNG HỢP: ĐÃ ĐĂNG NHẬP
         // ==============================
-        
+
         // A. Ẩn/Hiện Nút Đăng nhập/User
         // Desktop
-        if(guestActions) guestActions.classList.add('hidden-force');
-        if(userActions) userActions.classList.remove('hidden-force');
+        if (guestActions) guestActions.classList.add('hidden-force');
+        if (userActions) userActions.classList.remove('hidden-force');
         // Mobile (MỚI)
-        if(mobileGuest) mobileGuest.classList.add('hidden-force');
-        if(mobileUser) mobileUser.classList.remove('hidden-force');
+        if (mobileGuest) mobileGuest.classList.add('hidden-force');
+        if (mobileUser) mobileUser.classList.remove('hidden-force');
 
         // B. Cập nhật Avatar và Tên hiển thị
         const displayName = user.displayName || "Người chơi";
         const avatar = user.photoURL || `https://mc-heads.net/avatar/${displayName}`;
-        
+
         // Điền vào Desktop
         const desktopName = document.getElementById('user-name');
         const desktopAvatar = document.getElementById('user-avatar');
-        if(desktopName) desktopName.textContent = displayName;
-        if(desktopAvatar) desktopAvatar.src = avatar;
+        if (desktopName) desktopName.textContent = displayName;
+        if (desktopAvatar) desktopAvatar.src = avatar;
 
         // Điền vào Mobile (MỚI)
         const mobName = document.getElementById('mobile-user-name');
         const mobAvatar = document.getElementById('mobile-user-avatar');
-        if(mobName) mobName.textContent = displayName;
-        if(mobAvatar) mobAvatar.src = avatar;
+        if (mobName) mobName.textContent = displayName;
+        if (mobAvatar) mobAvatar.src = avatar;
 
         try {
             // C. Lấy Role từ Database
             const userRef = doc(db, "users", user.uid);
             const snap = await getDoc(userRef);
-            
+
             if (snap.exists()) {
                 window.currentUserRole = snap.data().role || 'member';
             } else {
@@ -287,22 +287,22 @@ onAuthStateChanged(auth, async (user) => {
                     username: displayName, email: user.email, photoURL: user.photoURL, role: 'member', joinedAt: serverTimestamp()
                 });
             }
-            
+
             // D. Hiển thị Role lên màn hình
             // Desktop
             const roleBadge = document.getElementById('user-role');
-            if(roleBadge) {
+            if (roleBadge) {
                 roleBadge.textContent = window.currentUserRole;
                 roleBadge.className = `role-badge role-${window.currentUserRole} mt-1 ml-0`;
             }
 
             // Mobile (MỚI)
             const mobRole = document.getElementById('mobile-user-role');
-            if(mobRole) {
+            if (mobRole) {
                 mobRole.textContent = window.currentUserRole.toUpperCase();
                 mobRole.className = `text-xs px-2 py-0.5 rounded font-bold uppercase role-${window.currentUserRole}`;
             }
-            
+
             // E. Cập nhật quyền Admin (để hiện nút đăng bài)
             updateAdminUI();
 
@@ -313,7 +313,7 @@ onAuthStateChanged(auth, async (user) => {
                 loadForum(isPendingTab ? 'pending' : 'approved');
             }
 
-        } catch (e) { 
+        } catch (e) {
             console.error("Lỗi sync user:", e);
         }
     } else {
@@ -321,27 +321,106 @@ onAuthStateChanged(auth, async (user) => {
         // TRƯỜNG HỢP: CHƯA ĐĂNG NHẬP (GUEST)
         // ==============================
         window.currentUserRole = 'guest';
-        
+
         // Reset Desktop
-        if(guestActions) guestActions.classList.remove('hidden-force');
-        if(userActions) userActions.classList.add('hidden-force');
-        
+        if (guestActions) guestActions.classList.remove('hidden-force');
+        if (userActions) userActions.classList.add('hidden-force');
+
         // Reset Mobile (MỚI) - Hiện nút đăng nhập, ẩn thông tin user
-        if(mobileGuest) mobileGuest.classList.remove('hidden-force');
-        if(mobileUser) mobileUser.classList.add('hidden-force');
+        if (mobileGuest) mobileGuest.classList.remove('hidden-force');
+        if (mobileUser) mobileUser.classList.add('hidden-force');
 
         updateAdminUI();
-        
+
         // Nếu đang ở tab Duyệt bài mà đăng xuất -> Load lại về bài đã duyệt
-        loadForum('approved'); 
+        loadForum('approved');
     }
+});
+
+// ==========================================
+// F. CHỈNH SỬA HỒ SƠ (PROFILE EDIT)
+// ==========================================
+
+// 1. Ẩn/Hiện Modal
+window.toggleProfileModal = () => {
+    const modal = document.getElementById('editProfileModal');
+    modal.classList.toggle('hidden-force');
+
+    // Nếu mở lên thì điền sẵn thông tin cũ
+    if (!modal.classList.contains('hidden-force') && auth.currentUser) {
+        document.getElementById('edit-display-name').value = auth.currentUser.displayName;
+        document.getElementById('edit-photo-url').value = auth.currentUser.photoURL || '';
+        document.getElementById('preview-avatar').src = auth.currentUser.photoURL || `https://mc-heads.net/avatar/${auth.currentUser.displayName}`;
+
+        // Đóng menu dropdown nếu đang mở
+        document.getElementById('user-dropdown-menu').classList.add('hidden-force');
+    }
+};
+
+// 2. Xử lý lưu thay đổi
+document.getElementById('editProfileForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const newName = document.getElementById('edit-display-name').value.trim();
+    let newPhoto = document.getElementById('edit-photo-url').value.trim();
+
+    if (!newName) return alert("Tên không được để trống!");
+
+    // Nếu không nhập link ảnh, tự động lấy skin Minecraft theo tên
+    if (!newPhoto) {
+        newPhoto = `https://mc-heads.net/avatar/${newName}`;
+    }
+
+    const btn = document.getElementById('btn-save-profile');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⏳ Đang lưu...";
+    btn.disabled = true;
+
+    try {
+        // A. Cập nhật bên Auth (Lớp đăng nhập)
+        await updateProfile(auth.currentUser, {
+            displayName: newName,
+            photoURL: newPhoto
+        });
+
+        // B. Cập nhật bên Firestore (Cơ sở dữ liệu - Quan trọng để đồng bộ)
+        const userRef = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(userRef, {
+            username: newName,
+            photoURL: newPhoto
+        });
+
+        // C. Cập nhật giao diện ngay lập tức (Không cần F5)
+        // Desktop
+        document.getElementById('user-name').textContent = newName;
+        document.getElementById('user-avatar').src = newPhoto;
+        // Mobile
+        document.getElementById('mobile-user-name').textContent = newName;
+        document.getElementById('mobile-user-avatar').src = newPhoto;
+
+        alert("✅ Cập nhật hồ sơ thành công!");
+        window.toggleProfileModal(); // Đóng modal
+
+    } catch (e) {
+        console.error(e);
+        alert("Lỗi: " + e.message);
+    } finally {
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+});
+
+// Sự kiện xem trước ảnh khi paste link
+document.getElementById('edit-photo-url')?.addEventListener('input', (e) => {
+    const url = e.target.value;
+    if (url) document.getElementById('preview-avatar').src = url;
 });
 
 function updateAdminUI() {
     const role = window.currentUserRole || 'guest'; // <--- SỬA LẠI CHO CHUẨN
     const isStaff = ['admin', 'dev'].includes(role);
     const isHelper = ['admin', 'dev', 'helper'].includes(role);
-    
+
     document.getElementById('btn-add-news').classList.toggle('hidden-force', !isStaff);
     document.getElementById('btn-add-guide').classList.toggle('hidden-force', !isHelper);
     document.getElementById('btn-pending-posts').classList.toggle('hidden-force', !isStaff);
@@ -350,11 +429,11 @@ function updateAdminUI() {
 
 // Sự kiện Submit Form
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     // [QUAN TRỌNG] Xử lý Google Login + Sync Database
     document.getElementById('googleLoginBtn')?.addEventListener('click', async () => {
-        try { 
-            const result = await signInWithPopup(auth, googleProvider); 
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
 
             // --- BẮT ĐẦU ĐỒNG BỘ USER VÀO FIRESTORE ---
@@ -367,15 +446,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     username: user.displayName,
                     email: user.email,
                     photoURL: user.photoURL,
-                    role: "member", 
+                    role: "member",
                     joinedAt: serverTimestamp()
                 });
                 console.log("Đã tạo user thành công!");
             }
             // ------------------------------------------
 
-            window.toggleAuthModal(); 
-        } 
+            window.toggleAuthModal();
+        }
         catch (e) { alert("Lỗi đăng nhập: " + e.message); }
     });
 
@@ -384,7 +463,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const u = document.getElementById('loginUser').value;
         const p = document.getElementById('loginPass').value;
-        try { await signInWithEmailAndPassword(auth, `${u}@corn.local`, p); window.toggleAuthModal(); } 
+        try { await signInWithEmailAndPassword(auth, `${u}@corn.local`, p); window.toggleAuthModal(); }
         catch (e) { alert("Sai thông tin!"); }
     });
 
@@ -397,11 +476,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const cred = await createUserWithEmailAndPassword(auth, `${u}@corn.local`, p);
             await updateProfile(cred.user, { displayName: u });
             // Tạo data cho user đăng ký thường
-            await setDoc(doc(db, "users", cred.user.uid), { 
-                username: u, 
-                role: 'member', 
+            await setDoc(doc(db, "users", cred.user.uid), {
+                username: u,
+                role: 'member',
                 photoURL: null,
-                joinedAt: serverTimestamp() 
+                joinedAt: serverTimestamp()
             });
             window.toggleAuthModal();
         } catch (e) { alert(e.message); }
@@ -422,8 +501,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await addDoc(collection(db, coll), {
-                title, content, category: type==='news'?category:null,
-                author: auth.currentUser.displayName, 
+                title, content, category: type === 'news' ? category : null,
+                author: auth.currentUser.displayName,
                 authorRole: currentUserRole,
                 authorId: auth.currentUser.uid,
                 status: status,
@@ -431,34 +510,34 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             alert(status === 'pending' ? "Đang chờ duyệt!" : "Đăng thành công!");
             window.togglePostModal();
-            if(type === 'news') loadNews();
-            if(type === 'guide') loadGuides();
-            if(type === 'forum') loadForum('approved');
-        } catch(e) { alert(e.message); }
+            if (type === 'news') loadNews();
+            if (type === 'guide') loadGuides();
+            if (type === 'forum') loadForum('approved');
+        } catch (e) { alert(e.message); }
     });
 });
 
-window.handleLogout = () => { if(confirm("Đăng xuất?")) signOut(auth); };
+window.handleLogout = () => { if (confirm("Đăng xuất?")) signOut(auth); };
 
 // ==========================================
 // D. CONTENT LOGIC (LOAD, DELETE, APPROVE)
 // ==========================================
 
 window.deletePost = async (collectionName, docId) => {
-    if(!confirm("⚠️ Xóa bài viết này?")) return;
+    if (!confirm("⚠️ Xóa bài viết này?")) return;
     try {
         await deleteDoc(doc(db, collectionName, docId));
         alert("Đã xóa!");
-        if(collectionName === 'news') loadNews();
-        if(collectionName === 'guides') loadGuides();
-        if(collectionName === 'forum_posts') loadForum('approved');
-    } catch(e) { alert(e.message); }
+        if (collectionName === 'news') loadNews();
+        if (collectionName === 'guides') loadGuides();
+        if (collectionName === 'forum_posts') loadForum('approved');
+    } catch (e) { alert(e.message); }
 };
 
 async function loadNews() {
     // 1. Chọn section bao quanh để render lại toàn bộ giao diện
-    const el = document.getElementById('news-section'); 
-    
+    const el = document.getElementById('news-section');
+
     // 2. Hiển thị trạng thái Loading + Tiêu đề
     el.innerHTML = `
         <div class="mb-10 flex justify-between items-end">
@@ -474,17 +553,17 @@ async function loadNews() {
         // 3. Lấy dữ liệu từ Firestore (Tin mới nhất lên đầu)
         const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
-        
+
         // --- PHẦN A: TIN TỨC ĐỘNG (TỪ DATABASE) ---
         let dynamicNewsHtml = '';
-        
+
         snap.forEach(doc => {
             const d = doc.data();
-            const date = d.createdAt ? new Date(d.createdAt.seconds*1000).toLocaleDateString('vi-VN') : 'Mới';
+            const date = d.createdAt ? new Date(d.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Mới';
             // Dùng window.currentUserRole để check quyền xóa chính xác
-            const isStaff = ['admin','dev'].includes(window.currentUserRole);
+            const isStaff = ['admin', 'dev'].includes(window.currentUserRole);
             let delBtn = isStaff ? `<button onclick="deletePost('news','${doc.id}')" class="text-red-500 border border-red-500 px-2 rounded text-xs hover:bg-red-500 hover:text-white transition ml-2">Xóa</button>` : '';
-            
+
             // Xử lý nội dung an toàn cho alert
             const safeContent = d.content ? d.content.replace(/'/g, "\\'").replace(/\n/g, '\\n') : '';
 
@@ -492,7 +571,7 @@ async function loadNews() {
             <div class="glass-effect rounded-2xl p-6 border border-gray-800 mb-6 hover:border-orange-500/30 transition-all card-hover">
                 <div class="flex justify-between items-start mb-2">
                     <div class="flex gap-2 items-center">
-                        <span class="corn-gradient text-white px-2 py-1 rounded text-xs font-bold uppercase">${d.category||'TIN'}</span>
+                        <span class="corn-gradient text-white px-2 py-1 rounded text-xs font-bold uppercase">${d.category || 'TIN'}</span>
                         <span class="text-gray-500 text-xs">${date}</span>
                     </div>
                     ${delBtn}
@@ -614,19 +693,19 @@ async function loadNews() {
                 ${staticNewsHtml}
             </div>
         `;
-        
+
         // Cập nhật lại giao diện Admin (ẩn/hiện nút đăng tin)
         updateAdminUI();
 
-    } catch(e) { 
+    } catch (e) {
         console.error(e);
-        el.innerHTML += `<div class="text-center text-red-500">Lỗi tải tin tức: ${e.message}</div>`; 
+        el.innerHTML += `<div class="text-center text-red-500">Lỗi tải tin tức: ${e.message}</div>`;
     }
 }
 
 async function loadGuides() {
     const el = document.getElementById('guide-section'); // Note: Targeting the main section, not just the container
-    
+
     // Show loading state
     el.innerHTML = `
         <div class="mb-10 flex justify-between items-end">
@@ -639,10 +718,10 @@ async function loadGuides() {
         // Fetch dynamic guides from Firestore
         const q = query(collection(db, "guides"), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
-        
+
         // 1. Generate HTML for Dynamic Guides (from Database)
         let dynamicGuidesHtml = '';
-        
+
         // Add a default static card first if you want, or remove this block
         dynamicGuidesHtml += `
             <div class="glass-effect rounded-2xl p-8 border border-gray-800 card-hover">
@@ -792,14 +871,14 @@ async function loadGuides() {
             
             ${staticContentHtml}
         `;
-        
-        el.innerHTML = finalHtml;
-        
-        // Re-run Admin UI check to show/hide the button if needed
-        updateAdminUI(); 
 
-    } catch (e) { 
-        console.error(e); 
+        el.innerHTML = finalHtml;
+
+        // Re-run Admin UI check to show/hide the button if needed
+        updateAdminUI();
+
+    } catch (e) {
+        console.error(e);
         el.innerHTML += `<div class="text-center text-red-500 mt-10">Lỗi tải dữ liệu: ${e.message}</div>`;
     }
 }
@@ -809,7 +888,7 @@ window.filterForum = (status) => loadForum(status);
 async function loadForum(status) {
     const el = document.getElementById('forum-container');
     el.innerHTML = '<div class="text-center py-10"><div class="loader inline-block"></div><div class="mt-2 text-gray-400">Đang tải dữ liệu...</div></div>';
-    
+
     // Đổi màu tab
     const btnApproved = document.querySelector("button[onclick=\"filterForum('approved')\"]");
     const btnPending = document.getElementById('btn-pending-posts');
@@ -826,14 +905,14 @@ async function loadForum(status) {
     try {
         const q = query(collection(db, "forum_posts"), where("status", "==", status), orderBy("createdAt", "desc"));
         const snap = await getDocs(q);
-        
+
         // Quyền hạn
         const currentUid = auth.currentUser ? auth.currentUser.uid : null;
-        const myAdminID = "VvsvQiQsymd03LR6neezKTjoKbz1"; 
+        const myAdminID = "VvsvQiQsymd03LR6neezKTjoKbz1";
         const isStaff = ['admin', 'dev'].includes(window.currentUserRole) || currentUid === myAdminID;
 
         let html = '';
-        let hasPost = false; 
+        let hasPost = false;
 
         if (snap.empty) {
             html = `<div class="text-center text-gray-500 py-10">${status === 'pending' ? 'Không có bài chờ duyệt.' : 'Chưa có bài viết nào.'}</div>`;
@@ -914,20 +993,20 @@ async function loadForum(status) {
         el.innerHTML = html;
 
     } catch (e) {
-        console.error("LỖI:", e); 
+        console.error("LỖI:", e);
         el.innerHTML = `<div class="text-center text-red-400">Lỗi tải dữ liệu: ${e.message}</div>`;
     }
 }
 // Hàm duyệt bài (Đã thêm bắt lỗi permission)
 window.approvePost = async (id) => {
     if (!confirm("Bạn có chắc chắn muốn duyệt bài viết này không?")) return;
-    
+
     try {
         await updateDoc(doc(db, "forum_posts", id), { status: 'approved' });
         // Thông báo nhỏ (Toast) hoặc alert
         alert("✅ Đã duyệt bài viết thành công!");
         // Tải lại danh sách đang chờ
-        loadForum('pending'); 
+        loadForum('pending');
     } catch (e) {
         console.error("Lỗi duyệt bài:", e);
         alert("❌ Lỗi: Bạn không có quyền duyệt bài hoặc hệ thống gặp sự cố.\n" + e.message);
@@ -942,7 +1021,7 @@ window.approvePost = async (id) => {
 window.toggleComments = (postId) => {
     const section = document.getElementById(`comments-section-${postId}`);
     const isHidden = section.classList.contains('hidden-force');
-    
+
     if (isHidden) {
         section.classList.remove('hidden-force');
         loadComments(postId); // Mở ra thì mới tải comment cho nhẹ
@@ -959,7 +1038,7 @@ async function loadComments(postId) {
     try {
         // Query vào sub-collection 'comments'
         const q = query(
-            collection(db, "forum_posts", postId, "comments"), 
+            collection(db, "forum_posts", postId, "comments"),
             orderBy("createdAt", "asc") // Cũ nhất hiện trước (giống chat)
         );
         const snap = await getDocs(q);
@@ -971,12 +1050,12 @@ async function loadComments(postId) {
             snap.forEach(doc => {
                 const c = doc.data();
                 const time = c.createdAt ? new Date(c.createdAt.seconds * 1000).toLocaleString('vi-VN') : '';
-                
+
                 // Check quyền xóa comment
                 const currentUid = auth.currentUser ? auth.currentUser.uid : null;
                 const isMyComment = currentUid === c.uid;
                 const isStaff = ['admin', 'dev'].includes(window.currentUserRole);
-                
+
                 let deleteBtn = '';
                 if (isStaff || isMyComment) {
                     deleteBtn = `<button onclick="deleteComment('${postId}', '${doc.id}')" class="text-red-500 hover:text-red-400 ml-2 text-[10px] font-bold">XÓA</button>`;
@@ -1005,7 +1084,7 @@ async function loadComments(postId) {
 // 3. Gửi bình luận mới
 window.sendComment = async (postId) => {
     if (!auth.currentUser) return alert("Vui lòng đăng nhập để bình luận!");
-    
+
     const input = document.getElementById(`comment-input-${postId}`);
     const content = input.value.trim();
     if (!content) return;
@@ -1038,30 +1117,30 @@ window.sendComment = async (postId) => {
 
 // 4. Xóa bình luận
 window.deleteComment = async (postId, commentId) => {
-    if(!confirm("Xóa bình luận này?")) return;
+    if (!confirm("Xóa bình luận này?")) return;
     try {
         await deleteDoc(doc(db, "forum_posts", postId, "comments", commentId));
         loadComments(postId);
-    } catch(e) { alert("Lỗi: " + e.message); }
+    } catch (e) { alert("Lỗi: " + e.message); }
 };
 
 function createSnowflake() {
-        const snowflake = document.createElement('div');
-        snowflake.classList.add('snowflake');
-        snowflake.innerHTML = '❄'; // Có thể đổi thành ❅ hoặc ❆
-        snowflake.style.left = Math.random() * 100 + 'vw';
-        snowflake.style.animationDuration = Math.random() * 3 + 5 + 's'; // Tốc độ rơi 5-8s
-        snowflake.style.fontSize = Math.random() * 10 + 10 + 'px'; // Kích thước
-        snowflake.style.opacity = Math.random();
-        
-        document.body.appendChild(snowflake);
+    const snowflake = document.createElement('div');
+    snowflake.classList.add('snowflake');
+    snowflake.innerHTML = '❄'; // Có thể đổi thành ❅ hoặc ❆
+    snowflake.style.left = Math.random() * 100 + 'vw';
+    snowflake.style.animationDuration = Math.random() * 3 + 5 + 's'; // Tốc độ rơi 5-8s
+    snowflake.style.fontSize = Math.random() * 10 + 10 + 'px'; // Kích thước
+    snowflake.style.opacity = Math.random();
 
-        // Xóa tuyết sau khi rơi xong để nhẹ máy
-        setTimeout(() => {
-            snowflake.remove();
-        }, 8000);
-    }
-    // Tạo tuyết mỗi 200ms
-    setInterval(createSnowflake, 200);
+    document.body.appendChild(snowflake);
+
+    // Xóa tuyết sau khi rơi xong để nhẹ máy
+    setTimeout(() => {
+        snowflake.remove();
+    }, 8000);
+}
+// Tạo tuyết mỗi 200ms
+setInterval(createSnowflake, 200);
 
 showSection('home');

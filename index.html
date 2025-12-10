@@ -90,6 +90,43 @@
         </div>
     </div>
 
+    <div id="editProfileModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4"
+        style="z-index: 10000;">
+        <div class="glass-panel w-full max-w-md rounded-2xl p-8 relative shadow-2xl animate-fade-in">
+            <button onclick="toggleProfileModal()"
+                class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">✕</button>
+
+            <h2 class="text-2xl font-bold corn-text mb-6 text-center">✏️ Chỉnh sửa hồ sơ</h2>
+
+            <form id="editProfileForm" class="space-y-5">
+                <div class="flex justify-center mb-4">
+                    <img id="preview-avatar" src=""
+                        class="w-20 h-20 rounded-full border-2 border-orange-500 shadow-lg object-cover">
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-2 uppercase">Tên hiển thị (Biệt danh)</label>
+                    <input type="text" id="edit-display-name"
+                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none transition"
+                        placeholder="Nhập tên mới...">
+                </div>
+
+                <div>
+                    <label class="block text-gray-400 text-xs font-bold mb-2 uppercase">Link Avatar (URL Ảnh)</label>
+                    <input type="text" id="edit-photo-url"
+                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none transition"
+                        placeholder="https://example.com/anh.jpg">
+                    <p class="text-[10px] text-gray-500 mt-1">*Mẹo: Dùng link từ Discord hoặc Imgur. Để trống sẽ dùng
+                        Skin Minecraft.</p>
+                </div>
+
+                <button type="submit" id="btn-save-profile"
+                    class="w-full corn-gradient text-white font-bold py-3 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg">💾
+                    LƯU THAY ĐỔI</button>
+            </form>
+        </div>
+    </div>
+
     <div id="adminUsersModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4">
         <div class="glass-panel admin-panel-container w-full max-w-5xl rounded-2xl p-6 relative h-[85vh] flex flex-col">
 
@@ -196,7 +233,7 @@
                                 <span>🛠️ Quản lý người dùng</span>
                             </button>
 
-                            <button class="menu-item" onclick="alert('Tính năng đang phát triển!')">
+                            <button class="menu-item" onclick="toggleProfileModal()">
                                 <span>👤 Hồ sơ cá nhân</span>
                             </button>
 
@@ -236,9 +273,31 @@
                         Diễn đàn</button>
 
                     <div class="border-t border-gray-700 my-2 pt-2">
-                        <button onclick="toggleAuthModal()"
-                            class="block w-full mt-2 corn-gradient text-white px-6 py-3 rounded-xl font-bold shadow-lg text-center">🔑
-                            Đăng nhập / Đăng ký</button>
+
+                        <div id="mobile-guest-action">
+                            <button onclick="toggleAuthModal()"
+                                class="block w-full mt-2 corn-gradient text-white px-6 py-3 rounded-xl font-bold shadow-lg text-center">🔑
+                                Đăng nhập / Đăng ký</button>
+                        </div>
+
+                        <div id="mobile-user-action" class="hidden-force text-center">
+                            <div class="flex items-center justify-center gap-3 mb-3">
+                                <img id="mobile-user-avatar" src=""
+                                    class="w-10 h-10 rounded-full border-2 border-orange-500 object-cover">
+                                <div class="text-left">
+                                    <div id="mobile-user-name" class="font-bold text-white text-lg">Username</div>
+                                    <span id="mobile-user-role"
+                                        class="text-xs bg-gray-700 px-2 py-0.5 rounded text-gray-300">Loading...</span>
+                                </div>
+                                <button onclick="toggleProfileModal()"
+                                    class="ml-2 text-gray-400 hover:text-white bg-white/10 p-2 rounded-lg">👤 Hồ sơ
+                                </button>
+                            </div>
+
+                            <button onclick="handleLogout()"
+                                class="block w-full bg-red-600/20 text-red-400 border border-red-500/50 px-6 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition">⏏
+                                Đăng xuất</button>
+                        </div>
                     </div>
                 </div>
             </div>
