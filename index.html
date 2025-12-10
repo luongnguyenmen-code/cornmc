@@ -127,44 +127,54 @@
         </div>
     </div>
 
-    <div id="adminUsersModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4">
-        <div class="glass-panel admin-panel-container w-full max-w-5xl rounded-2xl p-6 relative h-[85vh] flex flex-col">
+    <div id="adminUsersModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4"
+        style="z-index: 9999;">
+        <div
+            class="glass-panel admin-panel-container w-full max-w-5xl rounded-2xl p-6 relative h-[85vh] flex flex-col animate-fade-in">
 
             <button onclick="document.getElementById('adminUsersModal').classList.add('hidden-force')"
                 class="absolute top-5 right-5 text-gray-400 hover:text-white hover:bg-red-500/20 w-8 h-8 rounded-full flex items-center justify-center transition-all">✕</button>
 
-            <div class="admin-header">
+            <div class="admin-header flex justify-between items-end mb-4 border-b border-gray-700 pb-4">
                 <div>
                     <h2 class="text-2xl font-bold corn-text minecraft-font flex items-center gap-2">
                         <span class="text-3xl">🛡️</span> QUẢN TRỊ VIÊN
                     </h2>
                     <p class="text-xs text-gray-400 mt-1">Quản lý quyền hạn và thành viên</p>
                 </div>
-                <div class="search-box">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="userSearchInput" onkeyup="filterUsers()"
-                        placeholder="Tìm theo tên hoặc email...">
+                <div class="search-box relative">
+                    <span class="search-icon absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
+                    <input type="text" id="userSearchInput" onkeyup="filterUsers()" placeholder="Tìm tên/email..."
+                        class="bg-black/50 border border-gray-600 rounded-xl py-2 pl-10 pr-4 text-white text-sm focus:border-orange-500 outline-none w-64 transition">
                 </div>
             </div>
 
-            <div class="table-wrapper flex-1 custom-scrollbar">
-                <table class="styled-table">
-                    <thead>
+            <div
+                class="table-wrapper flex-1 custom-scrollbar overflow-y-auto bg-black/20 rounded-xl border border-gray-700/50">
+                <table class="styled-table w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-900/90 backdrop-blur-md z-10 border-b border-gray-700">
                         <tr>
-                            <th>Người chơi</th>
-                            <th>Email / ID</th>
-                            <th>Ngày tham gia</th>
-                            <th>Vai trò (Role)</th>
-                            <th>Thao tác</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Người chơi</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Email / ID</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Ngày tham gia</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Vai trò</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Thao tác</th>
                         </tr>
                     </thead>
-                    <tbody id="admin-user-list">
+                    <tbody id="admin-user-list" class="text-sm text-gray-300">
                     </tbody>
                 </table>
+
+                <div class="text-center py-4">
+                    <button id="btn-load-more-users" onclick="loadMoreUsers()"
+                        class="hidden-force text-xs bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition border border-gray-600">
+                        ⬇️ Tải thêm cũ hơn
+                    </button>
+                </div>
             </div>
 
             <div class="mt-4 text-right text-xs text-gray-500 border-t border-gray-700 pt-3">
-                Tổng thành viên: <span id="total-users-count" class="text-white font-bold">0</span>
+                Đã tải: <span id="total-users-count" class="text-white font-bold">0</span> thành viên
             </div>
         </div>
     </div>
@@ -290,16 +300,22 @@
                                         class="text-xs bg-gray-700 px-2 py-0.5 rounded text-gray-300">Loading...</span>
                                 </div>
                                 <button onclick="toggleProfileModal()"
-                                    class="ml-2 text-gray-400 hover:text-white bg-white/10 p-2 rounded-lg">👤 Hồ sơ
-                                </button>
+                                    class="ml-2 text-gray-400 hover:text-white bg-white/10 p-2 rounded-lg">👤 Hồ
+                                    sơ</button>
                             </div>
 
-                            <button onclick="handleLogout()"
-                                class="block w-full bg-red-600/20 text-red-400 border border-red-500/50 px-6 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition">⏏
-                                Đăng xuất</button>
+                            <button id="mobile-btn-admin-panel" onclick="openAdminUsersModal()"
+                                class="hidden-force block w-full mb-2 bg-yellow-600/20 text-yellow-400 border border-yellow-500/50 px-6 py-3 rounded-xl font-bold hover:bg-yellow-600 hover:text-white transition">
+                                🛡️ Quản lý người dùng
+                            </button>
                         </div>
+
+                        <button onclick="handleLogout()"
+                            class="block w-full bg-red-600/20 text-red-400 border border-red-500/50 px-6 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition">⏏
+                            Đăng xuất</button>
                     </div>
                 </div>
+            </div>
             </div>
         </nav>
     </header>

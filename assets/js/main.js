@@ -280,6 +280,9 @@ onAuthStateChanged(auth, async (user) => {
 
             if (snap.exists()) {
                 window.currentUserRole = snap.data().role || 'member';
+                localStorage.setItem('cached_user_role', window.currentUserRole);
+                localStorage.setItem('cached_user_name', user.displayName);
+                localStorage.setItem('cached_user_avatar', user.photoURL);
             } else {
                 window.currentUserRole = 'member';
                 // Tạo user backup nếu lỡ bị xóa
@@ -425,6 +428,9 @@ function updateAdminUI() {
     document.getElementById('btn-add-guide').classList.toggle('hidden-force', !isHelper);
     document.getElementById('btn-pending-posts').classList.toggle('hidden-force', !isStaff);
     document.getElementById('btn-admin-panel').classList.toggle('hidden-force', !isStaff);
+    
+    const mobileAdminBtn = document.getElementById('mobile-btn-admin-panel');
+    if(mobileAdminBtn) mobileAdminBtn.classList.toggle('hidden-force', !isStaff);
 }
 
 // Sự kiện Submit Form
@@ -1142,5 +1148,40 @@ function createSnowflake() {
 }
 // Tạo tuyết mỗi 200ms
 setInterval(createSnowflake, 200);
+
+// --- ĐOẠN CODE MỚI: DÁN VÀO CUỐI FILE MAIN.JS ---
+
+// Hàm khởi động nhanh: Lấy quyền từ bộ nhớ đệm ra dùng ngay lập tức
+(function initFastBoot() {
+    const cachedRole = localStorage.getItem('cached_user_role');
+    const cachedName = localStorage.getItem('cached_user_name') || 'Người chơi'; // Lưu thêm tên nếu muốn
+
+    if (cachedRole) {
+        console.log("⚡ FastBoot: Phát hiện quyền cũ [" + cachedRole + "] -> Kích hoạt giao diện ngay!");
+
+        // 1. Set quyền tạm thời
+        window.currentUserRole = cachedRole;
+
+        // 2. Hiển thị ngay các nút Admin (Desktop & Mobile)
+        updateAdminUI();
+
+        // 3. Ẩn nút đăng nhập, hiện thông tin user trên Mobile ngay lập tức
+        const mobileGuest = document.getElementById('mobile-guest-action');
+        const mobileUser = document.getElementById('mobile-user-action');
+        if (mobileGuest) mobileGuest.classList.add('hidden-force');
+        if (mobileUser) mobileUser.classList.remove('hidden-force');
+
+        // 4. Cập nhật Role Badge (Màu mè cho đẹp)
+        const mobRole = document.getElementById('mobile-user-role');
+        if (mobRole) {
+            mobRole.textContent = cachedRole.toUpperCase();
+            mobRole.className = `text-xs px-2 py-0.5 rounded font-bold uppercase role-${cachedRole}`;
+        }
+
+        // 5. Cập nhật Tên tạm thời (để đỡ bị hiện chữ "Username")
+        const mobName = document.getElementById('mobile-user-name');
+        if (mobName) mobName.textContent = "Xin chào (Đang tải...)";
+    }
+})();
 
 showSection('home');

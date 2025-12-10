@@ -550,7 +550,98 @@ body {
     }
 }
 
-/* --- THÊM VÀO CUỐI FILE style.css --- */
+/* --- MENU DROPDOWN PC: ĐẸP & MƯỢT --- */
+
+/* Khung chứa menu (để canh chỉnh vị trí) */
+.user-menu-container {
+    position: relative;
+}
+
+/* Bản thân cái menu sổ xuống */
+.user-dropdown {
+    position: absolute;
+    top: 100%; /* Nằm ngay dưới nút Avatar */
+    right: 0;
+    width: 260px; /* Rộng hơn chút cho thoáng */
+    margin-top: 12px; /* Cách nút một chút */
+    
+    /* Hiệu ứng kính mờ (Glassmorphism) */
+    background: rgba(15, 23, 42, 0.95); /* Màu nền tối thẫm */
+    backdrop-filter: blur(20px); /* Làm mờ nền phía sau */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Viền mỏng tinh tế */
+    border-radius: 16px; /* Bo tròn góc */
+    
+    /* Bóng đổ mềm mại */
+    box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+    
+    /* Animation hiện ra */
+    transform-origin: top right;
+    animation: dropdownFadeIn 0.2s ease-out;
+    
+    overflow: hidden; /* Để bo tròn góc con bên trong */
+    z-index: 100;
+}
+
+/* Hiệu ứng hiện ra */
+@keyframes dropdownFadeIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Mũi tên nhỏ chỉ lên trên (Optional - cho đẹp) */
+.user-dropdown::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    right: 20px;
+    width: 12px;
+    height: 12px;
+    background: inherit;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    transform: rotate(45deg);
+    z-index: -1;
+}
+
+/* Các mục trong menu */
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #cbd5e1; /* Màu chữ xám sáng */
+    transition: all 0.2s;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03); /* Đường kẻ mờ giữa các mục */
+}
+
+/* Hover vào mục menu */
+.menu-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    padding-left: 20px; /* Hiệu ứng đẩy nhẹ sang phải */
+}
+
+/* Mục cuối cùng không cần gạch chân */
+.menu-item:last-child {
+    border-bottom: none;
+}
+
+/* Nút Đăng xuất (Màu đỏ nhẹ) */
+.menu-item.logout {
+    color: #f87171;
+}
+.menu-item.logout:hover {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+}
+
+/* Icon trong menu (nếu bạn thêm icon vào thẻ span) */
+.menu-item span:first-child {
+    font-size: 1.1rem; /* Icon to hơn chữ chút */
+}
 
 /* Nút xóa */
 .delete-btn {
