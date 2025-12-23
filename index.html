@@ -13,6 +13,18 @@
 </head>
 
 <body class="h-full halloween-bg text-white font-sans relative">
+    <div
+        class="fixed bottom-0 left-4 z-50 hidden 2xl:block pointer-events-none opacity-40 hover:opacity-80 transition-opacity duration-500">
+        <img src="assets/icon/snowman1.png"
+            class="w-40 animate-float-slow filter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+    </div>
+
+    <div
+        class="fixed bottom-0 right-4 z-50 hidden 2xl:block pointer-events-none opacity-40 hover:opacity-80 transition-opacity duration-500">
+        <img src="assets/icon/snowman.png"
+            class="w-40 animate-float-slow filter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
+            style="transform: scaleX(-1);">
+    </div>
 
     <div id="authModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4">
         <div class="glass-panel w-full max-w-md rounded-2xl p-8 relative">
@@ -324,7 +336,11 @@
 
         <section id="home-section" class="fade-in">
             <div class="glass-effect rounded-3xl p-10 mb-10 relative overflow-hidden border border-orange-500/10">
-                <div class="absolute inset-0 corn-gradient opacity-10"></div>
+                <div class="absolute inset-0 z-0">
+                    <img src="/assets/image/nen1.png" alt="Background"
+                        class="w-full h-full object-cover opacity-100 transition-transform duration-1000 group-hover:scale-105">
+                    <div class="absolute inset-0 bg-black/70"></div>
+                </div>
                 <div class="relative z-10 text-center">
                     <h2 id="hero-title" class="text-6xl md:text-7xl font-bold minecraft-font mb-6 corn-text">
                         𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐓𝐎 𝐂𝐎𝐑𝐍 𝐌𝐈𝐍𝐄𝐑</h2>
@@ -338,8 +354,65 @@
                             class="glass-effect text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/20">💬
                             Discord</button>
                     </div>
+                    <div
+                        class="mt-6 inline-flex items-center gap-3 bg-black/40 px-4 py-2 rounded-lg border border-orange-500/30">
+                        <span class="text-2xl">🎁</span>
+                        <span class="text-gray-300 font-mono font-bold tracking-widest text-lg">CORNNOEL</span>
+                        <button onclick="navigator.clipboard.writeText('CORNNOEL'); alert('Đã copy code!')"
+                            class="text-xs bg-orange-600 hover:bg-orange-500 text-white px-2 py-1 rounded">COPY</button>
+                    </div>
                 </div>
             </div>
+
+            <!-- slider -->
+            <!-- <section
+                class="slider-section mb-12 relative group rounded-2xl overflow-hidden shadow-2xl border border-gray-800 h-[400px] md:h-[500px]">
+                <div class="slider-container h-full relative bg-gray-900">
+
+                    <div class="slide active absolute inset-0 transition-opacity duration-700 opacity-100 z-10">
+                        <div class="absolute inset-0 overflow-hidden">
+                            <img src="/assets/image/event1.png"
+                                class="w-full h-full object-cover blur-xl opacity-50 scale-110">
+                            <div class="absolute inset-0 bg-black/20"></div>
+                        </div>
+
+                        <div class="relative z-10 h-full w-full flex items-center justify-center p-6">
+                            <img src="/assets/image/event1.png"
+                                class="h-full w-auto max-w-full object-contain rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] border border-white/10">
+                        </div>
+                    </div>
+
+                    <div class="slide absolute inset-0 transition-opacity duration-700 opacity-0 z-0">
+                        <div class="absolute inset-0 overflow-hidden">
+                            <img src="/assets/image/event2.png"
+                                class="w-full h-full object-cover blur-xl opacity-50 scale-110">
+                            <div class="absolute inset-0 bg-black/20"></div>
+                        </div>
+
+                        <div class="relative z-10 h-full w-full flex items-center justify-center p-6">
+                            <img src="/assets/image/event2.png"
+                                class="h-full w-auto max-w-full object-contain rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] border border-white/10">
+                        </div>
+                    </div>
+
+                </div>
+
+                <button
+                    class="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 hover:bg-orange-600 text-white w-12 h-12 rounded-full z-30 opacity-0 group-hover:opacity-100 transition-all text-xl backdrop-blur-sm border border-white/10"
+                    onclick="changeSlide(-1)">❮</button>
+                <button
+                    class="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 hover:bg-orange-600 text-white w-12 h-12 rounded-full z-30 opacity-0 group-hover:opacity-100 transition-all text-xl backdrop-blur-sm border border-white/10"
+                    onclick="changeSlide(1)">❯</button>
+
+                <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-30">
+                    <span
+                        class="w-3 h-3 rounded-full bg-white/30 cursor-pointer hover:bg-orange-500 transition-all slider-dot active"
+                        onclick="goToSlide(0)"></span>
+                    <span
+                        class="w-3 h-3 rounded-full bg-white/30 cursor-pointer hover:bg-orange-500 transition-all slider-dot"
+                        onclick="goToSlide(1)"></span>
+                </div>
+            </section> -->
 
             <div class="stats-grid mb-12">
                 <div class="glass-effect rounded-2xl p-8 card-hover">

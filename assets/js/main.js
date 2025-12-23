@@ -1149,6 +1149,57 @@ function createSnowflake() {
 // Tạo tuyết mỗi 200ms
 setInterval(createSnowflake, 200);
 
+// ==========================================
+// G. SLIDER LOGIC (MỚI)
+// ==========================================
+
+let currentSlideIndex = 0;
+const slides = document.querySelectorAll('.slide');
+const dots = document.querySelectorAll('.slider-dot');
+
+function showSlide(index) {
+    if (slides.length === 0) return;
+
+    // Xử lý vòng lặp index
+    if (index >= slides.length) currentSlideIndex = 0;
+    else if (index < 0) currentSlideIndex = slides.length - 1;
+    else currentSlideIndex = index;
+
+    // 1. Reset tất cả slide & dot
+    slides.forEach(s => s.classList.remove('active'));
+    dots.forEach(d => d.classList.remove('active'));
+
+    // 2. Kích hoạt slide & dot hiện tại
+    slides[currentSlideIndex].classList.add('active');
+    if(dots[currentSlideIndex]) dots[currentSlideIndex].classList.add('active');
+}
+
+// Hàm cho nút Next/Prev
+window.changeSlide = (direction) => {
+    showSlide(currentSlideIndex + direction);
+}
+
+// Hàm cho nút Dot
+window.goToSlide = (index) => {
+    showSlide(index);
+}
+
+// Tự động chạy slider mỗi 5 giây
+let slideInterval = setInterval(() => {
+    changeSlide(1);
+}, 5000);
+
+// Reset timer khi người dùng bấm nút (để tránh bị trôi ngay khi vừa bấm)
+function resetTimer() {
+    clearInterval(slideInterval);
+    slideInterval = setInterval(() => changeSlide(1), 5000);
+}
+
+// Gắn sự kiện reset timer vào các nút
+document.querySelectorAll('.slider-nav, .slider-dot').forEach(btn => {
+    btn.addEventListener('click', resetTimer);
+});
+
 // --- ĐOẠN CODE MỚI: DÁN VÀO CUỐI FILE MAIN.JS ---
 
 // Hàm khởi động nhanh: Lấy quyền từ bộ nhớ đệm ra dùng ngay lập tức
