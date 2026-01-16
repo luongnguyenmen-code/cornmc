@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="vi" class="h-full">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CornMiner • Premium Minecraft Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="/_sdk/element_sdk.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="assets/css/sty.css">
+</head>
+
+<body class="h-full w-full"><!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-ring"></div>
+        <div class="loader-text title-font">
+            CORNMINER
+        </div>
+    </div><!-- Background -->
+    <canvas id="particle-network"></canvas>
+    <div class="cyber-grid"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div><!-- Animated Light Waves -->
+    <div
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; overflow: hidden;">
+        <div
+            style="position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.15), transparent 50%); animation: wave1 15s ease-in-out infinite;">
+        </div>
+        <div
+            style="position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.1), transparent 50%); animation: wave2 20s ease-in-out infinite;">
+        </div>
+        <div
+            style="position: absolute; width: 200%; height: 200%; top: -50%; left: -50%; background: radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.08), transparent 50%); animation: wave3 25s ease-in-out infinite;">
+        </div>
+    </div><!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20"><!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-12 h-12 rounded-lg glass-panel flex items-center justify-center relative overflow-hidden">
+                        <div
+                            style="position: absolute; inset: 0; background: linear-gradient(135deg, rgba(139, 92, 246, 0.3), rgba(34, 211, 238, 0.3));">
+                        </div><span style="position: relative; font-size: 1.5rem;">⛏️</span>
+                    </div><span class="text-2xl font-black title-font neon-text">CORNMINER</span>
+                </div><!-- Desktop Menu -->
+                <div class="hidden md:flex items-center space-x-1"><a href="#home" class="nav-link active title-font"
+                        data-nav="home">HOME</a> <a href="#map" class="nav-link title-font" data-nav="map">MAP</a> <a
+                        href="#ranking" class="nav-link title-font" data-nav="ranking">RANKING</a> <a href="#news"
+                        class="nav-link title-font" data-nav="news">NEWS</a> <a href="#guide"
+                        class="nav-link title-font" data-nav="guide">GUIDE</a> <a href="#forum"
+                        class="nav-link title-font" data-nav="forum">FORUM</a>
+                </div><!-- Right Section -->
+                <div class="flex items-center space-x-4"><!-- Status -->
+                    <div class="status-online">
+                        <div class="status-dot"></div><span class="text-sm font-bold" id="nav-online">142</span>
+                    </div><!-- Auth Button --> <button id="login-btn"
+                        class="cyber-btn px-6 py-2.5 rounded-lg font-bold text-sm title-font"> LOGIN </button>
+                    <!-- Mobile Menu --> <button class="md:hidden glass-panel p-2 rounded-lg" id="mobile-menu-btn">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg></button>
+                </div>
+            </div><!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden pb-4 space-y-2"><a href="#home"
+                    class="nav-link active block title-font" data-nav="home">HOME</a> <a href="#map"
+                    class="nav-link block title-font" data-nav="map">MAP</a> <a href="#ranking"
+                    class="nav-link block title-font" data-nav="ranking">RANKING</a> <a href="#news"
+                    class="nav-link block title-font" data-nav="news">NEWS</a> <a href="#guide"
+                    class="nav-link block title-font" data-nav="guide">GUIDE</a> <a href="#forum"
+                    class="nav-link block title-font" data-nav="forum">FORUM</a>
+            </div>
+        </div>
+    </nav><!-- Main Content -->
+    <main class="relative z-10 pt-20 w-full h-full"><!-- HOME SECTION -->
+        <section id="section-home" class="content-section active"><!-- Hero -->
+            <div class="min-h-screen flex items-center justify-center px-4 py-20">
+                <div class="max-w-6xl mx-auto text-center"><!-- Main Title -->
+                    <h1 id="main-title"
+                        class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black title-font neon-text mb-6 leading-none">
+                        CORNMINER</h1><!-- Tagline -->
+                    <p id="tagline" class="text-xl sm:text-2xl md:text-3xl mb-12 text-purple-200"
+                        style="letter-spacing: 0.15em;">NEXT-GEN MINECRAFT EXPERIENCE</p><!-- Server IP Box -->
+                    <!-- <div class="glass-intense p-8 rounded-2xl max-w-xl mx-auto mb-12 tilt-card">
+       <p class="text-sm text-purple-300 mb-3 title-font tracking-wider">SERVER ADDRESS</p>
+       <div class="flex items-center justify-center space-x-4 mb-4"><code id="server-ip" class="text-3xl sm:text-4xl font-mono font-bold text-cyan-400">play.cornminer.top</code> <button id="copy-ip" class="glass-panel p-3 rounded-lg hover:bg-purple-500/20 transition">
+         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+         </svg></button>
+       </div>
+       <p id="copy-feedback" class="text-sm text-green-400 opacity-0 transition-opacity">✓ Copied to clipboard!</p>
+      </div> -->
+                    <div class="flex flex-wrap items-center justify-center gap-4 mb-16"><button
+                            class="cyber-btn px-10 py-4 rounded-xl font-bold text-base title-font flex items-center space-x-3">
+                            <span>PLAY NOW</span> <span>⚡</span> </button> <a href="https://discord.gg/cornminer"
+                            target="_blank" rel="noopener noreferrer"
+                            class="cyber-btn-secondary px-10 py-4 rounded-xl font-bold text-base title-font flex items-center space-x-3">
+                            <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                            </svg><span>JOIN DISCORD</span> </a>
+                    </div><!-- Gift Code -->
+                    <div class="glass-panel p-6 rounded-xl max-w-md mx-auto tilt-card">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-4">
+                                <div class="text-4xl">
+                                    🎁
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-xs text-purple-300 title-font tracking-wider">ACTIVE GIFT CODE</p>
+                                    <p id="giftcode" class="text-xl font-bold text-yellow-400 title-font">WELCOME2024
+                                    </p>
+                                </div>
+                            </div><button class="cyber-btn px-5 py-2.5 rounded-lg text-sm font-bold title-font"> CLAIM
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Live Stats -->
+            <div class="max-w-6xl mx-auto px-4 py-20">
+                <h2 class="text-4xl sm:text-5xl font-black title-font text-center mb-12 neon-text">LIVE STATISTICS</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card">
+                        <div class="text-6xl font-black title-font mb-3"
+                            style="background: linear-gradient(135deg, #8b5cf6, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+                            id="stat-online">
+                            142
+                        </div>
+                        <p class="text-purple-200 title-font tracking-wider">PLAYERS ONLINE</p>
+                        <div class="mt-4 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"></div>
+                    </div>
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card"
+                        style="transition-delay: 0.1s;">
+                        <div class="text-6xl font-black title-font mb-3"
+                            style="background: linear-gradient(135deg, #22d3ee, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+                            id="stat-uptime">
+                            99.9%
+                        </div>
+                        <p class="text-purple-200 title-font tracking-wider">SERVER UPTIME</p>
+                        <div class="mt-4 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full"></div>
+                    </div>
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card"
+                        style="transition-delay: 0.2s;">
+                        <div class="text-6xl font-black title-font mb-3"
+                            style="background: linear-gradient(135deg, #8b5cf6, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+                            id="stat-peak">
+                            523
+                        </div>
+                        <p class="text-purple-200 title-font tracking-wider">PEAK RECORD</p>
+                        <div class="mt-4 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div><!-- Features -->
+            <div class="max-w-6xl mx-auto px-4 py-20">
+                <h2 class="text-4xl sm:text-5xl font-black title-font text-center mb-12 neon-text">SERVER HIGHLIGHTS
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-8 rounded-2xl feature-card tilt-card">
+                        <div class="text-5xl mb-6">
+                            ⚔️
+                        </div>
+                        <h3 class="text-2xl font-bold title-font mb-3 text-cyan-400">PVP ARENA</h3>
+                        <p class="text-purple-100/80 leading-relaxed">Professional combat system with ranked matches,
+                            ELO ratings, and exclusive rewards for top fighters.</p>
+                    </div>
+                    <div class="glass-panel p-8 rounded-2xl feature-card tilt-card" style="transition-delay: 0.1s;">
+                        <div class="text-5xl mb-6">
+                            🏗️
+                        </div>
+                        <h3 class="text-2xl font-bold title-font mb-3 text-cyan-400">CREATIVE BUILD</h3>
+                        <p class="text-purple-100/80 leading-relaxed">Unlimited building freedom with WorldEdit,
+                            VoxelSniper, and advanced construction tools.</p>
+                    </div>
+                    <div class="glass-panel p-8 rounded-2xl feature-card tilt-card" style="transition-delay: 0.2s;">
+                        <div class="text-5xl mb-6">
+                            💎
+                        </div>
+                        <h3 class="text-2xl font-bold title-font mb-3 text-cyan-400">ECONOMY</h3>
+                        <p class="text-purple-100/80 leading-relaxed">Advanced economy system with player shops, auction
+                            house, and secure trading marketplace.</p>
+                    </div>
+                </div>
+            </div><!-- Gallery -->
+            <div class="max-w-6xl mx-auto px-4 py-20">
+                <h2 class="text-4xl sm:text-5xl font-black title-font text-center mb-12 neon-text">SHOWCASE</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel rounded-2xl overflow-hidden h-64 tilt-card">
+                        <div class="w-full h-full flex items-center justify-center"
+                            style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(34, 211, 238, 0.2));">
+                            <span class="text-7xl">🏰</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-2xl overflow-hidden h-64 tilt-card">
+                        <div class="w-full h-full flex items-center justify-center"
+                            style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.2), rgba(139, 92, 246, 0.2));">
+                            <span class="text-7xl">⚡</span>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-2xl overflow-hidden h-64 tilt-card">
+                        <div class="w-full h-full flex items-center justify-center"
+                            style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(34, 211, 238, 0.2));">
+                            <span class="text-7xl">🌌</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section><!-- MAP SECTION -->
+        <section id="section-map" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-5xl font-black title-font text-center mb-8 neon-text">LIVE MAP</h2>
+                    <!-- World Selector -->
+                    <div class="flex justify-center space-x-4 mb-8 flex-wrap gap-2"><button
+                            class="cyber-btn px-6 py-3 rounded-lg font-bold title-font text-sm">OVERWORLD</button>
+                        <button
+                            class="cyber-btn-secondary px-6 py-3 rounded-lg font-bold title-font text-sm">NETHER</button>
+                        <button class="cyber-btn-secondary px-6 py-3 rounded-lg font-bold title-font text-sm">THE
+                            END</button>
+                    </div><!-- Map Container -->
+                    <div class="glass-intense rounded-2xl overflow-hidden" style="height: 600px;">
+                        <div class="w-full h-full flex items-center justify-center">
+                            <div class="text-center">
+                                <p class="text-7xl mb-6">🗺️</p>
+                                <p class="text-2xl font-bold title-font text-purple-300 mb-2">INTERACTIVE MAP</p>
+                                <p class="text-sm text-purple-200">Dynmap or BlueMap iframe will be embedded here</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section><!-- RANKING SECTION -->
+        <section id="section-ranking" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-5xl font-black title-font text-center mb-8 neon-text">LEADERBOARD</h2>
+                    <!-- Category Tabs -->
+                    <div class="flex justify-center space-x-4 mb-12 flex-wrap gap-2"><button
+                            class="cyber-btn px-6 py-3 rounded-lg font-bold title-font text-sm">PLAYTIME</button>
+                        <button
+                            class="cyber-btn-secondary px-6 py-3 rounded-lg font-bold title-font text-sm">WEALTH</button>
+                        <button class="cyber-btn-secondary px-6 py-3 rounded-lg font-bold title-font text-sm">PVP
+                            KILLS</button>
+                    </div><!-- Rankings -->
+                    <div class="w-full max-w-4xl mx-auto">
+                        <div class="podium-container">
+                            <div class="podium-card rank-2-card glass-intense rounded-2xl p-6 tilt-card">
+                                <img src="https://ui-avatars.com/api/?name=Master+Build&background=22d3ee&color=000&size=128"
+                                    alt="Player" class="podium-avatar">
+                                <div class="flex-1 w-full">
+                                    <h3 class="text-xl font-bold title-font text-white truncate">MASTERBUILDER</h3>
+                                    <p class="text-xs text-purple-300 mb-2">Architect</p>
+                                    <div class="border-t border-white/10 pt-3 mt-2 w-full">
+                                        <p class="text-2xl font-black title-font text-gray-200">980</p>
+                                        <p class="text-[10px] text-gray-500 tracking-widest">HOURS</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="podium-card rank-1-card glass-intense rounded-2xl p-6 tilt-card">
+                                <div class="crown-icon">👑</div>
+                                <img src="https://ui-avatars.com/api/?name=Player+One&background=8b5cf6&color=fff&size=128"
+                                    alt="Player" class="podium-avatar">
+                                <div class="flex-1 w-full">
+                                    <h3 class="text-2xl font-black title-font text-yellow-400 truncate">PLAYER_ONE</h3>
+                                    <p class="text-sm text-purple-200 mb-2">Elite Warrior</p>
+                                    <div class="border-t border-yellow-500/30 pt-4 mt-2 w-full">
+                                        <p class="text-4xl font-black title-font text-yellow-300">1,250</p>
+                                        <p class="text-xs text-yellow-600/80 tracking-widest font-bold">HOURS PLAYED</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="podium-card rank-3-card glass-intense rounded-2xl p-6 tilt-card">
+                                <img src="https://ui-avatars.com/api/?name=Crafty+Pro&background=fb923c&color=000&size=128"
+                                    alt="Player" class="podium-avatar">
+                                <div class="flex-1 w-full">
+                                    <h3 class="text-xl font-bold title-font text-white truncate">CRAFTYPRO</h3>
+                                    <p class="text-xs text-purple-300 mb-2">Veteran</p>
+                                    <div class="border-t border-white/10 pt-3 mt-2 w-full">
+                                        <p class="text-2xl font-black title-font text-orange-300">845</p>
+                                        <p class="text-[10px] text-gray-500 tracking-widest">HOURS</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="space-y-4 max-w-2xl mx-auto">
+
+                            <div
+                                class="glass-panel p-4 rounded-xl flex items-center space-x-4 hover:bg-white/5 transition-colors">
+                                <div
+                                    class="w-10 h-10 glass-panel rounded-lg flex items-center justify-center font-bold title-font text-lg text-gray-400">
+                                    4</div>
+                                <img src="https://ui-avatars.com/api/?name=Sky+War&background=6366f1&color=fff&size=48"
+                                    alt="Player" class="w-12 h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <h4 class="font-bold title-font text-white">SKYWARRIOR</h4>
+                                    <p class="text-xs text-purple-300">Level 65</p>
+                                </div>
+                                <p class="font-bold text-cyan-400 title-font text-xl">720</p>
+                            </div>
+
+                            <div
+                                class="glass-panel p-4 rounded-xl flex items-center space-x-4 hover:bg-white/5 transition-colors">
+                                <div
+                                    class="w-10 h-10 glass-panel rounded-lg flex items-center justify-center font-bold title-font text-lg text-gray-400">
+                                    5</div>
+                                <img src="https://ui-avatars.com/api/?name=Diamond+Hunt&background=06b6d4&color=000&size=48"
+                                    alt="Player" class="w-12 h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <h4 class="font-bold title-font text-white">DIAMONDHUNTER</h4>
+                                    <p class="text-xs text-purple-300">Level 58</p>
+                                </div>
+                                <p class="font-bold text-cyan-400 title-font text-xl">650</p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section><!-- NEWS SECTION -->
+        <section id="section-news" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-5xl font-black title-font text-center mb-12 neon-text">NEWS &amp; UPDATES</h2>
+                    <div class="space-y-6"><!-- Pinned Post -->
+                        <div class="glass-intense p-8 rounded-2xl forum-post pinned">
+                            <div class="flex items-start space-x-4"><span class="text-4xl">��</span>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-3"><span
+                                            class="bg-yellow-400 text-black px-4 py-1 rounded-lg text-xs font-black title-font">PINNED</span>
+                                        <span class="text-xs text-purple-300">3 days ago</span>
+                                    </div>
+                                    <h3 class="text-2xl font-bold title-font mb-3 text-cyan-400">MAJOR UPDATE - VERSION
+                                        2.0</h3>
+                                    <p class="text-purple-100/80 leading-relaxed mb-4">Server has been upgraded to
+                                        version 2.0 with new features: Custom Enchants, Pet System, and Daily Quests.
+                                        Login now to experience!</p><button
+                                        class="text-cyan-400 font-bold text-sm hover:underline title-font">READ MORE
+                                        →</button>
+                                </div>
+                            </div>
+                        </div><!-- Regular Posts -->
+                        <div class="glass-panel p-6 rounded-xl forum-post">
+                            <div class="flex items-start space-x-4"><span class="text-3xl">🎮</span>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2"><span
+                                            class="text-xs text-purple-300">1 week ago</span>
+                                    </div>
+                                    <h3 class="text-xl font-bold title-font mb-2">SPRING PVP TOURNAMENT 2024</h3>
+                                    <p class="text-purple-100/80 text-sm mb-3">Register for the PVP tournament with
+                                        total prize pool of $500...</p><button
+                                        class="text-cyan-400 font-bold text-sm hover:underline title-font">READ MORE
+                                        →</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-6 rounded-xl forum-post">
+                            <div class="flex items-start space-x-4"><span class="text-3xl">🛠️</span>
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2"><span
+                                            class="text-xs text-purple-300">2 weeks ago</span>
+                                    </div>
+                                    <h3 class="text-xl font-bold title-font mb-2">SERVER MAINTENANCE - HARDWARE UPGRADE
+                                    </h3>
+                                    <p class="text-purple-100/80 text-sm mb-3">Server will be under maintenance for 2
+                                        hours to upgrade hardware...</p><button
+                                        class="text-cyan-400 font-bold text-sm hover:underline title-font">READ MORE
+                                        →</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section><!-- GUIDE SECTION -->
+        <section id="section-guide" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-5xl font-black title-font text-center mb-12 neon-text">PLAYER GUIDES</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="glass-panel p-8 rounded-2xl feature-card tilt-card">
+                            <div class="text-5xl mb-4">
+                                🎯
+                            </div>
+                            <h3 class="text-2xl font-bold title-font mb-3 text-cyan-400">QUICK START</h3>
+                            <p class="text-purple-100/80 leading-relaxed mb-4">Complete guide for new players: How to
+                                join, basic commands, and essential knowledge.</p><button
+                                class="text-cyan-400 font-bold text-sm hover:underline title-font">VIEW GUIDE →</button>
+                        </div>
+                        <div class="glass-panel p-8 rounded-2xl feature-card tilt-card">
+                            <div class="text-5xl mb-4">
+                                💎
+                            </div>
+                            <h3 class="text-2xl font-bold title-font mb-3 text-cyan-400">EARNING MONEY</h3>
+                            <p class="text-purple-100/80 leading-relaxed mb-4">Efficient money-making methods: Mining,
+                                selling resources, and completing quests.</p><button
+                                class="text-cyan-400 font-bold text-sm hover:underline title-font">VIEW GUIDE →</button>
+                        </div>
+                        <div class="glass-panel p-8 rounded-2xl feature-card tilt-card">
+                            <div class="text-5xl mb-4">
+                                ⚔️
+                            </div>
+                            <h3 class="text-2xl font-bold title-font mb-3 text-cyan-400">PVP COMBAT</h3>
+                            <p class="text-purple-100/80 leading-relaxed mb-4">Advanced PVP techniques, combo usage, and
+                                Arena strategies.</p><button
+                                class="text-cyan-400 font-bold text-sm hover:underline title-font">VIEW GUIDE →</button>
+                        </div>
+                        <div class="glass-panel p-8 rounded-2xl feature-card tilt-card">
+                            <div class="text-5xl mb-4">
+                                🏗️
+                            </div>
+                            <h3 class="text-2xl font-bold title-font mb-3 text-cyan-400">BUILDING &amp; WORLDEDIT</h3>
+                            <p class="text-purple-100/80 leading-relaxed mb-4">Guide to using WorldEdit, VoxelSniper,
+                                and modern building tools.</p><button
+                                class="text-cyan-400 font-bold text-sm hover:underline title-font">VIEW GUIDE →</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section><!-- FORUM SECTION -->
+        <section id="section-forum" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="flex items-center justify-between mb-12 flex-wrap gap-4">
+                        <h2 class="text-5xl font-black title-font neon-text">COMMUNITY FORUM</h2><button
+                            id="create-post-btn" class="cyber-btn px-6 py-3 rounded-lg font-bold title-font text-sm"> +
+                            NEW POST </button>
+                    </div>
+                    <div class="space-y-4"><!-- Forum Post 1 -->
+                        <div class="glass-panel p-6 rounded-xl forum-post">
+                            <div class="flex items-start space-x-4"><img
+                                    src="https://ui-avatars.com/api/?name=Player123&amp;background=8b5cf6&amp;color=fff&amp;size=48"
+                                    alt="Avatar" class="w-12 h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2 flex-wrap gap-2">
+                                        <h4 class="font-bold title-font">PLAYER123</h4><span
+                                            class="text-xs text-purple-300">• 2 hours ago</span> <span
+                                            class="bg-green-400/20 text-green-400 px-3 py-1 rounded-lg text-xs font-bold title-font">APPROVED</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold title-font mb-2">Looking for teammates to build a city
+                                    </h3>
+                                    <p class="text-purple-100/80 text-sm mb-3">I'm planning to build a large city and
+                                        need more builders. Anyone interested, DM me!</p>
+                                    <div class="flex items-center space-x-4 text-sm"><button
+                                            class="flex items-center space-x-2 text-purple-300 hover:text-cyan-400 transition">
+                                            <span>💬</span> <span>12</span> </button> <button
+                                            class="flex items-center space-x-2 text-purple-300 hover:text-cyan-400 transition">
+                                            <span>👍</span> <span>25</span> </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- Forum Post 2 -->
+                        <div class="glass-panel p-6 rounded-xl forum-post">
+                            <div class="flex items-start space-x-4"><img
+                                    src="https://ui-avatars.com/api/?name=BuilderPro&amp;background=22d3ee&amp;color=000&amp;size=48"
+                                    alt="Avatar" class="w-12 h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2 flex-wrap gap-2">
+                                        <h4 class="font-bold title-font">BUILDERPRO</h4><span
+                                            class="text-xs text-purple-300">• 5 hours ago</span> <span
+                                            class="bg-green-400/20 text-green-400 px-3 py-1 rounded-lg text-xs font-bold title-font">APPROVED</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold title-font mb-2">Sharing my completed build</h3>
+                                    <p class="text-purple-100/80 text-sm mb-3">After 2 weeks of building, my castle is
+                                        finally complete! Thanks everyone for the help 🏰</p>
+                                    <div class="flex items-center space-x-4 text-sm"><button
+                                            class="flex items-center space-x-2 text-purple-300 hover:text-cyan-400 transition">
+                                            <span>💬</span> <span>8</span> </button> <button
+                                            class="flex items-center space-x-2 text-purple-300 hover:text-cyan-400 transition">
+                                            <span>👍</span> <span>42</span> </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- Forum Post 3 - Pending -->
+                        <div class="glass-panel p-6 rounded-xl forum-post">
+                            <div class="flex items-start space-x-4"><img
+                                    src="https://ui-avatars.com/api/?name=NewPlayer&amp;background=6366f1&amp;color=fff&amp;size=48"
+                                    alt="Avatar" class="w-12 h-12 rounded-lg">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-3 mb-2 flex-wrap gap-2">
+                                        <h4 class="font-bold title-font">NEWPLAYER</h4><span
+                                            class="text-xs text-purple-300">• 1 day ago</span> <span
+                                            class="bg-yellow-400/20 text-yellow-400 px-3 py-1 rounded-lg text-xs font-bold title-font">PENDING</span>
+                                    </div>
+                                    <h3 class="text-lg font-bold title-font mb-2">Question about using the shop</h3>
+                                    <p class="text-purple-100/80 text-sm mb-3">I'm new, don't know how to buy items from
+                                        shop. Can anyone help?</p>
+                                    <div class="flex items-center space-x-4 text-sm"><button
+                                            class="flex items-center space-x-2 text-purple-300 hover:text-cyan-400 transition">
+                                            <span>💬</span> <span>3</span> </button> <button
+                                            class="flex items-center space-x-2 text-purple-300 hover:text-cyan-400 transition">
+                                            <span>👍</span> <span>5</span> </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main><!-- Auth Modal -->
+    <div id="auth-modal" class="modal">
+        <div class="modal-content glass-intense p-8 rounded-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-black title-font neon-text">LOGIN</h2><button id="close-auth-modal"
+                    class="text-purple-300 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
+            </div>
+            <form id="login-form" class="space-y-4">
+                <div><label for="email" class="block text-sm font-bold title-font mb-2 text-purple-200">EMAIL</label>
+                    <input type="email" id="email" class="cyber-input w-full px-4 py-3 rounded-lg"
+                        placeholder="your@email.com">
+                </div>
+                <div><label for="password"
+                        class="block text-sm font-bold title-font mb-2 text-purple-200">PASSWORD</label> <input
+                        type="password" id="password" class="cyber-input w-full px-4 py-3 rounded-lg"
+                        placeholder="••••••••">
+                </div><button type="submit" class="cyber-btn w-full py-3 rounded-lg font-bold title-font"> LOGIN NOW
+                </button>
+            </form>
+            <div class="my-6 flex items-center">
+                <div class="flex-1 border-t border-purple-500/30"></div><span
+                    class="px-4 text-sm text-purple-300">OR</span>
+                <div class="flex-1 border-t border-purple-500/30"></div>
+            </div><button
+                class="cyber-btn-secondary w-full py-3 rounded-lg font-bold title-font flex items-center justify-center space-x-3">
+                <span>🔷</span> <span>LOGIN WITH GOOGLE</span> </button>
+            <p class="text-center text-sm text-purple-300 mt-6">Don't have an account? <button
+                    class="text-cyan-400 font-bold hover:underline">REGISTER NOW</button></p>
+        </div>
+    </div><!-- Create Post Modal -->
+    <div id="post-modal" class="modal">
+        <div class="modal-content glass-intense p-8 rounded-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-black title-font neon-text">NEW POST</h2><button id="close-post-modal"
+                    class="text-purple-300 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg></button>
+            </div>
+            <form id="new-post-form" class="space-y-4">
+                <div><label for="post-title"
+                        class="block text-sm font-bold title-font mb-2 text-purple-200">TITLE</label> <input type="text"
+                        id="post-title" class="cyber-input w-full px-4 py-3 rounded-lg" placeholder="Enter post title">
+                </div>
+                <div><label for="post-category"
+                        class="block text-sm font-bold title-font mb-2 text-purple-200">CATEGORY</label> <select
+                        id="post-category" class="cyber-input w-full px-4 py-3 rounded-lg">
+                        <option>General Discussion</option>
+                        <option>Find Teammates</option>
+                        <option>Showcase Builds</option>
+                        <option>Questions</option>
+                    </select>
+                </div>
+                <div><label for="post-content"
+                        class="block text-sm font-bold title-font mb-2 text-purple-200">CONTENT</label> <textarea
+                        id="post-content" rows="6" class="cyber-input w-full px-4 py-3 rounded-lg resize-none"
+                        placeholder="Write your post content..."></textarea>
+                </div><button type="submit" class="cyber-btn w-full py-3 rounded-lg font-bold title-font"> SUBMIT POST
+                </button>
+            </form>
+        </div>
+    </div>
+    <script>
+        // Config
+        const defaultConfig = {
+            main_title: "CORNMINER",
+            tagline: "NEXT-GEN MINECRAFT EXPERIENCE",
+            server_ip: "play.cornminer.top",
+            players_online: "142",
+            server_uptime: "99.9%",
+            peak_players: "523",
+            giftcode: "WELCOME2024"
+        };
+
+        // Element SDK Init
+        if (window.elementSdk) {
+            window.elementSdk.init({
+                defaultConfig,
+                onConfigChange: async (config) => {
+                    // Update hero
+                    const titleEl = document.getElementById('main-title');
+                    if (titleEl) titleEl.textContent = config.main_title || defaultConfig.main_title;
+
+                    const taglineEl = document.getElementById('tagline');
+                    if (taglineEl) taglineEl.textContent = config.tagline || defaultConfig.tagline;
+
+                    const ipEl = document.getElementById('server-ip');
+                    if (ipEl) ipEl.textContent = config.server_ip || defaultConfig.server_ip;
+
+                    const giftEl = document.getElementById('giftcode');
+                    if (giftEl) giftEl.textContent = config.giftcode || defaultConfig.giftcode;
+
+                    // Update stats
+                    const statOnline = document.getElementById('stat-online');
+                    if (statOnline) statOnline.textContent = config.players_online || defaultConfig.players_online;
+
+                    const statUptime = document.getElementById('stat-uptime');
+                    if (statUptime) statUptime.textContent = config.server_uptime || defaultConfig.server_uptime;
+
+                    const statPeak = document.getElementById('stat-peak');
+                    if (statPeak) statPeak.textContent = config.peak_players || defaultConfig.peak_players;
+
+                    // Update nav status
+                    const navOnline = document.getElementById('nav-online');
+                    if (navOnline) navOnline.textContent = config.players_online || defaultConfig.players_online;
+                },
+                mapToCapabilities: (config) => ({
+                    recolorables: [],
+                    borderables: [],
+                    fontEditable: undefined,
+                    fontSizeable: undefined
+                }),
+                mapToEditPanelValues: (config) => new Map([
+                    ["main_title", config.main_title || defaultConfig.main_title],
+                    ["tagline", config.tagline || defaultConfig.tagline],
+                    ["server_ip", config.server_ip || defaultConfig.server_ip],
+                    ["players_online", config.players_online || defaultConfig.players_online],
+                    ["server_uptime", config.server_uptime || defaultConfig.server_uptime],
+                    ["peak_players", config.peak_players || defaultConfig.peak_players],
+                    ["giftcode", config.giftcode || defaultConfig.giftcode]
+                ])
+            });
+        }
+
+        // Preloader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hidden');
+            }, 2000);
+        });
+
+        // Particle Network System
+        const canvas = document.getElementById('particle-network');
+        const ctx = canvas.getContext('2d');
+        let particlesArray = [];
+        let mouse = { x: null, y: null, radius: 150 };
+
+        // Canvas Setup
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Mouse Interaction
+        window.addEventListener('mousemove', (e) => {
+            mouse.x = e.x;
+            mouse.y = e.y;
+        });
+
+        window.addEventListener('mouseout', () => {
+            mouse.x = null;
+            mouse.y = null;
+        });
+
+        // Particle Class
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 1 - 0.5;
+                this.speedY = Math.random() * 1 - 0.5;
+                this.color = Math.random() > 0.5 ? 'rgba(139, 92, 246, 0.8)' : 'rgba(34, 211, 238, 0.8)';
+            }
+
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+
+                // Bounce off edges
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+
+                // Mouse repulsion
+                if (mouse.x && mouse.y) {
+                    const dx = mouse.x - this.x;
+                    const dy = mouse.y - this.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < mouse.radius) {
+                        const force = (mouse.radius - distance) / mouse.radius;
+                        const angle = Math.atan2(dy, dx);
+                        this.x -= Math.cos(angle) * force * 3;
+                        this.y -= Math.sin(angle) * force * 3;
+                    }
+                }
+            }
+
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Glow effect
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // Initialize Particles
+        function initParticles() {
+            particlesArray = [];
+            const numberOfParticles = Math.floor((canvas.width * canvas.height) / 15000);
+            for (let i = 0; i < numberOfParticles; i++) {
+                particlesArray.push(new Particle());
+            }
+        }
+
+        // Connect Particles
+        function connectParticles() {
+            for (let i = 0; i < particlesArray.length; i++) {
+                for (let j = i + 1; j < particlesArray.length; j++) {
+                    const dx = particlesArray[i].x - particlesArray[j].x;
+                    const dy = particlesArray[i].y - particlesArray[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 120) {
+                        const opacity = 1 - (distance / 120);
+                        ctx.strokeStyle = `rgba(139, 92, 246, ${opacity * 0.3})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        // Animation Loop
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let particle of particlesArray) {
+                particle.update();
+                particle.draw();
+            }
+
+            connectParticles();
+            requestAnimationFrame(animateParticles);
+        }
+
+        initParticles();
+        animateParticles();
+
+        window.addEventListener('resize', () => {
+            initParticles();
+        });
+
+        // Navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.content-section');
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = link.getAttribute('data-nav');
+
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById(`section-${target}`).classList.add('active');
+
+                document.getElementById('mobile-menu').classList.add('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+
+        // Mobile Menu
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        });
+
+        // Copy IP
+        document.getElementById('play-now-btn').addEventListener('click', () => {
+            const ip = document.getElementById('server-ip').textContent;
+            navigator.clipboard.writeText(ip).then(() => {
+                const feedback = document.getElementById('copy-feedback');
+                feedback.style.opacity = '1';
+                setTimeout(() => {
+                    feedback.style.opacity = '0';
+                }, 3000);
+            });
+        });
+
+        // Auth Modal
+        const authModal = document.getElementById('auth-modal');
+        document.getElementById('login-btn').addEventListener('click', () => {
+            authModal.classList.add('active');
+        });
+        document.getElementById('close-auth-modal').addEventListener('click', () => {
+            authModal.classList.remove('active');
+        });
+        authModal.addEventListener('click', (e) => {
+            if (e.target === authModal) authModal.classList.remove('active');
+        });
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            authModal.classList.remove('active');
+        });
+
+        // Post Modal
+        const postModal = document.getElementById('post-modal');
+        document.getElementById('create-post-btn').addEventListener('click', () => {
+            postModal.classList.add('active');
+        });
+        document.getElementById('close-post-modal').addEventListener('click', () => {
+            postModal.classList.remove('active');
+        });
+        postModal.addEventListener('click', (e) => {
+            if (e.target === postModal) postModal.classList.remove('active');
+        });
+        document.getElementById('new-post-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            postModal.classList.remove('active');
+        });
+    </script>
+    <script>(function () { function c() { var b = a.contentDocument || a.contentWindow.document; if (b) { var d = b.createElement('script'); d.innerHTML = "window.__CF$cv$params={r:'9be460b0f1d7f88e',t:'MTc2ODQ2OTY3MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);"; b.getElementsByTagName('head')[0].appendChild(d) } } if (document.body) { var a = document.createElement('iframe'); a.height = 1; a.width = 1; a.style.position = 'absolute'; a.style.top = 0; a.style.left = 0; a.style.border = 'none'; a.style.visibility = 'hidden'; document.body.appendChild(a); if ('loading' !== document.readyState) c(); else if (window.addEventListener) document.addEventListener('DOMContentLoaded', c); else { var e = document.onreadystatechange || function () { }; document.onreadystatechange = function (b) { e(b); 'loading' !== document.readyState && (document.onreadystatechange = e, c()) } } } })();</script>
+</body>
+
+</html>

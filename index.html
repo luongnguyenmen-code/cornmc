@@ -4,532 +4,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CornMiner.top - Máy chủ Minecraft Việt Nam</title>
+    <title>CornMiner • Loading...</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="/_sdk/element_sdk.js"></script>
-    <link rel="icon" type="image/png" href="/assets/icon/logo2bx.png">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&amp;family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/assets/css/style.css">
+
 </head>
 
-<body class="h-full halloween-bg text-white font-sans relative">
-    <div
-        class="fixed bottom-0 left-4 z-50 hidden 2xl:block pointer-events-none opacity-40 hover:opacity-80 transition-opacity duration-500">
-        <img src="assets/icon/snowman1.png"
-            class="w-40 animate-float-slow filter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+<body class="h-full w-full">
+    <div id="preloader">
+        <div class="loader-ring"></div>
+        <div class="loader-text title-font">CORNMINER</div>
     </div>
 
-    <div
-        class="fixed bottom-0 right-4 z-50 hidden 2xl:block pointer-events-none opacity-40 hover:opacity-80 transition-opacity duration-500">
-        <img src="assets/icon/snowman.png"
-            class="w-40 animate-float-slow filter drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]"
-            style="transform: scaleX(-1);">
-    </div>
+    <canvas id="particle-network"></canvas>
+    <div class="cyber-grid"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
 
-    <div id="authModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-8 relative">
-            <button onclick="toggleAuthModal()"
-                class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">✕</button>
-            <div class="text-center mb-6">
-                <div class="text-5xl mb-2">🎃</div>
-                <h2 class="text-2xl font-bold corn-text minecraft-font">CORN ID LOGIN</h2>
-            </div>
-
-            <div id="loginForm" class="space-y-4">
-                <button id="googleLoginBtn" class="google-btn">
-                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5">
-                    <span>Tiếp tục với Google</span>
-                </button>
-
-                <div class="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase my-4">
-                    <div class="h-px bg-gray-700 flex-1"></div> HOẶC <div class="h-px bg-gray-700 flex-1"></div>
+    <nav class="nav-bar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <div class="flex items-center space-x-3">
+                    <div
+                        class="w-12 h-12 rounded-lg glass-panel flex items-center justify-center relative overflow-hidden">
+                        <span style="position: relative; font-size: 1.5rem;"><img src="assets/icon/serverlogo.png"
+                                alt=""></span>
+                    </div>
+                    <span class="text-2xl font-black title-font neon-text" id="site-name">CORN NETWORK</span>
                 </div>
 
-                <form id="emailLoginForm" class="space-y-4">
-                    <input type="text" id="loginUser"
-                        class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none"
-                        placeholder="Tên nhân vật (Ingame)">
-                    <input type="password" id="loginPass"
-                        class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none"
-                        placeholder="Mật khẩu">
-                    <button type="submit"
-                        class="w-full corn-gradient text-white font-bold py-3 rounded-xl hover:opacity-90 pulse-glow transition-all">ĐĂNG
-                        NHẬP</button>
-                </form>
-                <p class="text-center text-sm text-gray-400 mt-4 cursor-pointer hover:text-orange-400"
-                    onclick="switchAuthMode('register')">Chưa có tài khoản? <b>Đăng ký ngay</b></p>
-            </div>
-
-            <form id="registerForm" class="space-y-4 hidden-force">
-                <input type="text" id="regUser"
-                    class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none"
-                    placeholder="Tên nhân vật (Ingame)">
-                <input type="password" id="regPass"
-                    class="w-full bg-black/60 border border-gray-700 rounded-xl px-4 py-3 text-white focus:border-green-500 focus:outline-none"
-                    placeholder="Mật khẩu bảo vệ">
-                <button type="submit"
-                    class="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:opacity-90 transition-all">TẠO
-                    TÀI KHOẢN</button>
-                <p class="text-center text-sm text-gray-400 mt-4 cursor-pointer hover:text-orange-400"
-                    onclick="switchAuthMode('login')">Đã có tài khoản? <b>Đăng nhập</b></p>
-            </form>
-        </div>
-    </div>
-
-    <div id="createPostModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4">
-        <div class="glass-panel w-full max-w-2xl rounded-2xl p-8 relative shadow-2xl">
-            <button onclick="togglePostModal()"
-                class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">✕</button>
-            <h2 class="text-2xl font-bold corn-text mb-4" id="postModalTitle">Đăng bài mới</h2>
-            <form id="createPostForm" class="space-y-4">
-                <input type="hidden" id="postType" value="forum">
-                <div><label class="block text-gray-400 text-sm mb-1">Tiêu đề</label><input type="text" id="postTitle"
-                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none"
-                        required></div>
-                <div><label class="block text-gray-400 text-sm mb-1">Nội dung</label><textarea id="postContent" rows="6"
-                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none"
-                        required></textarea></div>
-                <div id="adminCategorySelect" class="hidden-force"><label class="block text-gray-400 text-sm mb-1">Danh
-                        mục</label><select id="postCategory"
-                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-2 text-white">
-                        <option value="Sự kiện">Sự kiện</option>
-                        <option value="Update">Cập nhật</option>
-                        <option value="Thông báo">Thông báo</option>
-                    </select></div>
-                <button type="submit"
-                    class="w-full corn-gradient text-white font-bold py-3 rounded-xl hover:opacity-90">ĐĂNG BÀI</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="editProfileModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4"
-        style="z-index: 10000;">
-        <div class="glass-panel w-full max-w-md rounded-2xl p-8 relative shadow-2xl animate-fade-in">
-            <button onclick="toggleProfileModal()"
-                class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">✕</button>
-
-            <h2 class="text-2xl font-bold corn-text mb-6 text-center">✏️ Chỉnh sửa hồ sơ</h2>
-
-            <form id="editProfileForm" class="space-y-5">
-                <div class="flex justify-center mb-4">
-                    <img id="preview-avatar" src=""
-                        class="w-20 h-20 rounded-full border-2 border-orange-500 shadow-lg object-cover">
+                <div class="hidden md:flex items-center space-x-1" id="nav-links">
+                    <a href="#home" class="nav-link active title-font" data-nav="home">HOME</a>
+                    <a href="#map" class="nav-link title-font" data-nav="map">MAP</a>
+                    <a href="#ranking" class="nav-link title-font" data-nav="ranking">RANKING</a>
+                    <a href="#news" class="nav-link title-font" data-nav="news">NEWS</a>
+                    <a href="#guide" class="nav-link title-font" data-nav="guide">GUIDE</a>
+                    <a href="#forum" class="nav-link title-font" data-nav="forum">FORUM</a>
                 </div>
 
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-2 uppercase">Tên hiển thị (Biệt danh)</label>
-                    <input type="text" id="edit-display-name"
-                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none transition"
-                        placeholder="Nhập tên mới...">
-                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="status-online">
+                        <div class="status-dot"></div>
+                        <span class="text-sm font-bold" id="nav-online">...</span>
+                    </div>
 
-                <div>
-                    <label class="block text-gray-400 text-xs font-bold mb-2 uppercase">Link Avatar (URL Ảnh)</label>
-                    <input type="text" id="edit-photo-url"
-                        class="w-full bg-black/60 border border-gray-600 rounded-xl px-4 py-3 text-white focus:border-orange-500 focus:outline-none transition"
-                        placeholder="https://example.com/anh.jpg">
-                    <p class="text-[10px] text-gray-500 mt-1">*Mẹo: Dùng link từ Discord hoặc Imgur. Để trống sẽ dùng
-                        Skin Minecraft.</p>
-                </div>
+                    <div id="auth-display">
+                        <button id="login-btn"
+                            class="cyber-btn px-6 py-2.5 rounded-lg font-bold text-sm title-font">LOGIN</button>
+                    </div>
 
-                <button type="submit" id="btn-save-profile"
-                    class="w-full corn-gradient text-white font-bold py-3 rounded-xl hover:opacity-90 hover:scale-[1.02] transition-all shadow-lg">💾
-                    LƯU THAY ĐỔI</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="adminUsersModal" class="fixed inset-0 modal-overlay hidden-force flex items-center justify-center p-4"
-        style="z-index: 9999;">
-        <div
-            class="glass-panel admin-panel-container w-full max-w-5xl rounded-2xl p-6 relative h-[85vh] flex flex-col animate-fade-in">
-
-            <button onclick="document.getElementById('adminUsersModal').classList.add('hidden-force')"
-                class="absolute top-5 right-5 text-gray-400 hover:text-white hover:bg-red-500/20 w-8 h-8 rounded-full flex items-center justify-center transition-all">✕</button>
-
-            <div class="admin-header flex justify-between items-end mb-4 border-b border-gray-700 pb-4">
-                <div>
-                    <h2 class="text-2xl font-bold corn-text minecraft-font flex items-center gap-2">
-                        <span class="text-3xl">🛡️</span> QUẢN TRỊ VIÊN
-                    </h2>
-                    <p class="text-xs text-gray-400 mt-1">Quản lý quyền hạn và thành viên</p>
-                </div>
-                <div class="search-box relative">
-                    <span class="search-icon absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">🔍</span>
-                    <input type="text" id="userSearchInput" onkeyup="filterUsers()" placeholder="Tìm tên/email..."
-                        class="bg-black/50 border border-gray-600 rounded-xl py-2 pl-10 pr-4 text-white text-sm focus:border-orange-500 outline-none w-64 transition">
-                </div>
-            </div>
-
-            <div
-                class="table-wrapper flex-1 custom-scrollbar overflow-y-auto bg-black/20 rounded-xl border border-gray-700/50">
-                <table class="styled-table w-full text-left border-collapse">
-                    <thead class="sticky top-0 bg-gray-900/90 backdrop-blur-md z-10 border-b border-gray-700">
-                        <tr>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Người chơi</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Email / ID</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Ngày tham gia</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Vai trò</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Thao tác</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-user-list" class="text-sm text-gray-300">
-                    </tbody>
-                </table>
-
-                <div class="text-center py-4">
-                    <button id="btn-load-more-users" onclick="loadMoreUsers()"
-                        class="hidden-force text-xs bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition border border-gray-600">
-                        ⬇️ Tải thêm cũ hơn
+                    <button class="md:hidden glass-panel p-2 rounded-lg" id="mobile-menu-btn">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
                     </button>
                 </div>
             </div>
 
-            <div class="mt-4 text-right text-xs text-gray-500 border-t border-gray-700 pt-3">
-                Đã tải: <span id="total-users-count" class="text-white font-bold">0</span> thành viên
+            <div id="mobile-menu" class="hidden md:hidden pb-4 space-y-2">
             </div>
         </div>
-    </div>
+    </nav>
 
-    <header class="glass-effect sticky top-0 z-50">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-18">
-                <div class="flex items-center cursor-pointer" onclick="showSection('home')">
-                    <div class="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg">
-                        <img src="/assets/icon/corn.png" alt="logo">
-                    </div>
-                    <div class="ml-4"><span id="nav-server-name"
-                            class="text-2xl font-bold minecraft-font corn-text">𝐂𝐎𝐑𝐍𝐌𝐈𝐍𝐄𝐑</span>
-                        <p class="text-xs text-gray-300">Máy chủ Minecraft Việt Nam</p>
-                    </div>
+    <main class="relative z-10 pt-20 w-full h-full">
+
+        <section id="section-home" class="content-section active">
+            <div class="min-h-screen flex items-center justify-center px-4 py-20 relative overflow-hidden group">
+
+                <img src="/assets/image/nen1.png"
+                    class="absolute inset-0 w-full h-full object-cover opacity-60 contrast-110 group-hover:scale-105 transition-transform duration-[10s]">
+
+                <div class="absolute inset-0"
+                    style="background: radial-gradient(circle at center, rgba(9, 9, 11, 0.3) 0%, rgba(9, 9, 11, 0.95) 100%);">
                 </div>
 
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-6">
-                        <button onclick="showSection('home')"
-                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Trang
-                            chủ</button>
-                        <button onclick="showSection('map')"
-                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Bản
-                            đồ</button>
-                        <button onclick="showSection('leaderboard')"
-                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Xếp
-                            hạng</button>
-                        <button onclick="showSection('news')"
-                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Tin
-                            tức</button>
-                        <button onclick="showSection('guide')"
-                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-gray-300 hover:text-white">Hướng
-                            dẫn</button>
-                        <button onclick="showSection('forum')"
-                            class="nav-link px-3 py-2 text-sm font-bold uppercase tracking-wide text-orange-400 border border-orange-500/30 rounded hover:bg-orange-500/10">Diễn
-                            đàn</button>
-                    </div>
-                </div>
+                <div class="max-w-6xl mx-auto text-center relative z-10">
+                    <h1 id="main-title"
+                        class="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black title-font neon-text mb-6 leading-none drop-shadow-[0_0_25px_rgba(139,92,246,0.6)]">
+                        CORN NETWORK
+                    </h1>
 
-                <div class="hidden md:flex items-center space-x-4">
-                    <div id="guest-actions" class="flex items-center gap-4">
-                        <div
-                            class="server-status status-online flex items-center gap-2 bg-green-500/10 px-3 py-1 rounded-full border border-green-500/20">
-                            <div class="status-dot w-2 h-2 bg-green-500 rounded-full animate-pulse"></div><span
-                                class="text-xs font-bold text-green-400">Online</span>
-                        </div>
-                        <button onclick="toggleAuthModal()"
-                            class="corn-gradient text-white px-6 py-2 rounded-xl font-bold hover:shadow-lg transition-all text-sm uppercase">🔑
-                            Đăng nhập</button>
-                    </div>
-                    <div id="user-actions" class="hidden-force user-menu-container">
-                        <button class="user-btn" onclick="toggleUserDropdown()">
-                            <img id="user-avatar" src="" class="w-8 h-8 rounded-full border border-gray-500">
-                            <span id="user-name" class="font-bold text-sm">...</span>
-                            <span class="text-xs">▼</span>
+                    <p id="tagline"
+                        class="text-xl sm:text-2xl md:text-3xl mb-12 text-purple-100 font-medium drop-shadow-md"
+                        style="letter-spacing: 0.15em; text-shadow: 0 2px 4px rgba(0,0,0,0.8);">
+                        Thế giới sinh tồn đầy thử thách và sáng tạo!
+                    </p>
+
+                    <div class="flex flex-wrap items-center justify-center gap-4 mb-16">
+                        <button id="copy-ip-btn"
+                            class="cyber-btn px-10 py-4 rounded-xl font-bold text-base title-font flex items-center space-x-3 hover:scale-110 transition-transform shadow-[0_0_20px_rgba(34,211,238,0.4)]">
+                            <span>PLAY NOW</span> <span>⚡</span>
                         </button>
-
-                        <div id="user-dropdown-menu" class="user-dropdown hidden-force">
-                            <div class="px-3 py-2 border-b border-gray-700 mb-2">
-                                <p class="text-xs text-gray-400">Vai trò của bạn</p>
-                                <span id="user-role" class="role-badge mt-1 ml-0">Loading...</span>
-                            </div>
-
-                            <button id="btn-admin-panel" class="menu-item hidden-force" onclick="openAdminUsersModal()">
-                                <span>🛠️ Quản lý người dùng</span>
-                            </button>
-
-                            <button class="menu-item" onclick="toggleProfileModal()">
-                                <span>👤 Hồ sơ cá nhân</span>
-                            </button>
-
-                            <button onclick="handleLogout()" class="menu-item logout">
-                                <span>⏏ Đăng xuất</span>
-                            </button>
-                        </div>
+                        <a href="#" id="discord-btn" target="_blank"
+                            class="cyber-btn-secondary px-10 py-4 rounded-xl font-bold text-base title-font flex items-center space-x-3 hover:bg-white/10 backdrop-blur-md">
+                            <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 24 24">
+                                <path
+                                    d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
+                            </svg><span>JOIN DISCORD</span>
+                        </a>
                     </div>
                 </div>
 
-                <div class="md:hidden"><button onclick="toggleMobileMenu()" class="text-gray-300 hover:text-white"><svg
-                            class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16M4 18h16"></path>
-                        </svg></button></div>
-            </div>
-            <div id="mobile-menu"
-                class="md:hidden hidden bg-black/95 rounded-xl mt-2 border border-red-500/30 backdrop-blur-xl">
-                <div class="px-4 pt-4 pb-6 space-y-2">
-                    <button onclick="showSection('home')"
-                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">🏠
-                        Trang chủ</button>
-                    <button onclick="showSection('map')"
-                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">🗺️
-                        Bản đồ</button>
-                    <button onclick="showSection('leaderboard')"
-                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">🏆
-                        Xếp hạng</button>
-                    <button onclick="showSection('news')"
-                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">📰
-                        Tin tức</button>
-                    <button onclick="showSection('guide')"
-                        class="block w-full text-left px-4 py-3 text-base font-bold text-gray-200 hover:text-white hover:bg-white/10 rounded-lg transition">📘
-                        Hướng dẫn</button>
-                    <button onclick="showSection('forum')"
-                        class="block w-full text-left px-4 py-3 text-base font-bold text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg mt-2">💬
-                        Diễn đàn</button>
-
-                    <div class="border-t border-gray-700 my-2 pt-2">
-
-                        <div id="mobile-guest-action">
-                            <button onclick="toggleAuthModal()"
-                                class="block w-full mt-2 corn-gradient text-white px-6 py-3 rounded-xl font-bold shadow-lg text-center">🔑
-                                Đăng nhập / Đăng ký</button>
-                        </div>
-
-                        <div id="mobile-user-action" class="hidden-force text-center">
-                            <div class="flex items-center justify-center gap-3 mb-3">
-                                <img id="mobile-user-avatar" src=""
-                                    class="w-10 h-10 rounded-full border-2 border-orange-500 object-cover">
-                                <div class="text-left">
-                                    <div id="mobile-user-name" class="font-bold text-white text-lg">Username</div>
-                                    <span id="mobile-user-role"
-                                        class="text-xs bg-gray-700 px-2 py-0.5 rounded text-gray-300">Loading...</span>
-                                </div>
-                                <button onclick="toggleProfileModal()"
-                                    class="ml-2 text-gray-400 hover:text-white bg-white/10 p-2 rounded-lg">👤 Hồ
-                                    sơ</button>
-                            </div>
-
-                            <button id="mobile-btn-admin-panel" onclick="openAdminUsersModal()"
-                                class="hidden-force block w-full mb-2 bg-yellow-600/20 text-yellow-400 border border-yellow-500/50 px-6 py-3 rounded-xl font-bold hover:bg-yellow-600 hover:text-white transition">
-                                🛡️ Quản lý người dùng
-                            </button>
-                        </div>
-
-                        <button onclick="handleLogout()"
-                            class="block w-full bg-red-600/20 text-red-400 border border-red-500/50 px-6 py-3 rounded-xl font-bold hover:bg-red-600 hover:text-white transition">⏏
-                            Đăng xuất</button>
-                    </div>
-                </div>
-            </div>
-            </div>
-        </nav>
-    </header>
-
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-
-        <section id="home-section" class="fade-in">
-            <div class="glass-effect rounded-3xl p-10 mb-10 relative overflow-hidden border border-orange-500/10">
-                <div class="absolute inset-0 z-0">
-                    <img src="/assets/image/nen1.png" alt="Background"
-                        class="w-full h-full object-cover opacity-100 transition-transform duration-1000 group-hover:scale-105">
-                    <div class="absolute inset-0 bg-black/70"></div>
-                </div>
-                <div class="relative z-10 text-center">
-                    <h2 id="hero-title" class="text-6xl md:text-7xl font-bold minecraft-font mb-6 corn-text">
-                        𝐖𝐞𝐥𝐜𝐨𝐦𝐞 𝐓𝐎 𝐂𝐎𝐑𝐍 𝐌𝐈𝐍𝐄𝐑</h2>
-                    <p id="hero-description" class="text-2xl text-gray-200 mb-10 max-w-4xl mx-auto leading-relaxed">Thế
-                        giới sinh tồn đầy thử thách và sáng tạo!</p>
-                    <div class="flex flex-col sm:flex-row gap-6 justify-center items-center">
-                        <button onclick="copyServerIP()"
-                            class="corn-gradient text-white px-10 py-5 rounded-xl font-bold text-xl hover:shadow-2xl pulse-glow">🎮
-                            Tham gia ngay</button>
-                        <button onclick="openDiscord()"
-                            class="glass-effect text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-white/20">💬
-                            Discord</button>
-                    </div>
-                    <div
-                        class="mt-6 inline-flex items-center gap-3 bg-black/40 px-4 py-2 rounded-lg border border-orange-500/30">
-                        <span class="text-2xl">🎁</span>
-                        <span class="text-gray-300 font-mono font-bold tracking-widest text-lg">CODE NOEL</span>
-                        <button onclick="navigator.clipboard.writeText('/redeem MERRYCHRISTMAS'); alert('Đã copy code!')"
-                            class="text-xs bg-orange-600 hover:bg-orange-500 text-white px-2 py-1 rounded">COPY</button>
-                    </div>
-                </div>
             </div>
 
-            <!-- slider -->
-            <!-- <section
-                class="slider-section mb-12 relative group rounded-2xl overflow-hidden shadow-2xl border border-gray-800 h-[400px] md:h-[500px]">
-                <div class="slider-container h-full relative bg-gray-900">
-
-                    <div class="slide active absolute inset-0 transition-opacity duration-700 opacity-100 z-10">
-                        <div class="absolute inset-0 overflow-hidden">
-                            <img src="/assets/image/event1.png"
-                                class="w-full h-full object-cover blur-xl opacity-50 scale-110">
-                            <div class="absolute inset-0 bg-black/20"></div>
-                        </div>
-
-                        <div class="relative z-10 h-full w-full flex items-center justify-center p-6">
-                            <img src="/assets/image/event1.png"
-                                class="h-full w-auto max-w-full object-contain rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] border border-white/10">
-                        </div>
-                    </div>
-
-                    <div class="slide absolute inset-0 transition-opacity duration-700 opacity-0 z-0">
-                        <div class="absolute inset-0 overflow-hidden">
-                            <img src="/assets/image/event2.png"
-                                class="w-full h-full object-cover blur-xl opacity-50 scale-110">
-                            <div class="absolute inset-0 bg-black/20"></div>
-                        </div>
-
-                        <div class="relative z-10 h-full w-full flex items-center justify-center p-6">
-                            <img src="/assets/image/event2.png"
-                                class="h-full w-auto max-w-full object-contain rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.5)] border border-white/10">
-                        </div>
-                    </div>
-
-                </div>
-
-                <button
-                    class="absolute top-1/2 left-4 -translate-y-1/2 bg-black/40 hover:bg-orange-600 text-white w-12 h-12 rounded-full z-30 opacity-0 group-hover:opacity-100 transition-all text-xl backdrop-blur-sm border border-white/10"
-                    onclick="changeSlide(-1)">❮</button>
-                <button
-                    class="absolute top-1/2 right-4 -translate-y-1/2 bg-black/40 hover:bg-orange-600 text-white w-12 h-12 rounded-full z-30 opacity-0 group-hover:opacity-100 transition-all text-xl backdrop-blur-sm border border-white/10"
-                    onclick="changeSlide(1)">❯</button>
-
-                <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-2 z-30">
-                    <span
-                        class="w-3 h-3 rounded-full bg-white/30 cursor-pointer hover:bg-orange-500 transition-all slider-dot active"
-                        onclick="goToSlide(0)"></span>
-                    <span
-                        class="w-3 h-3 rounded-full bg-white/30 cursor-pointer hover:bg-orange-500 transition-all slider-dot"
-                        onclick="goToSlide(1)"></span>
-                </div>
-            </section> -->
-
-            <div class="stats-grid mb-12">
-                <div class="glass-effect rounded-2xl p-8 card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-400 text-sm font-semibold">Người chơi online</p>
-                            <p class="text-4xl font-bold corn-text">156</p>
-                        </div>
-                        <div class="text-5xl floating-icon">
-                            👥
-                        </div>
-                    </div>
-                </div>
-                <div class="glass-effect rounded-2xl p-8 card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-400 text-sm font-semibold">Tổng người chơi</p>
-                            <p class="text-4xl font-bold text-purple-400">8,247</p>
-                        </div>
-                        <div class="text-5xl floating-icon">
-                            🏆
-                        </div>
-                    </div>
-                </div>
-                <div class="glass-effect rounded-2xl p-8 card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-400 text-sm font-semibold">Thời gian hoạt động</p>
-                            <p class="text-4xl font-bold text-green-400">99.8%</p>
-                        </div>
-                        <div class="text-5xl floating-icon">
-                            ⚡
-                        </div>
-                    </div>
-                </div>
-                <div class="glass-effect rounded-2xl p-8 card-hover">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-gray-400 text-sm font-semibold">Phiên bản</p>
-                            <p class="text-4xl font-bold text-orange-400">1.21.4</p>
-                        </div>
-                        <div class="text-5xl floating-icon">
-                            🔧
-                        </div>
-                    </div>
-                </div>
-            </div><!-- Features Grid -->
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-7xl mb-6 floating-icon">
-                            🏰
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 minecraft-font corn-text">Xây dựng sáng tạo</h3>
-                        <p class="text-gray-300 leading-relaxed">Thể hiện sự sáng tạo với những công trình khổng lồ và
-                            kiến trúc tuyệt vời trong khu vực sáng tạo riêng biệt.</p>
-                    </div>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-7xl mb-6 floating-icon">
-                            ⚔️
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 minecraft-font corn-text">Chiến đấu PvP</h3>
-                        <p class="text-gray-300 leading-relaxed">Thử thách kỹ năng trong các trận chiến PvP căng thẳng,
-                            giải đấu và chiến tranh phe phái với vũ khí tùy chỉnh.</p>
-                    </div>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <div class="text-center">
-                        <div class="text-7xl mb-6 floating-icon">
-                            💰
-                        </div>
-                        <h3 class="text-2xl font-bold mb-4 minecraft-font corn-text">Hệ thống kinh tế</h3>
-                        <p class="text-gray-300 leading-relaxed">Xây dựng tài sản thông qua giao dịch, cửa hàng và doanh
-                            nghiệp trong nền kinh tế do người chơi điều khiển.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-effect rounded-2xl p-8 mb-10">
-                <h2 class="text-3xl font-bold minecraft-font mb-8 text-center corn-text">Tài Nguyên Máy Chủ</h2>
+            <!-- <div class="max-w-6xl mx-auto px-4 py-20">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="gallery-item">
-                        <div
-                            class="h-70 bg-gradient-to-br from-orange-600 to-red-600 rounded-2xl flex items-center justify-center">
-                            <span class="text-6xl"><img src="/assets/image/mine1.png"></span>
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card">
+                        <div class="text-6xl font-black title-font mb-3 neon-text" id="stat-online">--</div>
+                        <p class="text-purple-200 title-font tracking-wider">PLAYERS ONLINE</p>
+                    </div>
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card">
+                        <div class="text-4xl font-black title-font mb-3 text-cyan-400" id="server-version">1.21</div>
+                        <p class="text-purple-200 title-font tracking-wider">VERSION</p>
+                    </div>
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card">
+                        <div class="text-6xl font-black title-font mb-3 neon-text" id="stat-peak">--</div>
+                        <p class="text-purple-200 title-font tracking-wider">PEAK RECORD</p>
+                    </div>
+                </div>
+            </div> -->
+            <div class="max-w-6xl mx-auto px-4 py-20">
+                <h2 class="text-4xl sm:text-5xl font-black title-font text-center mb-12 neon-text">LIVE STATISTICS</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card">
+                        <div class="text-6xl font-black title-font mb-3"
+                            style="background: linear-gradient(135deg, #8b5cf6, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+                            id="stat-online">
+                            142
                         </div>
-                        <div class="gallery-overlay">
-                            <div class="text-white">
-                                <h4 class="font-bold text-lg">Hình ảnh máy chủ</h4>
-                                <p class="text-sm opacity-90">Người chơi: menng1337</p>
+                        <p class="text-purple-200 title-font tracking-wider">PLAYERS ONLINE</p>
+                        <div class="mt-4 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"></div>
+                    </div>
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card"
+                        style="transition-delay: 0.1s;">
+                        <div class="text-6xl font-black title-font mb-3"
+                            style="background: linear-gradient(135deg, #22d3ee, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+                            id="stat-uptime">
+                            99.9%
+                        </div>
+                        <p class="text-purple-200 title-font tracking-wider">SERVER UPTIME</p>
+                        <div class="mt-4 h-1 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full"></div>
+                    </div>
+                    <div class="glass-intense p-8 rounded-2xl text-center stat-card tilt-card"
+                        style="transition-delay: 0.2s;">
+                        <div class="text-6xl font-black title-font mb-3"
+                            style="background: linear-gradient(135deg, #8b5cf6, #22d3ee); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"
+                            id="stat-peak">
+                            1.21.8
+                        </div>
+                        <p class="text-purple-200 title-font tracking-wider">VERSION</p>
+                        <div class="mt-4 h-1 bg-gradient-to-r from-purple-500 to-cyan-500 rounded-full"></div>
+                    </div>
+                </div>
+            </div><!-- Features -->
+            <div class="max-w-6xl mx-auto px-4 py-20">
+                <!-- <h2 class="text-4xl sm:text-5xl font-black title-font text-center mb-12 neon-text">ĐIỂM NỔI BẬT
+                </h2> -->
+                <div
+                    class="relative w-full h-[600px] overflow-hidden rounded-2xl shadow-2xl border border-purple-500/20 group select-none bg-black">
+
+                    <div onclick="document.getElementById('feature-slider').scrollBy({left: -document.getElementById('feature-slider').offsetWidth, behavior: 'smooth'})"
+                        class="absolute top-0 left-0 w-1/2 h-full z-30 cursor-pointer" title="Quay lại">
+                    </div>
+
+                    <div onclick="document.getElementById('feature-slider').scrollBy({left: document.getElementById('feature-slider').offsetWidth, behavior: 'smooth'})"
+                        class="absolute top-0 right-0 w-1/2 h-full z-30 cursor-pointer" title="Tiếp theo">
+                    </div>
+
+                    <div id="feature-slider"
+                        class="flex w-full h-full overflow-x-auto snap-x snap-mandatory no-scrollbar scroll-smooth ">
+
+                        <div class="min-w-full h-full relative snap-center shrink-0">
+                            <img src="/assets/image/Dungeon.png"
+                                class="absolute inset-0 w-full h-full object-cover opacity-60">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+
+                            <div
+                                class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10 pointer-events-none">
+                                <h3
+                                    class="text-5xl md:text-7xl font-black title-font mb-6 text-cyan-400 drop-shadow-lg neon-text">
+                                    PVP & DUNGEON</h3>
+                                <p
+                                    class="text-lg md:text-2xl text-white font-medium max-w-4xl leading-relaxed drop-shadow-md">
+                                    Chiến trường rực lửa, chiếm cứ điểm Bang Hội. <br>
+                                    Khám phá Dungeon rộng lớn với hàng ngàn quái vật mới lạ.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="min-w-full h-full relative snap-center shrink-0">
+                            <img src="/assets/image/word.png"
+                                class="absolute inset-0 w-full h-full object-cover opacity-60">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+
+                            <div
+                                class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10 pointer-events-none">
+                                <h3
+                                    class="text-5xl md:text-7xl font-black title-font mb-6 text-cyan-400 drop-shadow-lg neon-text">
+                                    WORLD CUSTOM</h3>
+                                <p
+                                    class="text-lg md:text-2xl text-white font-medium max-w-4xl leading-relaxed drop-shadow-md">
+                                    Hệ thống địa hình độc quyền chưa từng có. <br>
+                                    Thỏa sức xây dựng đế chế, vương quốc riêng của bạn.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="min-w-full h-full relative snap-center shrink-0">
+                            <img src="/assets/image/craft.png"
+                                class="absolute inset-0 w-full h-full object-cover opacity-60">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
+
+                            <div
+                                class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center z-10 pointer-events-none">
+                                <h3
+                                    class="text-5xl md:text-7xl font-black title-font mb-6 text-cyan-400 drop-shadow-lg neon-text">
+                                    TRADE & CRAFT</h3>
+                                <p
+                                    class="text-lg md:text-2xl text-white font-medium max-w-4xl leading-relaxed drop-shadow-md">
+                                    Nền kinh tế tự do, giao dịch vật phẩm phong phú. <br>
+                                    Chế tạo trang bị Huyền Thoại với công thức bí truyền.
+                                </p>
                             </div>
                         </div>
                     </div>
-                    <div class="gallery-item">
-                        <div
-                            class="h-70 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center">
-                            <span class="text-6xl"><img src="/assets/image/wiki2.jpg"></span>
-                        </div>
-                        <div class="gallery-overlay">
-                            <div class="text-white">
-                                <h4 class="font-bold text-lg">Cẩm nang Sinh Tồn</h4>
-                                <p class="text-sm opacity-90">Dự án cộng đồng</p>
+                </div>
+            </div><!-- Gallery -->
+            <div class="max-w-6xl mx-auto px-4 py-20">
+                <h2 class="text-4xl sm:text-5xl font-black title-font text-center mb-12 neon-text">TÀI NGUYÊN</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="glass-panel rounded-2xl overflow-hidden h-64 tilt-card group">
+                        <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                            <img src="/assets/image/databack.png"
+                                class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700">
+
+                            <div class="absolute inset-0"
+                                style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(34, 211, 238, 0.4));">
+                            </div>
+
+                            <div class="relative z-10 text-center">
+                                <span class="text-2xl font-bold text-white drop-shadow-md">MOD + RSP</span>
                             </div>
                         </div>
                     </div>
-                    <div class="gallery-item">
-                        <div
-                            class="h-70 bg-gradient-to-br from-yellow-600 to-orange-600 rounded-2xl flex items-center justify-center">
-                            <span class="text-6xl"><img src="/assets/image/mine3.png"></span>
+
+                    <div class="glass-panel rounded-2xl overflow-hidden h-64 tilt-card group">
+                        <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                            <img src="/assets/image/tool.jpg"
+                                class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700">
+
+                            <div class="absolute inset-0"
+                                style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.4), rgba(139, 92, 246, 0.4));">
+                            </div>
+
+                            <div class="relative z-10 text-center">
+                                <span class="text-2xl font-bold text-white drop-shadow-md">TOOL</span>
+                            </div>
                         </div>
-                        <div class="gallery-overlay">
-                            <div class="text-white">
-                                <h4 class="font-bold text-lg">Khu thương mại</h4>
-                                <p class="text-sm opacity-90">Trung tâm kinh tế</p>
+                    </div>
+
+                    <div class="glass-panel rounded-2xl overflow-hidden h-64 tilt-card group">
+                        <div class="w-full h-full flex items-center justify-center relative overflow-hidden">
+                            <img src="/assets/image/cree.jpg"
+                                class="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-110 transition-transform duration-700">
+
+                            <div class="absolute inset-0"
+                                style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(34, 211, 238, 0.4));">
+                            </div>
+
+                            <div class="relative z-10 text-center">
+                                <span class="text-2xl font-bold text-white drop-shadow-md">MC PE</span>
                             </div>
                         </div>
                     </div>
@@ -537,79 +288,278 @@
             </div>
         </section>
 
-        <section id="map-section" class="section-hidden fade-in text-center">
-            <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">Bản đồ thế giới</h1>
-            <div
-                class="glass-effect rounded-2xl p-4 mb-10 border border-gray-800 h-[500px] flex items-center justify-center bg-black/50">
-                <div>
-                    <div class="text-8xl mb-6 animate-pulse">🗺️</div>
-                    <h3 class="text-2xl font-bold mb-4 corn-text">Dynmap Live</h3>
-                    <p class="text-gray-400">Đang kết nối tới vệ tinh...</p>
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <h3 class="text-xl font-bold mb-4 corn-text">🌍 Overworld</h3><button
-                        class="w-full corn-gradient text-white py-2 rounded-lg font-bold">Xem ngay</button>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <h3 class="text-xl font-bold mb-4 text-red-500">🔥 Nether</h3><button
-                        class="w-full bg-red-600 text-white py-2 rounded-lg font-bold">Xem ngay</button>
-                </div>
-                <div class="halloween-card rounded-2xl p-8 card-hover">
-                    <h3 class="text-xl font-bold mb-4 text-purple-400">🌟 The End</h3><button
-                        class="w-full bg-purple-600 text-white py-2 rounded-lg font-bold">Xem ngay</button>
+        <section id="section-map" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-6xl mx-auto text-center">
+                    <h2 class="text-5xl font-black title-font mb-8 neon-text">LIVE MAP</h2>
+                    <div class="glass-intense rounded-2xl overflow-hidden h-[600px] flex items-center justify-center">
+                        <p class="text-purple-200">Map Iframe Placeholder (Insert Dynmap link in code)</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="leaderboard-section" class="section-hidden fade-in text-center">
-            <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">Bảng Xếp Hạng</h1>
-            <div class="mb-10 flex justify-center flex-wrap gap-4">
-                <button onclick="showLeaderboard('playtime')"
-                    class="corn-gradient text-white px-6 py-2 rounded-xl font-bold">⏱️ Online</button>
-                <button onclick="showLeaderboard('kills')"
-                    class="glass-effect text-white px-6 py-2 rounded-xl font-bold">🗡️ Kills</button>
-                <button onclick="showLeaderboard('money')"
-                    class="glass-effect text-white px-6 py-2 rounded-xl font-bold">💰 Money</button>
-            </div>
-            <div class="glass-effect rounded-2xl p-8 border border-gray-800">
-                <h2 id="leaderboard-title" class="text-2xl font-bold mb-4 corn-text">⏱️ Top thời gian chơi</h2>
-                <p class="text-gray-300">Dữ liệu đang được đồng bộ...</p>
-            </div>
-        </section>
-
-        <section id="news-section" class="section-hidden fade-in">
-        </section>
-
-        <section id="guide-section" class="section-hidden fade-in">
-            <div id="guide-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
-        </section>
-
-        <section id="forum-section" class="section-hidden fade-in">
-            <div class="mb-8 text-center">
-                <h1 class="text-4xl font-bold minecraft-font mb-4 corn-text">DIỄN ĐÀN CỘNG ĐỒNG</h1>
-                <p class="text-gray-300">Thảo luận - Chém gió - Góp ý (Admin/Dev duyệt bài)</p>
-            </div>
-            <div class="flex justify-between items-center mb-8 glass-effect p-4 rounded-xl border border-gray-800">
-                <div class="flex gap-2">
-                    <button class="px-4 py-2 rounded-lg bg-orange-600 text-white font-bold"
-                        onclick="filterForum('approved')">Bài viết</button>
-                    <button id="btn-pending-posts"
-                        class="hidden-force px-4 py-2 rounded-lg bg-gray-700 text-gray-300 hover:bg-gray-600"
-                        onclick="filterForum('pending')">Duyệt bài ⚠️</button>
+        <section id="section-ranking" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-5xl font-black title-font text-center mb-12 neon-text">LEADERBOARD</h2>
+                    <div id="ranking-container" class="w-full">
+                        <p class="text-center text-gray-400">Loading rankings...</p>
+                    </div>
                 </div>
-                <button onclick="openPostModal('forum')"
-                    class="corn-gradient text-white px-6 py-2 rounded-xl font-bold hover:shadow-lg">✍️ Đăng bài</button>
             </div>
-            <div id="forum-container" class="grid gap-4">
-                <div class="text-center py-10 text-gray-500">Đang tải thảo luận...</div>
+        </section>
+
+        <section id="section-news" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-4xl mx-auto">
+                    <h2 class="text-5xl font-black title-font text-center mb-12 neon-text">NEWS & UPDATES</h2>
+                    <div id="news-container" class="space-y-6">
+                        <p class="text-center text-gray-400">Loading news...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-guide" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-5xl font-black title-font text-center mb-12 neon-text">PLAYER GUIDES</h2>
+                    <div id="guide-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <p class="text-center text-gray-400 col-span-2">Loading guides...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-forum" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-4xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-5xl font-black title-font neon-text mb-2">COMMUNITY</h2>
+                        <p class="text-purple-300">Thảo luận - Chém gió - Góp ý</p>
+                    </div>
+
+                    <div class="flex justify-end mb-4">
+                        <button id="create-post-trigger"
+                            class="cyber-btn px-6 py-2 rounded-lg font-bold title-font text-sm hidden"> + ĐĂNG BÀI
+                        </button>
+                    </div>
+
+                    <div id="forum-container" class="space-y-4">
+                        <div class="text-center py-8">
+                            <div class="loader-ring w-8 h-8 mx-auto mb-4"></div>
+                            <p class="text-gray-400">Đang tải dữ liệu diễn đàn...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="section-admin" class="content-section">
+            <div class="min-h-screen py-24 px-4">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="text-5xl font-black title-font text-center mb-12 text-red-500 neon-text">ADMIN CONTROL
+                    </h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h3 class="text-2xl font-bold text-cyan-400 mb-4">Post Content</h3>
+                            <form id="admin-post-form" class="space-y-4">
+                                <select id="admin-post-type" class="cyber-input w-full p-2 rounded">
+                                    <option value="news">News</option>
+                                    <option value="guides">Guide</option>
+                                </select>
+                                <input type="text" id="admin-post-title" placeholder="Title"
+                                    class="cyber-input w-full p-2 rounded">
+                                <textarea id="admin-post-content" rows="4" placeholder="Content (HTML allowed)"
+                                    class="cyber-input w-full p-2 rounded"></textarea>
+                                <button type="submit" class="cyber-btn w-full py-2 rounded font-bold">PUBLISH</button>
+                            </form>
+                        </div>
+
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h3 class="text-2xl font-bold text-cyan-400 mb-4">User List</h3>
+                            <div class="overflow-y-auto h-64 pr-2" id="admin-user-list">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <script type="module" src="assets/js/main.js"></script>
+    <div id="auth-modal" class="modal">
+        <div class="modal-content glass-intense p-8 rounded-2xl w-full max-w-md relative">
+            <button class="close-modal absolute top-4 right-4 text-purple-300 hover:text-white text-xl">✕</button>
+
+            <div id="form-login" class="auth-form">
+                <h2 class="text-3xl font-black title-font neon-text mb-6 text-center">ĐĂNG NHẬP</h2>
+                <button id="google-login-btn"
+                    class="cyber-btn-secondary w-full py-3 rounded-lg font-bold flex justify-center items-center gap-2 mb-4">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5"> <span>Google
+                        Login</span>
+                </button>
+                <div class="flex items-center gap-2 text-xs text-gray-500 mb-4">
+                    <div class="h-px bg-gray-700 flex-1"></div>HOẶC<div class="h-px bg-gray-700 flex-1"></div>
+                </div>
+
+                <form id="email-login-form" class="space-y-4">
+                    <input type="text" id="login-email" placeholder="Email hoặc Tên nhân vật"
+                        class="cyber-input w-full p-3 rounded-lg">
+                    <input type="password" id="login-pass" placeholder="Mật khẩu"
+                        class="cyber-input w-full p-3 rounded-lg">
+                    <div class="text-right">
+                        <a href="#" onclick="switchAuthForm('forgot')"
+                            class="text-xs text-cyan-400 hover:underline">Quên mật khẩu?</a>
+                    </div>
+                    <button type="submit" class="cyber-btn w-full py-3 rounded-lg font-bold">ĐĂNG NHẬP ⚡</button>
+                </form>
+                <p class="text-center text-sm text-gray-400 mt-4">Chưa có tài khoản? <a href="#"
+                        onclick="switchAuthForm('register')" class="text-purple-400 font-bold hover:underline">Đăng ký
+                        ngay</a></p>
+            </div>
+
+            <div id="form-register" class="auth-form hidden">
+                <h2 class="text-3xl font-black title-font neon-text mb-6 text-center">ĐĂNG KÝ</h2>
+                <form id="email-register-form" class="space-y-4">
+                    <input type="text" id="reg-username" placeholder="Tên nhân vật (Ingame)"
+                        class="cyber-input w-full p-3 rounded-lg" required>
+                    <input type="password" id="reg-pass" placeholder="Mật khẩu"
+                        class="cyber-input w-full p-3 rounded-lg" required>
+                    <button type="submit"
+                        class="bg-green-600 hover:bg-green-500 text-white w-full py-3 rounded-lg font-bold transition">TẠO
+                        TÀI KHOẢN ✨</button>
+                </form>
+                <p class="text-center text-sm text-gray-400 mt-4">Đã có tài khoản? <a href="#"
+                        onclick="switchAuthForm('login')" class="text-cyan-400 font-bold hover:underline">Đăng nhập</a>
+                </p>
+            </div>
+
+            <div id="form-forgot" class="auth-form hidden">
+                <h2 class="text-2xl font-black title-font text-white mb-4 text-center">KHÔI PHỤC MẬT KHẨU</h2>
+                <p class="text-xs text-gray-400 mb-4 text-center">Nhập email bạn đã dùng để đăng ký. Chúng tôi sẽ gửi
+                    link đặt lại mật khẩu.</p>
+                <form id="forgot-pass-form" class="space-y-4">
+                    <input type="email" id="forgot-email" placeholder="Nhập Email của bạn"
+                        class="cyber-input w-full p-3 rounded-lg" required>
+                    <button type="submit"
+                        class="cyber-btn-secondary w-full py-3 rounded-lg font-bold border-yellow-500 text-yellow-400">GỬI
+                        YÊU CẦU 📩</button>
+                </form>
+                <p class="text-center text-sm mt-4"><a href="#" onclick="switchAuthForm('login')"
+                        class="text-gray-400 hover:text-white">← Quay lại đăng nhập</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="post-modal" class="modal">
+        <div class="modal-content glass-intense p-8 rounded-2xl">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-3xl font-black title-font neon-text">BÀI ĐĂNG </h2>
+                <button class="close-modal text-purple-300 hover:text-white">✕</button>
+            </div>
+            <form id="forum-post-form" class="space-y-4">
+                <input type="text" id="forum-title" class="cyber-input w-full p-3 rounded-lg" placeholder="Tiêu Đề"
+                    required>
+                <textarea id="forum-content" rows="5" class="cyber-input w-full p-3 rounded-lg"
+                    placeholder="Nhập Vào Nội Dung" required></textarea>
+                <button type="submit" class="cyber-btn w-full py-3 rounded-lg font-bold">ĐĂNG</button>
+            </form>
+        </div>
+    </div>
+    <div id="admin-modal" class="modal">
+        <div class="modal-content glass-intense p-8 rounded-2xl w-full max-w-5xl h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between mb-6 border-b border-purple-500/30 pb-4">
+                <div>
+                    <h2 class="text-3xl font-black title-font neon-text flex items-center gap-2">
+                        🛡️ ADMIN CONTROL
+                    </h2>
+                    <p class="text-purple-300 text-sm">Quản lý thành viên & Phân quyền</p>
+                </div>
+                <button class="close-modal text-purple-300 hover:text-red-400 transition text-2xl">✕</button>
+            </div>
+
+            <div class="flex justify-between items-center mb-4">
+                <div class="text-cyan-400 font-bold">
+                    Tổng: <span id="total-users-count" class="text-white">0</span> thành viên
+                </div>
+                <input type="text" id="user-search" placeholder="🔍 Tìm tên hoặc email..."
+                    class="cyber-input px-4 py-2 rounded-lg w-64 border border-purple-500/30">
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar bg-black/40 rounded-xl border border-purple-500/20">
+                <table class="w-full text-left border-collapse">
+                    <thead class="sticky top-0 bg-gray-900/95 backdrop-blur z-10 text-cyan-400 uppercase text-xs">
+                        <tr>
+                            <th class="p-4 border-b border-purple-500/30">Người chơi</th>
+                            <th class="p-4 border-b border-purple-500/30">Email / ID</th>
+                            <th class="p-4 border-b border-purple-500/30">Ngày tham gia</th>
+                            <th class="p-4 border-b border-purple-500/30">Vai trò</th>
+                            <th class="p-4 border-b border-purple-500/30 text-center">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-user-table-body" class="text-sm text-gray-300 divide-y divide-purple-500/10">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div id="global-modal" class="modal" style="z-index: 9999;">
+        <div
+            class="modal-content glass-intense p-8 rounded-2xl w-full max-w-sm text-center relative border border-purple-500/50">
+            <div id="global-modal-icon" class="text-5xl mb-4">🔔</div>
+
+            <h3 id="global-modal-title" class="text-2xl font-black title-font text-white mb-2">THÔNG BÁO</h3>
+
+            <p id="global-modal-message" class="text-gray-300 text-sm mb-6 leading-relaxed"></p>
+
+            <div id="global-modal-actions" class="flex justify-center gap-4">
+            </div>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="modal">
+        <div class="modal-content glass-intense p-8 rounded-2xl max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-black title-font neon-text">👤 HỒ SƠ CÁ NHÂN</h2>
+                <button class="close-modal text-purple-300 hover:text-white">✕</button>
+            </div>
+
+            <form id="profile-form" class="space-y-6">
+                <div class="flex justify-center">
+                    <div class="relative group">
+                        <img id="profile-preview" src=""
+                            class="w-24 h-24 rounded-full border-2 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.3)] object-cover">
+                        <div
+                            class="absolute inset-0 rounded-full border-2 border-dashed border-white/50 animate-spin-slow pointer-events-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-purple-300 uppercase block mb-2">Tên hiển thị</label>
+                    <input type="text" id="edit-name"
+                        class="cyber-input w-full px-4 py-3 rounded-lg text-white font-bold"
+                        placeholder="Nhập tên mới...">
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-purple-300 uppercase block mb-2">Avatar URL (Tùy chọn)</label>
+                    <input type="text" id="edit-avatar" class="cyber-input w-full px-4 py-3 rounded-lg text-sm"
+                        placeholder="Link ảnh...">
+                    <p class="text-[10px] text-gray-500 mt-1">Để trống để dùng Skin Minecraft theo tên.</p>
+                </div>
+
+                <button type="submit" class="cyber-btn w-full py-3 rounded-lg font-bold title-font text-lg">
+                    LƯU THAY ĐỔI 💾
+                </button>
+            </form>
+        </div>
+    </div>
+    <script type="module" src="/assets/js/main.js"></script>
 </body>
 
 </html>
