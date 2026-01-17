@@ -699,6 +699,40 @@ window.addEventListener('load', async () => {
 
     setupAuthForms();
 
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const desktopLinks = document.getElementById('nav-links');
+
+    if (mobileBtn && mobileMenu && desktopLinks) {
+        // 1. Tạo link cho mobile từ menu desktop (để không phải viết lại HTML)
+        const links = desktopLinks.querySelectorAll('a');
+        let mobileHtml = '';
+        
+        links.forEach(link => {
+            const target = link.getAttribute('data-nav');
+            const text = link.innerText;
+            // Tạo thẻ a mới với style phù hợp cho mobile
+            mobileHtml += `<a href="#${target}" 
+                class="nav-link block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-bold title-font transition mb-1" 
+                data-nav="${target}">
+                ${text}
+            </a>`;
+        });
+        mobileMenu.innerHTML = mobileHtml;
+
+        // 2. Bắt sự kiện click nút Menu
+        mobileBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 3. Tự động đóng menu khi click vào link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+    }
+
     // 3. Setup Navigation
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
