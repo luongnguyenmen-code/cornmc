@@ -78,8 +78,8 @@ function showCustomModal(title, message, type = 'info', onConfirm = null) {
 
 // --- Tiện ích ---
 window.copyServerIP = () => {
-    navigator.clipboard.writeText("cornminer.top").then(() => {
-        showCustomModal("SERVER IP", "✅ Đã copy IP thành công:\n cornminer.top", "info");
+    navigator.clipboard.writeText("cornnetwork.site").then(() => {
+        showCustomModal("SERVER IP", "✅ Đã copy IP thành công:\n cornnetwork.site", "info");
     });
 };
 

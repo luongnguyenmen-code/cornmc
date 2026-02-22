@@ -1,0 +1,136 @@
+<div class="tool-container">
+    <h2>🎨 Tool Chuyển Skin -> 3D Schematic</h2>
+    <p>Chọn file Skin Minecraft của bạn (định dạng .png) để chuyển đổi thành file .schem dùng cho WorldEdit.</p>
+    
+    <div class="upload-area">
+        <input type="file" id="skinInput" accept="image/png" />
+    </div>
+
+    <button id="convertBtn" onclick="convertSkin()">Chuyển Đổi Ngay 🚀</button>
+
+    <p id="statusMessage"></p>
+</div>
+
+<style>
+    .tool-container {
+        background-color: #1e1e2e;
+        color: #cdd6f4;
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+        text-align: center;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        border: 1px solid #313244;
+    }
+    .tool-container h2 {
+        color: #89b4fa;
+        margin-top: 0;
+    }
+    .upload-area {
+        margin: 20px 0;
+        padding: 20px;
+        border: 2px dashed #6c7086;
+        border-radius: 8px;
+        background-color: #181825;
+    }
+    input[type="file"] {
+        color: #a6adc8;
+    }
+    #convertBtn {
+        background-color: #a6e3a1;
+        color: #11111b;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+    }
+    #convertBtn:hover {
+        background-color: #94e2d5;
+        transform: scale(1.02);
+    }
+    #convertBtn:disabled {
+        background-color: #585b70;
+        cursor: not-allowed;
+        transform: none;
+    }
+    #statusMessage {
+        margin-top: 15px;
+        font-weight: bold;
+        min-height: 20px;
+    }
+</style>
+
+<script>
+    async function convertSkin() {
+        const fileInput = document.getElementById('skinInput');
+        const statusMsg = document.getElementById('statusMessage');
+        const convertBtn = document.getElementById('convertBtn');
+
+        // Kiểm tra xem đã chọn file chưa
+        if (fileInput.files.length === 0) {
+            statusMsg.textContent = '⚠️ Vui lòng chọn một file ảnh skin (.png) trước!';
+            statusMsg.style.color = '#f38ba8'; // Màu đỏ lỗi
+            return;
+        }
+
+        // Đóng băng nút bấm & Hiện trạng thái loading
+        convertBtn.disabled = true;
+        convertBtn.textContent = '⏳ Đang xử lý...';
+        statusMsg.textContent = 'Đang tải ảnh lên và phân tích màu sắc...';
+        statusMsg.style.color = '#f9e2af'; // Màu vàng chờ
+
+        // Chuẩn bị dữ liệu gửi đi
+        const formData = new FormData();
+        formData.append('skin', fileInput.files[0]);
+
+        try {
+            // Gọi đến API trên Vercel của bạn
+            const response = await fetch('/api/convert', {
+                method: 'POST',
+                body: formData
+            });
+
+            // Nếu server trả về lỗi (ví dụ không tìm thấy file, lỗi code...)
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Lỗi từ máy chủ!');
+            }
+
+            // Lấy dữ liệu file .schem trả về dạng Blob (File nhị phân)
+            const blob = await response.blob();
+            
+            // Tạo link ẩn để ép trình duyệt tự động tải file về
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            
+            // Đặt tên file khi tải xuống (Có thể lấy tên gốc của ảnh + _3D.schem)
+            let originalName = fileInput.files[0].name.replace('.png', '');
+            a.download = originalName + '_3D.schem';
+            
+            document.body.appendChild(a);
+            a.click(); // Kích hoạt tải về
+            a.remove(); // Xóa thẻ a đi cho sạch
+            window.URL.revokeObjectURL(downloadUrl); // Giải phóng bộ nhớ
+
+            // Báo thành công
+            statusMsg.textContent = '✅ Thành công! File .schem đã được tải về máy của bạn.';
+            statusMsg.style.color = '#a6e3a1'; // Màu xanh thành công
+
+        } catch (error) {
+            // Xử lý khi có lỗi xảy ra
+            statusMsg.textContent = '❌ Thất bại: ';
+            statusMsg.style.color = '#f38ba8';
+        } finally {
+            // Khôi phục lại nút bấm sau khi chạy xong (dù thành công hay lỗi)
+            convertBtn.disabled = false;
+            convertBtn.textContent = 'Chuyển Đổi Ngay 🚀';
+        }
+    }
+</script>
