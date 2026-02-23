@@ -300,7 +300,7 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "ishuy9nOmZIM13jr"; // ID Bytebin của bạn
+    const exportID = "QXHnWTfv6yDDz6V4"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
