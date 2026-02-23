@@ -76,7 +76,7 @@ document.getElementById('edit-image').addEventListener('input', (e) => {
     }
 });
 
-// 4. QUẢN LÝ USER (CÓ BAN/UNBAN)
+// 4. QUẢN LÝ USER (CÓ BAN/UNBAN & BẢO VỆ ADMIN)
 async function loadUsers() {
     const list = document.getElementById('user-list');
     list.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Đang tải...</td></tr>';
@@ -88,28 +88,51 @@ async function loadUsers() {
         const banClass = isBanned ? 'bg-red-500/20 text-red-500' : 'bg-green-500/20 text-green-500';
         const banText = isBanned ? 'Đã BAN' : 'Hoạt động';
         
-        // Select Role
-        const roles = ['member', 'vip', 'media', 'helper', 'dev', 'admin'];
-        const roleSelect = `
-            <select onchange="window.updateUserRole('${u.id}', this.value)" class="bg-black border border-gray-700 text-xs rounded px-2 py-1 text-white">
-                ${roles.map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`).join('')}
-            </select>
-        `;
+        // 1. Kiểm tra xem user này có phải là ADMIN không
+        const isAdmin = u.role === 'admin';
 
-        return `
-        <tr class="hover:bg-white/5 transition">
-            <td class="p-4 flex items-center gap-3">
-                <img src="${u.photoURL || `https://mc-heads.net/avatar/${u.username}`}" class="w-8 h-8 rounded">
-                <span class="font-bold">${u.username}</span>
-            </td>
-            <td class="p-4 text-gray-400 text-xs">${u.email}</td>
-            <td class="p-4">${roleSelect}</td>
-            <td class="p-4"><span class="text-xs px-2 py-1 rounded font-bold ${banClass}">${banText}</span></td>
-            <td class="p-4 text-right">
+        // 2. Xử lý Cột Chọn Role (Quyền)
+        let roleDisplay = '';
+        if (isAdmin) {
+            // Nếu là Admin -> Hiện mác tĩnh, KHÔNG cho dropdown để sửa
+            roleDisplay = `<span class="bg-red-900/50 text-red-400 font-bold px-3 py-1.5 rounded text-xs border border-red-500/30 shadow-[0_0_10px_rgba(248,113,113,0.2)]">👑 ADMIN</span>`;
+        } else {
+            // Nếu không phải Admin -> Hiện Dropdown bình thường
+            // LƯU Ý: Đã xóa 'admin' ra khỏi danh sách này để không ai cấp quyền admin được
+            const roles = ['member', 'vip', 'media', 'helper', 'dev'];
+            roleDisplay = `
+                <select onchange="window.updateUserRole('${u.id}', this.value)" class="bg-black border border-gray-700 text-xs rounded px-2 py-1 text-white hover:border-cyan-500 transition outline-none">
+                    ${roles.map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`).join('')}
+                </select>
+            `;
+        }
+
+        // 3. Xử lý Cột Nút Bấm Thao Tác (Ban/Unban)
+        let actionButton = '';
+        if (isAdmin) {
+            // Bảo vệ Admin: Không có nút BAN
+            actionButton = `<span class="text-[10px] text-gray-600 italic font-bold">VÔ HIỆU HÓA THAO TÁC</span>`;
+        } else {
+            // User thường: Hiện nút thao tác bình thường
+            actionButton = `
                 <button onclick="window.toggleBanUser('${u.id}', ${isBanned})" 
-                    class="text-xs font-bold px-3 py-1 rounded border ${isBanned ? 'border-green-500 text-green-500 hover:bg-green-500/10' : 'border-red-500 text-red-500 hover:bg-red-500/10'}">
+                    class="text-xs font-bold px-3 py-1 rounded border ${isBanned ? 'border-green-500 text-green-500 hover:bg-green-500/10' : 'border-red-500 text-red-500 hover:bg-red-500/10'} transition">
                     ${isBanned ? 'MỞ KHÓA' : 'BAN'}
                 </button>
+            `;
+        }
+
+        return `
+        <tr class="hover:bg-white/5 transition border-b border-white/5">
+            <td class="p-4 flex items-center gap-3">
+                <img src="${u.photoURL || `https://mc-heads.net/avatar/${u.username}`}" class="w-8 h-8 rounded border border-gray-700 object-cover bg-black">
+                <span class="font-bold text-white">${u.username}</span>
+            </td>
+            <td class="p-4 text-gray-400 text-xs">${u.email}</td>
+            <td class="p-4">${roleDisplay}</td>
+            <td class="p-4"><span class="text-xs px-2 py-1 rounded font-bold ${banClass}">${banText}</span></td>
+            <td class="p-4 text-right">
+                ${actionButton}
             </td>
         </tr>`;
     }).join('');
