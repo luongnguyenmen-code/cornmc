@@ -291,6 +291,187 @@ async function renderGuides() {
 `}).join('');
 }
 
+// ==========================================
+// RENDER 4 BẢNG XẾP HẠNG (CHIA TAB)
+// ==========================================
+async function renderRanking() {
+    const container = document.getElementById('ranking-container');
+    if (!container) return;
+
+    container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
+
+    const exportID = "ishuy9nOmZIM13jr"; // ID Bytebin của bạn
+    const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
+
+    try {
+        const response = await fetch(rawDataUrl);
+        const data = await response.json();
+
+        // 1. LẤY DỮ LIỆU VÀ SẮP XẾP TỪ CAO XUỐNG THẤP
+        const moneyBoard = (data["vault_eco_balance"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
+        const onlineBoard = (data["statistic_time_played"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
+        const pointBoard = (data["playerpoints_points"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
+        const killBoard = (data["statistic_player_kills"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
+
+        // 2. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
+        let html = `
+        <div class="flex flex-wrap justify-center gap-3 mb-8">
+            <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-green-600/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.3)]">💰 ĐẠI GIA</button>
+            <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">⏳ CHĂM CHỈ</button>
+            <button onclick="window.switchRankTab('point')" id="tab-btn-point" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💎 TOP XU</button>
+            <button onclick="window.switchRankTab('kill')" id="tab-btn-kill" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">⚔️ SÁT THỦ</button>
+        </div>
+        <div class="relative w-full max-w-2xl mx-auto">
+        `;
+
+        // Hàm hỗ trợ vẽ 1 bảng
+        const renderBoard = (tabId, title, boardData, prefix, suffix, colorClass, borderGlow, isHidden) => {
+            let boardHtml = `<div id="board-${tabId}" class="rank-board ${isHidden ? 'hidden' : ''} glass-intense p-4 sm:p-6 rounded-2xl border ${borderGlow} shadow-[0_0_30px_rgba(0,0,0,0.2)] relative overflow-hidden group transition-all duration-300">`;
+            boardHtml += `<div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>`;
+            boardHtml += `<h3 class="text-2xl font-black title-font text-center mb-6 ${colorClass} drop-shadow-md relative z-10">${title}</h3>`;
+            boardHtml += `<div class="space-y-3 relative z-10">`;
+
+            if (boardData.length === 0) {
+                boardHtml += `<div class="text-center py-8 text-gray-500 italic text-sm">Chưa có dữ liệu</div>`;
+            } else {
+                const top10 = boardData.slice(0, 10);
+                top10.forEach((player, index) => {
+                    let val = parseFloat(player.value || 0).toLocaleString('vi-VN');
+                    let playerName = player.namecache || "Ẩn danh";
+                    
+                    let medal = `#${index + 1}`;
+                    let medalClass = "text-gray-400 text-base font-bold";
+                    let rowBorder = "border-white/10";
+                    
+                    if (index === 0) { medal = '🥇'; medalClass = "text-3xl drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"; rowBorder = "border-yellow-400/50 bg-gradient-to-r from-yellow-500/20 to-transparent"; }
+                    else if (index === 1) { medal = '🥈'; medalClass = "text-2xl drop-shadow-[0_0_8px_rgba(148,163,184,0.8)]"; rowBorder = "border-gray-300/50 bg-gradient-to-r from-gray-400/20 to-transparent"; }
+                    else if (index === 2) { medal = '🥉'; medalClass = "text-2xl drop-shadow-[0_0_8px_rgba(180,83,9,0.8)]"; rowBorder = "border-orange-400/50 bg-gradient-to-r from-orange-600/20 to-transparent"; }
+
+                    boardHtml += `
+                    <div class="glass-panel p-3 rounded-xl flex items-center justify-between border-l-4 ${rowBorder} hover:bg-white/10 hover:scale-[1.02] transition-all cursor-default">
+                        <div class="flex items-center gap-3 sm:gap-4">
+                            <div class="w-10 text-center ${medalClass} title-font">${medal}</div>
+                            <div class="relative">
+                                <img src="https://mc-heads.net/avatar/${playerName}" class="w-10 h-10 sm:w-12 sm:h-12 rounded-lg border border-white/20 bg-gray-900 object-cover shadow-md">
+                                ${index === 0 ? '<div class="absolute -top-3 -right-2 text-lg">👑</div>' : ''}
+                            </div>
+                            <span class="font-bold text-white text-base sm:text-xl tracking-wide">${playerName}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="${colorClass} font-black text-lg sm:text-2xl drop-shadow-sm">${prefix}${val}${suffix}</span>
+                        </div>
+                    </div>`;
+                });
+            }
+            boardHtml += `</div></div>`;
+            return boardHtml;
+        };
+
+        // 3. VẼ 4 BẢNG VÀO HTML (Chỉ hiện Top Tiền, Ẩn 3 Top còn lại)
+        html += renderBoard("money", "💰 TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", false);
+        html += renderBoard("online", "⏳ TOP CHĂM CHỈ", onlineBoard, "", " Giờ", "text-cyan-400", "border-cyan-500/20", true); 
+        html += renderBoard("point", "💎 TOP ĐẠI GIA XU", pointBoard, "", " Xu", "text-yellow-400", "border-yellow-500/20", true);
+        html += renderBoard("kill", "⚔️ TOP SÁT THỦ", killBoard, "", " Kill", "text-red-400", "border-red-500/20", true);
+
+        html += '</div>'; // Đóng div max-w-2xl
+        
+        container.classList.remove('max-w-7xl'); 
+        container.classList.add('max-w-3xl');    
+        container.innerHTML = html;
+
+    } catch (error) {
+        console.error("Lỗi tải Ranking:", error);
+        container.innerHTML = '<div class="text-red-500 text-center glass-panel p-6 border border-red-500/30 rounded-xl">❌ Lỗi kết nối đến dữ liệu máy chủ. Vui lòng thử lại sau!</div>';
+    }
+}
+
+// ==========================================
+// HÀM CHUYỂN TAB RANKING
+// ==========================================
+window.switchRankTab = (tabName) => {
+    // 1. Ẩn tất cả các bảng
+    document.querySelectorAll('.rank-board').forEach(el => el.classList.add('hidden'));
+    
+    // 2. Hiện bảng vừa được chọn
+    const activeBoard = document.getElementById(`board-${tabName}`);
+    if(activeBoard) activeBoard.classList.remove('hidden');
+
+    // 3. Reset style tất cả các nút bấm về màu xám mờ
+    ['money', 'online', 'point', 'kill'].forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if(btn) btn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10';
+    });
+
+    // 4. Bật sáng nút bấm vừa được chọn với màu tương ứng
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    if(activeBtn) {
+        if(tabName === 'money') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-green-600/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.3)]';
+        } else if (tabName === 'online') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-cyan-600/20 text-cyan-400 border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.3)]';
+        } else if (tabName === 'point') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-yellow-600/20 text-yellow-400 border border-yellow-500/50 shadow-[0_0_15px_rgba(250,204,21,0.3)]';
+        } else if (tabName === 'kill') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-red-600/20 text-red-400 border border-red-500/50 shadow-[0_0_15px_rgba(248,113,113,0.3)]';
+        }
+    }
+};
+
+// ==========================================
+// CẬP NHẬT TRẠNG THÁI SERVER (SỐ NGƯỜI CHƠI)
+// ==========================================
+async function updateServerStatus() {
+    // Thay IP thành IP thật server Minecraft của bạn nhé
+    const serverIP = "45.117.166.6:25522"; 
+    const apiUrl = `https://api.mcsrvstat.us/2/${serverIP}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // Lấy các thẻ HTML cần điền số
+        const statOnlineEl = document.getElementById('stat-online');
+        const navOnlineEl = document.getElementById('nav-online');
+        const statVersionEl = document.getElementById('stat-peak'); // Thẻ hiển thị Version
+        const statusDot = document.querySelector('.status-dot');
+
+        if (data.online) {
+            // Nếu Server đang MỞ
+            const currentPlayers = data.players.online;
+            
+            // 1. Cập nhật số to đùng ở phần LIVE STATISTICS
+            if (statOnlineEl) statOnlineEl.innerText = currentPlayers;
+            
+            // 2. Cập nhật chữ trên thanh Menu Navbar
+            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers} </span>`;
+            
+            // Cập nhật chấm tròn nhấp nháy thành màu xanh lá
+            if (statusDot) {
+                statusDot.style.background = '#4ade80'; 
+                statusDot.style.boxShadow = '0 0 10px #4ade80';
+            }
+
+            if (statVersionEl && data.version) {
+                // Regex tìm chuỗi số có dạng x.x hoặc x.x.x
+                const cleanVersion = data.version.match(/\d+\.\d+(\.\d+)?/);
+                // Nếu tìm thấy số thì in ra số, nếu không thì in ra bản gốc
+                statVersionEl.innerText = cleanVersion ? cleanVersion[0] : data.version;
+            }
+
+        } else {
+            // Nếu Server ĐÓNG / BẢO TRÌ
+            if (statOnlineEl) statOnlineEl.innerText = "OFF";
+            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFFLINE</span>`;
+            if (statusDot) {
+                statusDot.style.background = '#f87171';
+                statusDot.style.boxShadow = '0 0 10px #f87171';
+            }
+        }
+    } catch (error) {
+        console.error("Lỗi kết nối API Server:", error);
+    }
+}
+
 async function renderForum(filterMode = 'approved') {
     // filterMode có 3 dạng: 'approved' (chung), 'pending' (admin duyệt), 'mine' (bài của tôi)
 
@@ -751,6 +932,7 @@ window.addEventListener('load', async () => {
             if (target === 'guide') renderGuides();
             if (target === 'forum') renderForum('approved');
             if (target === 'admin') renderAdminTable();
+            if (target === 'ranking') renderRanking();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
@@ -799,6 +981,8 @@ window.addEventListener('load', async () => {
     renderNews();
     renderGuides();
     renderForum('approved');
+    renderRanking();
+    updateServerStatus();
     subscribeToAuth(handleAuthUI);
 });
 
