@@ -255,40 +255,182 @@ async function renderNews() {
     `}).join('');
 }
 
+// ==========================================
+// RENDER PLAYER GUIDES (KẾT HỢP STATIC DATA & DYNAMIC FIREBASE)
+// ==========================================
 async function renderGuides() {
     const container = document.getElementById('guide-container');
     if (!container) return;
 
-    const guides = await fetchGuides();
-    const isStaff = ['admin', 'dev', 'helper'].includes(currentRole);
+    // --- PHẦN 1: MẢNG DỮ LIỆU CÁC LỆNH (CỐ ĐỊNH Ở TRÊN) ---
+    const guidesData = [
+        {
+            title: "🌍 Di Chuyển & Dịch Chuyển",
+            colSpan: false,
+            commands: [
+                { cmd: "/spawn", desc: "Dịch chuyển về điểm spawn", color: "yellow" },
+                { cmd: "/home <tên>", desc: "Dịch chuyển về nhà (vd: /home home1)", color: "yellow" },
+                { cmd: "/sethome <tên>", desc: "Đặt vị trí nhà (vd: /sethome home1)", color: "yellow" },
+                { cmd: "/delhome <tên>", desc: "Xóa nhà (vd: /delhome home1)", color: "red" },
+                { cmd: "/warp <tên>", desc: "Dịch chuyển đến warp (vd: /warp donate)", color: "yellow" },
+                { cmd: "/rtp", desc: "Dịch chuyển ngẫu nhiên", color: "yellow" },
+                { cmd: "/back", desc: "Quay về chỗ chết hoặc vị trí cũ", color: "yellow" }
+            ]
+        },
+        {
+            title: "👥 Tương Tác Người Chơi",
+            colSpan: false,
+            commands: [
+                { cmd: "/tpa <tên>", desc: "Gửi yêu cầu dịch chuyển", color: "green" },
+                { cmd: "/tpaccept", desc: "Chấp nhận yêu cầu", color: "green" },
+                { cmd: "/tpdeny", desc: "Từ chối yêu cầu", color: "red" },
+                { cmd: "/msg, /w, /tell <tên>", desc: "Nhắn tin riêng", color: "blue" },
+                { cmd: "/pay <tên> <tiền>", desc: "Chuyển tiền cho người khác", color: "purple" },
+                { cmd: "/p pay <tên> <xu>", desc: "Chuyển xu cho người khác", color: "purple" }
+            ]
+        },
+        {
+            title: "💰 Kinh Tế & Mua Bán",
+            colSpan: false,
+            commands: [
+                { cmd: "/balance, /bal", desc: "Xem số tiền bạn có", color: "yellow" },
+                { cmd: "/ah", desc: "Mở chợ đấu giá cộng đồng", color: "orange" },
+                { cmd: "/ah sell <giá>", desc: "Bán vật phẩm đang cầm", color: "orange" },
+                { cmd: "/shop", desc: "Mở cửa hàng hệ thống", color: "blue" },
+                { cmd: "/sellgui", desc: "Mở Menu bán đồ nhanh", color: "blue" },
+                { cmd: "/sellall <tên>", desc: "Bán tất cả 1 loại đồ", color: "blue" },
+                { cmd: "/rank", desc: "Xem menu mua Rank VIP", color: "cyan" }
+            ]
+        },
+        {
+            title: "🛡️ Bảo Vệ Đất (Claim)",
+            colSpan: false,
+            videoLink: "https://streamable.com/oym4xe",
+            commands: [
+                { cmd: "/claim", desc: "Tạo vùng bảo vệ (Cần Golden Shovel)", color: "yellow" },
+                { cmd: "/claimshop", desc: "Mua thêm Claimblocks", color: "yellow" },
+                { cmd: "/abandonclaim", desc: "Bỏ vùng đất đang đứng", color: "red" },
+                { cmd: "/trust <tên>", desc: "Cho phép người khác xây dựng", color: "green" },
+                { cmd: "/untrust <tên>", desc: "Thu hồi quyền xây dựng", color: "red" },
+                { cmd: "/trustlist", desc: "Xem danh sách người có quyền", color: "cyan" },
+                { cmd: "/claimslist", desc: "Xem các vùng bạn đang sở hữu", color: "cyan" }
+            ]
+        },
+        {
+            title: "⚙️ Tiện Ích & Biểu Cảm",
+            colSpan: true,
+            commands: [
+                { cmd: "/pv <số>", desc: "Mở kho chứa đồ ảo (vd: /pv 1)", color: "purple" },
+                { cmd: "/repair", desc: "Sửa vật phẩm đang cầm", color: "purple" },
+                { cmd: "/diemdanh", desc: "Nhận thưởng điểm danh hằng ngày", color: "purple" },
+                { cmd: "[i]", desc: "Gõ trong chat để show đồ đang cầm", color: "white" },
+                { cmd: "[inv]", desc: "Hiển thị toàn bộ kho đồ lên chat", color: "white" },
+                { cmd: "/sit", desc: "Ngồi xuống tại chỗ", color: "pink" },
+                { cmd: "/lay", desc: "Nằm xuống mặt đất", color: "pink" },
+                { cmd: "/crawl", desc: "Bò trườn", color: "pink" },
+                { cmd: "/spin", desc: "Xoay vòng vòng", color: "pink" }
+            ]
+        }
+    ];
 
-    if (guides.length === 0) {
-        container.innerHTML = `<p class="col-span-2 text-center text-gray-400">Chưa có hướng dẫn.</p>`;
-        return;
-    }
+    const colorMap = {
+        "yellow": "text-yellow-400 border-yellow-500/30",
+        "red": "text-red-400 border-red-500/30",
+        "green": "text-green-400 border-green-500/30",
+        "blue": "text-blue-400 border-blue-500/30",
+        "purple": "text-purple-400 border-purple-500/30",
+        "orange": "text-orange-400 border-orange-500/30",
+        "cyan": "text-cyan-400 border-cyan-500/30",
+        "pink": "text-pink-400 border-pink-500/30",
+        "white": "text-white border-gray-500/30"
+    };
 
-    container.innerHTML = guides.map(item => {
-        const headerDisplay = item.imageUrl 
-            ? `<div class="w-full h-48 mb-4 overflow-hidden rounded-lg border border-purple-500/30 relative">
-                 <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-               </div>`
-            : `<div class="text-4xl mb-4 filter drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">📘</div>`;
+    let staticHtml = guidesData.map(group => {
+        const videoBtn = group.videoLink ? `
+            <a href="${group.videoLink}" target="_blank" class="bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1 rounded text-xs font-bold flex items-center gap-1 hover:bg-red-500 hover:text-white transition">
+                ▶️ XEM VIDEO
+            </a>
+        ` : '';
+        const gridClass = group.colSpan ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3" : "space-y-3";
+        const boxSpanClass = group.colSpan ? "md:col-span-2" : "";
+
+        const commandsHtml = group.commands.map(cmd => `
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <code class="${colorMap[cmd.color] || colorMap['white']} bg-black/50 px-3 py-1.5 rounded font-mono border whitespace-nowrap">${cmd.cmd}</code>
+                <span class="text-gray-300 text-left sm:text-right flex-1 text-sm">${cmd.desc}</span>
+            </div>
+        `).join('');
 
         return `
-    <div class="glass-panel p-6 rounded-2xl feature-card tilt-card relative group flex flex-col h-full bg-gradient-to-b from-white/5 to-black/20 border border-white/10 hover:border-cyan-400/50 hover:shadow-[0_0_25px_rgba(34,211,238,0.25)] transition-all duration-300">
-        
-        ${headerDisplay}
-
-        <h3 class="text-2xl font-bold title-font mb-3 text-cyan-300 group-hover:text-cyan-200 transition-colors drop-shadow-sm">${item.title}</h3>
-        <p class="text-gray-200 leading-relaxed mb-4 line-clamp-3 flex-grow font-light">${item.content}</p>
-        <div class="flex justify-between items-end mt-4 pt-4 border-t border-white/10">
-            <button onclick="alert('${item.content.replace(/'/g, "\\'").replace(/\n/g, '\\n')}')" class="text-cyan-300 hover:text-white font-bold text-sm hover:underline title-font flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                ĐỌC TIẾP <span class="text-lg">→</span>
-            </button>
-            ${isStaff ? `<button onclick="window.deletePost('guides', '${item.id}')" class="text-red-400 text-xs hover:text-white bg-red-900/20 px-3 py-1 rounded border border-red-500/30 opacity-0 group-hover:opacity-100 transition">XÓA</button>` : ''}
+        <div class="glass-panel p-6 rounded-2xl border border-purple-500/30 hover:border-cyan-400/50 transition-colors ${boxSpanClass}">
+            <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-6">
+                <h3 class="text-2xl font-bold title-font text-cyan-400 flex items-center gap-2">
+                    ${group.title}
+                </h3>
+                ${videoBtn}
+            </div>
+            <div class="${gridClass}">
+                ${commandsHtml}
+            </div>
         </div>
-    </div>
-`}).join('');
+        `;
+    }).join('');
+
+    // --- PHẦN 2: TẢI DỮ LIỆU ĐỘNG TỪ DATABASE (Ở DƯỚI) ---
+    let dynamicHtml = '';
+    try {
+        const guides = await fetchGuides();
+        const isStaff = ['admin', 'dev', 'helper'].includes(currentRole);
+
+        if (guides && guides.length > 0) {
+            dynamicHtml += `
+            <div class="md:col-span-2 mt-12 mb-4 border-b border-purple-500/30 pb-4 text-center">
+                <h3 class="text-3xl font-black title-font neon-text">📚 BÀI VIẾT HƯỚNG DẪN TỪ ADMIN</h3>
+                <p class="text-gray-400 text-sm mt-2">Đọc các bài viết chi tiết để hiểu rõ hơn về tính năng server</p>
+            </div>
+            `;
+
+            dynamicHtml += guides.map(item => {
+                const headerDisplay = item.imageUrl 
+                    ? `<div class="w-full h-48 mb-4 overflow-hidden rounded-lg border border-purple-500/30 relative">
+                         <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                       </div>`
+                    : `<div class="text-4xl mb-4 filter drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">📘</div>`;
+
+                // Xử lý chuỗi để tránh bị lỗi nháy đơn/nháy kép khi truyền vào Modal
+                const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const safeContent = item.content.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
+
+                return `
+                <div class="glass-panel p-6 rounded-2xl feature-card tilt-card relative group flex flex-col h-full bg-gradient-to-b from-white/5 to-black/20 border border-white/10 hover:border-cyan-400/50 hover:shadow-[0_0_25px_rgba(34,211,238,0.25)] transition-all duration-300">
+                    
+                    ${headerDisplay}
+
+                    <h3 class="text-2xl font-bold title-font mb-3 text-cyan-300 group-hover:text-cyan-200 transition-colors drop-shadow-sm">${item.title}</h3>
+                    <p class="text-gray-200 leading-relaxed mb-4 line-clamp-3 flex-grow font-light">${item.content}</p>
+                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-white/10">
+                        
+                        <button onclick="window.showCustomModal('${safeTitle}', '${safeContent}', 'info')" 
+                                class="text-cyan-300 hover:text-white font-bold text-sm hover:underline title-font flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                            ĐỌC TIẾP <span class="text-lg">→</span>
+                        </button>
+                        
+                        ${isStaff ? `
+                        <button onclick="window.deletePost('guides', '${item.id}')" 
+                                class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/50 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shadow-lg shadow-red-900/20">
+                            🗑️ XÓA
+                        </button>` : ''}
+
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+    } catch (error) {
+        console.error("Lỗi tải bài viết hướng dẫn:", error);
+    }
+
+    container.innerHTML = staticHtml + dynamicHtml;
 }
 
 // ==========================================
@@ -300,7 +442,7 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "QXHnWTfv6yDDz6V4"; // ID Bytebin của bạn
+    const exportID = "YKIhByu3CSIJFuAG"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
