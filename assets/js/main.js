@@ -724,8 +724,7 @@ window.switchRankTab = (tabName) => {
 // ==========================================
 async function updateServerStatus() {
     // Thay IP thành IP thật server Minecraft của bạn nhé
-    const serverIP = "103.161.119.246:25017";
-    const apiUrl = `https://api.mcsrvstat.us/2/${serverIP}`;
+    const apiUrl = `https://mcapi.us/server/status?ip=103.161.119.246&port=25017`;
 
     try {
         const response = await fetch(apiUrl);
@@ -739,31 +738,32 @@ async function updateServerStatus() {
 
         if (data.online) {
             // Nếu Server đang MỞ
-            const currentPlayers = data.players.online;
+            const currentPlayers = data.players.now || 0;
 
             // 1. Cập nhật số to đùng ở phần LIVE STATISTICS
             if (statOnlineEl) statOnlineEl.innerText = currentPlayers;
 
-            // 2. Cập nhật chữ trên thanh Menu Navbar
-            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers} </span>`;
+           if (navOnlineEl) {
+                navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers}</span>`;
+            }
 
-            // Cập nhật chấm tròn nhấp nháy thành màu xanh lá
+            // Cập nhật chấm tròn xanh nhấp nháy
             if (statusDot) {
                 statusDot.style.background = '#4ade80';
                 statusDot.style.boxShadow = '0 0 10px #4ade80';
             }
 
-            if (statVersionEl && data.version) {
-                // Regex tìm chuỗi số có dạng x.x hoặc x.x.x
-                const cleanVersion = data.version.match(/\d+\.\d+(\.\d+)?/);
-                // Nếu tìm thấy số thì in ra số, nếu không thì in ra bản gốc
-                statVersionEl.innerText = cleanVersion ? cleanVersion[0] : data.version;
+            if (statVersionEl && data.server && data.server.name) {
+                const versionString = data.server.name; 
+                // Regex lọc lấy số (ví dụ: 1.21.8)
+                const cleanVersion = versionString.match(/\d+\.\d+(\.\d+)?/);
+                statVersionEl.innerText = cleanVersion ? cleanVersion[0] : versionString;
             }
 
         } else {
             // Nếu Server ĐÓNG / BẢO TRÌ
             if (statOnlineEl) statOnlineEl.innerText = "OFF";
-            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFFLINE</span>`;
+            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFF</span>`;
             if (statusDot) {
                 statusDot.style.background = '#f87171';
                 statusDot.style.boxShadow = '0 0 10px #f87171';

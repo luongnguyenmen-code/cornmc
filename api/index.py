@@ -4,6 +4,7 @@ from PIL import Image
 import json
 import tempfile
 import os
+import io
 
 app = Flask(__name__)
 
