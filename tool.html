@@ -1,134 +1,177 @@
-<div class="tool-container">
-    <h2>🎨 Tool Chuyển Skin -> 3D Schematic</h2>
-    <p>Chọn file Skin Minecraft của bạn (định dạng .png) để chuyển đổi thành file .schem dùng cho WorldEdit.</p>
-    
-    <div class="upload-area">
-        <input type="file" id="skinInput" accept="image/png" />
+<div class="tools-wrapper">
+    <div class="tool-selector">
+        <button id="tab-merge" class="tab-btn active" onclick="openTool('merge')">✂️ Tool Ghép Skin Toàn Diện</button>
+        <button id="tab-convert" class="tab-btn" onclick="openTool('convert')">🎨 Tool Chuyển Skin -> 3D Schematic</button>
     </div>
 
-    <button id="convertBtn" onclick="convertSkin()">Chuyển Đổi Ngay 🚀</button>
+    <div id="tool-merge" class="tool-container">
+        <h2>✂️ Ghép Đầu + Thân + Chân</h2>
+        <p>Chọn 3 mảnh skin khác nhau để tạo ra phiên bản hoàn hảo nhất.</p>
+        
+        <div class="upload-area" style="text-align: left;">
+            <label style="color: #bac2de; font-weight: bold; display: block; margin-bottom: 5px;">1. Skin lấy ĐẦU (Head & Hat):</label>
+            <input type="file" id="skinHead" accept="image/png" style="margin-bottom: 15px; width: 100%;" />
+            
+            <label style="color: #bac2de; font-weight: bold; display: block; margin-bottom: 5px;">2. Skin lấy THÂN (Body & Arms):</label>
+            <input type="file" id="skinBody" accept="image/png" style="margin-bottom: 15px; width: 100%;" />
 
-    <p id="statusMessage"></p>
+            <label style="color: #bac2de; font-weight: bold; display: block; margin-bottom: 5px;">3. Skin lấy CHÂN (Legs & Pants):</label>
+            <input type="file" id="skinLegs" accept="image/png" style="width: 100%;" />
+        </div>
+
+        <button id="btnMerge" class="action-btn" onclick="mergeSkin()">Ghép Lại Ngay 🚀</button>
+        <p id="msgMerge" class="status-message"></p>
+    </div>
+
+    <div id="tool-convert" class="tool-container" style="display: none;">
+        <h2>🎨 Tool Chuyển Skin -> 3D Schematic</h2>
+        <p>Chọn file Skin Minecraft của bạn (định dạng .png) để chuyển đổi thành file .schem dùng cho WorldEdit.</p>
+        
+        <div class="upload-area">
+            <input type="file" id="skinInput" accept="image/png" />
+        </div>
+
+        <button id="convertBtn" class="action-btn" onclick="convertSkin()">Chuyển Đổi Ngay 🚀</button>
+        <p id="statusMessage" class="status-message"></p>
+    </div>
 </div>
 
 <style>
-    .tool-container {
-        background-color: #1e1e2e;
-        color: #cdd6f4;
-        max-width: 500px;
-        margin: 40px auto;
-        padding: 30px;
-        border-radius: 12px;
-        box-shadow: 0 8px 16px rgba(0,0,0,0.4);
-        text-align: center;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        border: 1px solid #313244;
-    }
-    .tool-container h2 {
-        color: #89b4fa;
-        margin-top: 0;
-    }
-    .upload-area {
-        margin: 20px 0;
-        padding: 20px;
-        border: 2px dashed #6c7086;
-        border-radius: 8px;
-        background-color: #181825;
-    }
-    input[type="file"] {
-        color: #a6adc8;
-    }
-    #convertBtn {
-        background-color: #a6e3a1;
-        color: #11111b;
-        border: none;
-        padding: 12px 24px;
-        font-size: 16px;
-        font-weight: bold;
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.2s;
-        width: 100%;
-    }
-    #convertBtn:hover {
-        background-color: #94e2d5;
-        transform: scale(1.02);
-    }
-    #convertBtn:disabled {
-        background-color: #585b70;
-        cursor: not-allowed;
-        transform: none;
-    }
-    #statusMessage {
-        margin-top: 15px;
-        font-weight: bold;
-        min-height: 20px;
-    }
+    .tools-wrapper { display: flex; flex-direction: column; align-items: center; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    .tool-selector { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
+    .tab-btn { background-color: #181825; color: #a6adc8; border: 2px solid #313244; padding: 15px 25px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+    .tab-btn:hover { background-color: #313244; color: #cdd6f4; }
+    .tab-btn.active { background-color: #89b4fa; color: #11111b; border-color: #89b4fa; transform: scale(1.05); }
+    .tool-container { background-color: #1e1e2e; color: #cdd6f4; width: 100%; max-width: 500px; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); text-align: center; border: 1px solid #313244; animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .tool-container h2 { color: #89b4fa; margin-top: 0; }
+    .upload-area { margin: 20px 0; padding: 20px; border: 2px dashed #6c7086; border-radius: 8px; background-color: #181825; }
+    input[type="file"] { color: #a6adc8; }
+    .action-btn { background-color: #a6e3a1; color: #11111b; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 10px; }
+    .action-btn:hover { background-color: #94e2d5; transform: scale(1.02); }
+    .action-btn:disabled { background-color: #585b70; cursor: not-allowed; transform: none; }
+    .status-message { margin-top: 15px; font-weight: bold; min-height: 20px; }
 </style>
 
 <script>
-    async function convertSkin() {
-        const fileInput = document.getElementById('skinInput');
-        const statusMsg = document.getElementById('statusMessage');
-        const convertBtn = document.getElementById('convertBtn');
+    function openTool(toolName) {
+        document.getElementById('tool-merge').style.display = 'none';
+        document.getElementById('tool-convert').style.display = 'none';
+        document.getElementById('tab-merge').classList.remove('active');
+        document.getElementById('tab-convert').classList.remove('active');
 
-        // Kiểm tra xem đã chọn file chưa
-        if (fileInput.files.length === 0) {
-            statusMsg.textContent = '⚠️ Vui lòng chọn một file ảnh skin (.png) trước!';
-            statusMsg.style.color = '#f38ba8'; // Màu đỏ lỗi
+        document.getElementById('tool-' + toolName).style.display = 'block';
+        document.getElementById('tab-' + toolName).classList.add('active');
+    }
+
+    // 1. GHÉP SKIN (ĐẦU + THÂN + CHÂN)
+    async function mergeSkin() {
+        const headInput = document.getElementById('skinHead');
+        const bodyInput = document.getElementById('skinBody');
+        const legsInput = document.getElementById('skinLegs'); // Đã thêm ô CHÂN
+        const statusMsg = document.getElementById('msgMerge');
+        const btn = document.getElementById('btnMerge');
+
+        if (headInput.files.length === 0 || bodyInput.files.length === 0 || legsInput.files.length === 0) {
+            statusMsg.textContent = '⚠️ Vui lòng chọn đủ cả 3 file ảnh (Đầu, Thân, Chân)!';
+            statusMsg.style.color = '#f38ba8';
             return;
         }
 
-        // Đóng băng nút bấm & Hiện trạng thái loading
-        convertBtn.disabled = true;
-        convertBtn.textContent = '⏳ Đang xử lý...';
-        statusMsg.textContent = 'Đang tải ảnh lên và phân tích màu sắc...';
-        statusMsg.style.color = '#f9e2af'; // Màu vàng chờ
+        btn.disabled = true;
+        btn.textContent = '⏳ Đang xử lý...';
+        statusMsg.textContent = 'Đang cắt ghép trên máy chủ...';
+        statusMsg.style.color = '#f9e2af';
 
-        // Chuẩn bị dữ liệu gửi đi
         const formData = new FormData();
-        formData.append('skin', fileInput.files[0]);
+        formData.append('head', headInput.files[0]);
+        formData.append('body', bodyInput.files[0]);
+        formData.append('legs', legsInput.files[0]); // Đẩy thêm file Chân lên Vercel
 
         try {
-            // Gọi đến API trên Vercel của bạn
-            const response = await fetch('/api/convert', {
+            const response = await fetch('/api/merge', {
                 method: 'POST',
                 body: formData
             });
 
-            // Nếu server trả về lỗi (ví dụ không tìm thấy file, lỗi code...)
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Lỗi từ máy chủ!');
             }
 
-            // Lấy dữ liệu file .schem trả về dạng Blob (File nhị phân)
             const blob = await response.blob();
-            
-            // Tạo link ẩn để ép trình duyệt tự động tải file về
             const downloadUrl = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = downloadUrl;
+            a.download = 'Skin_Ghep_Toan_Dien.png';
             
-            // Đặt tên file khi tải xuống (Có thể lấy tên gốc của ảnh + _3D.schem)
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+
+            statusMsg.textContent = '✅ Đã ghép hoàn chỉnh và tải về máy!';
+            statusMsg.style.color = '#a6e3a1';
+
+        } catch (error) {
+            statusMsg.textContent = '❌ Thất bại: ' + error.message;
+            statusMsg.style.color = '#f38ba8';
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Ghép Lại Ngay 🚀';
+        }
+    }
+
+    // 2. CONVERT SCHEMATIC
+    async function convertSkin() {
+        const fileInput = document.getElementById('skinInput');
+        const statusMsg = document.getElementById('statusMessage');
+        const convertBtn = document.getElementById('convertBtn');
+
+        if (fileInput.files.length === 0) {
+            statusMsg.textContent = '⚠️ Vui lòng chọn một file ảnh skin (.png) trước!';
+            statusMsg.style.color = '#f38ba8'; 
+            return;
+        }
+
+        convertBtn.disabled = true;
+        convertBtn.textContent = '⏳ Đang xử lý...';
+        statusMsg.textContent = 'Đang tải ảnh lên và phân tích màu sắc...';
+        statusMsg.style.color = '#f9e2af'; 
+
+        const formData = new FormData();
+        formData.append('skin', fileInput.files[0]);
+
+        try {
+            const response = await fetch('/api/convert', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Lỗi từ máy chủ!');
+            }
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
             let originalName = fileInput.files[0].name.replace('.png', '');
             a.download = originalName + '_3D.schem';
             
             document.body.appendChild(a);
-            a.click(); // Kích hoạt tải về
-            a.remove(); // Xóa thẻ a đi cho sạch
-            window.URL.revokeObjectURL(downloadUrl); // Giải phóng bộ nhớ
+            a.click(); 
+            a.remove(); 
+            window.URL.revokeObjectURL(downloadUrl); 
 
-            // Báo thành công
-            statusMsg.textContent = '✅ Thành công! File .schem đã được tải về máy của bạn.';
-            statusMsg.style.color = '#a6e3a1'; // Màu xanh thành công
+            statusMsg.textContent = '✅ Thành công! File .schem đã tải về.';
+            statusMsg.style.color = '#a6e3a1'; 
 
         } catch (error) {
-            // Xử lý khi có lỗi xảy ra
-            statusMsg.textContent = '❌ Thất bại: ';
+            statusMsg.textContent = '❌ Thất bại: ' + error.message;
             statusMsg.style.color = '#f38ba8';
         } finally {
-            // Khôi phục lại nút bấm sau khi chạy xong (dù thành công hay lỗi)
             convertBtn.disabled = false;
             convertBtn.textContent = 'Chuyển Đổi Ngay 🚀';
         }

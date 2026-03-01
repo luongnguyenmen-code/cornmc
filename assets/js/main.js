@@ -19,6 +19,7 @@ function showCustomModal(title, message, type = 'info', onConfirm = null) {
     const msgEl = document.getElementById('global-modal-message');
     const actionsEl = document.getElementById('global-modal-actions');
     const iconEl = document.getElementById('global-modal-icon');
+    const modalContent = modal.querySelector('.modal-content');
 
     // 1. Set nội dung
     titleEl.innerText = title;
@@ -48,12 +49,12 @@ function showCustomModal(title, message, type = 'info', onConfirm = null) {
 
         // Nút Đồng ý
         const btnOk = document.createElement('button');
-        btnOk.className = type === 'danger' 
+        btnOk.className = type === 'danger'
             ? "bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-red-900/50 transition"
             : "cyber-btn px-6 py-2 rounded-lg font-bold text-sm text-white transition";
-        
+
         btnOk.innerText = type === 'danger' ? "XÓA NGAY" : "ĐỒNG Ý";
-        
+
         btnOk.onclick = async () => {
             modal.classList.remove('active');
             if (onConfirm) await onConfirm();
@@ -66,6 +67,12 @@ function showCustomModal(title, message, type = 'info', onConfirm = null) {
         btnClose.innerText = "ĐÃ HIỂU";
         btnClose.onclick = () => modal.classList.remove('active');
         actionsEl.appendChild(btnClose);
+    }
+
+    if (type === 'info') {
+        modalContent.classList.add('is-news');
+    } else {
+        modalContent.classList.remove('is-news');
     }
 
     // 4. Hiện Modal
@@ -90,9 +97,9 @@ window.openDiscord = () => {
 // --- Chức năng Admin: Quản lý User ---
 window.handleRoleChange = async (uid, newRole) => {
     showCustomModal(
-        "XÁC NHẬN PHÂN QUYỀN", 
-        `Bạn có chắc muốn đổi quyền thành viên này sang [${newRole.toUpperCase()}]?`, 
-        "confirm", 
+        "XÁC NHẬN PHÂN QUYỀN",
+        `Bạn có chắc muốn đổi quyền thành viên này sang [${newRole.toUpperCase()}]?`,
+        "confirm",
         async () => {
             try {
                 await editDocument('users', uid, { role: newRole });
@@ -104,9 +111,9 @@ window.handleRoleChange = async (uid, newRole) => {
 
 window.handleDeleteUser = async (uid, name) => {
     showCustomModal(
-        "CẢNH BÁO XÓA USER", 
-        `⛔ Bạn đang xóa toàn bộ dữ liệu của [${name}]?\nHành động này KHÔNG THỂ khôi phục!`, 
-        "danger", 
+        "CẢNH BÁO XÓA USER",
+        `⛔ Bạn đang xóa toàn bộ dữ liệu của [${name}]?\nHành động này KHÔNG THỂ khôi phục!`,
+        "danger",
         async () => {
             try {
                 await deleteUserAndData(uid);
@@ -146,7 +153,7 @@ window.approvePost = (docId) => {
         async () => {
             try {
                 await editDocument('forum_posts', docId, { status: 'approved' });
-                renderForum('pending'); 
+                renderForum('pending');
                 showCustomModal("THÀNH CÔNG", "Đã duyệt bài!", "info");
             } catch (e) { showCustomModal("LỖI", e.message, "danger"); }
         }
@@ -210,9 +217,8 @@ window.deleteCommentAction = (postId, commentId) => {
 };
 
 // ==========================================
-// 3. RENDER FUNCTIONS (Hiển thị dữ liệu)
+// RENDER NEWS 
 // ==========================================
-
 async function renderNews() {
     const container = document.getElementById('news-container');
     if (!container) return;
@@ -226,72 +232,83 @@ async function renderNews() {
     }
 
     container.innerHTML = news.map(item => {
-        const imageHTML = item.imageUrl 
-            ? `<img src="${item.imageUrl}" class="w-full h-auto max-h-96 object-cover rounded-lg mb-4 border border-cyan-500/30 shadow-[0_0_15px_rgba(34,211,238,0.2)]">` 
-            : '';
+        // Xử lý dữ liệu an toàn để đưa vào Modal
+        const safeTitle = (item.title || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+
+        // Nếu có hình ảnh, tự động chèn thẻ img vào đầu nội dung khi hiển thị trong Modal
+        let modalContent = item.content || '';
+        if (item.imageUrl) {
+            modalContent = `<img src="${item.imageUrl}" class="w-full h-auto rounded-lg mb-4 border border-cyan-500/30 shadow-lg"><br>` + modalContent;
+        }
+        const safeContent = modalContent.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '<br>');
+
+        // Lấy 1 đoạn text ngắn bỏ hết HTML để làm mô tả
+        const plainTextDesc = (item.content || '').replace(/<[^>]*>?/gm, '');
 
         return `
-    <div class="glass-panel p-6 rounded-xl forum-post mb-4 border-l-4 bg-gradient-to-r from-white/10 to-transparent hover:bg-white/15 transition relative group shadow-[0_0_15px_rgba(34,211,238,0.15)]">
-        <div class="flex items-start space-x-4">
-            <span class="text-3xl filter drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]">📰</span>
-            <div class="flex-1 min-w-0"> <div class="flex items-center space-x-3 mb-2">
+    <div class="glass-panel p-5 rounded-xl forum-post mb-4 border-l-4 border-cyan-500 bg-gradient-to-r from-white/10 to-transparent hover:bg-white/15 transition cursor-pointer group shadow-[0_0_15px_rgba(34,211,238,0.1)]" 
+         onclick="window.showCustomModal('${safeTitle}', '${safeContent}', 'info')">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            
+            <div class="flex-1 min-w-0"> 
+                <div class="flex items-center space-x-3 mb-2">
                     <span class="text-xs text-white bg-purple-600/40 border border-purple-400/30 px-2 rounded shadow-sm">${new Date(item.createdAt?.seconds * 1000).toLocaleDateString()}</span>
-                    <span class="bg-cyan-500/30 text-cyan-200 border border-cyan-400/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase shadow-[0_0_10px_rgba(34,211,238,0.3)]">${item.category || 'TIN TỨC'}</span>
+                    <span class="bg-cyan-500/30 text-cyan-200 border border-cyan-400/30 px-2 py-0.5 rounded text-[10px] font-bold uppercase">${item.category || 'TIN TỨC'}</span>
                 </div>
                 
-                <h3 class="text-xl font-bold title-font mb-2 text-cyan-100 drop-shadow-md">${item.title}</h3>
+                <h3 class="text-xl font-bold title-font text-cyan-100 drop-shadow-md group-hover:text-white transition">${item.title}</h3>
                 
-                ${imageHTML}
+                <p class="text-gray-400 text-sm mt-1 line-clamp-2">${plainTextDesc}</p>
+            </div>
+
+            <div class="flex flex-col items-end gap-2 flex-shrink-0 border-t sm:border-t-0 border-white/10 pt-3 sm:pt-0 w-full sm:w-auto">
+                <span class="text-xs text-gray-400 hidden sm:block">Bởi: <b class="text-cyan-300">${item.author}</b></span>
+                <span class="text-cyan-400 text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">ĐỌC CHI TIẾT ➔</span>
                 
-                <div class="text-gray-100 text-sm leading-relaxed whitespace-pre-line">${item.content}</div>
-                
-                <div class="mt-3 pt-3 border-t border-white/10 flex justify-between items-center">
-                    <span class="text-xs text-gray-400 group-hover:text-white transition">Đăng bởi: <b class="text-cyan-300">${item.author}</b></span>
-                    ${isStaff ? `<button onclick="window.deletePost('news', '${item.id}')" class="text-red-400 text-xs hover:text-red-200 font-bold opacity-0 group-hover:opacity-100 transition bg-red-900/30 px-2 py-1 rounded border border-red-500/30">🗑️ XÓA BÀI</button>` : ''}
-                </div>
+                ${isStaff ? `<button onclick="event.stopPropagation(); window.deletePost('news', '${item.id}')" class="text-red-400 text-xs hover:text-white font-bold bg-red-900/30 hover:bg-red-600 px-3 py-1.5 rounded border border-red-500/30 mt-1 transition shadow-md">🗑️ XÓA</button>` : ''}
             </div>
         </div>
     </div>
     `}).join('');
 }
 
+
 // ==========================================
-// RENDER PLAYER GUIDES (KẾT HỢP STATIC DATA & DYNAMIC FIREBASE)
+// RENDER PLAYER GUIDES (2 CỘT: LỆNH & LUẬT - DẠNG XỔ XUỐNG)
 // ==========================================
 async function renderGuides() {
     const container = document.getElementById('guide-container');
     if (!container) return;
 
-    // --- PHẦN 1: MẢNG DỮ LIỆU CÁC LỆNH (CỐ ĐỊNH Ở TRÊN) ---
-    const guidesData = [
+    // ==========================================
+    // 1. DỮ LIỆU BÊN TRÁI: DANH SÁCH LỆNH (COMMANDS)
+    // ==========================================
+    const commandsData = [
         {
             title: "🌍 Di Chuyển & Dịch Chuyển",
-            colSpan: false,
             commands: [
                 { cmd: "/spawn", desc: "Dịch chuyển về điểm spawn", color: "yellow" },
-                { cmd: "/home <tên>", desc: "Dịch chuyển về nhà (vd: /home home1)", color: "yellow" },
-                { cmd: "/sethome <tên>", desc: "Đặt vị trí nhà (vd: /sethome home1)", color: "yellow" },
-                { cmd: "/delhome <tên>", desc: "Xóa nhà (vd: /delhome home1)", color: "red" },
-                { cmd: "/warp <tên>", desc: "Dịch chuyển đến warp (vd: /warp donate)", color: "yellow" },
+                { cmd: "/home <tên>", desc: "Dịch chuyển về nhà", color: "yellow" },
+                { cmd: "/sethome <tên>", desc: "Đặt vị trí nhà", color: "yellow" },
+                { cmd: "/delhome <tên>", desc: "Xóa nhà", color: "red" },
+                { cmd: "/warp <tên>", desc: "Dịch chuyển đến warp", color: "yellow" },
                 { cmd: "/rtp", desc: "Dịch chuyển ngẫu nhiên", color: "yellow" },
                 { cmd: "/back", desc: "Quay về chỗ chết hoặc vị trí cũ", color: "yellow" }
             ]
         },
         {
             title: "👥 Tương Tác Người Chơi",
-            colSpan: false,
             commands: [
                 { cmd: "/tpa <tên>", desc: "Gửi yêu cầu dịch chuyển", color: "green" },
                 { cmd: "/tpaccept", desc: "Chấp nhận yêu cầu", color: "green" },
                 { cmd: "/tpdeny", desc: "Từ chối yêu cầu", color: "red" },
                 { cmd: "/msg, /w, /tell <tên>", desc: "Nhắn tin riêng", color: "blue" },
                 { cmd: "/pay <tên> <tiền>", desc: "Chuyển tiền cho người khác", color: "purple" },
-                { cmd: "/p pay <tên> <xu>", desc: "Chuyển xu cho người khác", color: "purple" }
+                { cmd: "/points pay <tên> <xu>", desc: "Chuyển xu cho người khác", color: "purple" }
             ]
         },
         {
             title: "💰 Kinh Tế & Mua Bán",
-            colSpan: false,
             commands: [
                 { cmd: "/balance, /bal", desc: "Xem số tiền bạn có", color: "yellow" },
                 { cmd: "/ah", desc: "Mở chợ đấu giá cộng đồng", color: "orange" },
@@ -304,12 +321,11 @@ async function renderGuides() {
         },
         {
             title: "🛡️ Bảo Vệ Đất (Claim)",
-            colSpan: false,
             videoLink: "https://streamable.com/oym4xe",
             commands: [
                 { cmd: "/claim", desc: "Tạo vùng bảo vệ (Cần Golden Shovel)", color: "yellow" },
                 { cmd: "/claimshop", desc: "Mua thêm Claimblocks", color: "yellow" },
-                { cmd: "/abandonclaim", desc: "Bỏ vùng đất đang đứng", color: "red" },
+                { cmd: "/unclaim", desc: "Bỏ vùng đất đang đứng", color: "red" },
                 { cmd: "/trust <tên>", desc: "Cho phép người khác xây dựng", color: "green" },
                 { cmd: "/untrust <tên>", desc: "Thu hồi quyền xây dựng", color: "red" },
                 { cmd: "/trustlist", desc: "Xem danh sách người có quyền", color: "cyan" },
@@ -320,7 +336,7 @@ async function renderGuides() {
             title: "⚙️ Tiện Ích & Biểu Cảm",
             colSpan: true,
             commands: [
-                { cmd: "/pv <số>", desc: "Mở kho chứa đồ ảo (vd: /pv 1)", color: "purple" },
+                { cmd: "/pv <số>", desc: "Mở kho chứa đồ ảo", color: "purple" },
                 { cmd: "/repair", desc: "Sửa vật phẩm đang cầm", color: "purple" },
                 { cmd: "/diemdanh", desc: "Nhận thưởng điểm danh hằng ngày", color: "purple" },
                 { cmd: "[i]", desc: "Gõ trong chat để show đồ đang cầm", color: "white" },
@@ -333,6 +349,106 @@ async function renderGuides() {
         }
     ];
 
+    // ==========================================
+    // 2. DỮ LIỆU BÊN PHẢI: LUẬT MÁY CHỦ (RULES)
+    // ==========================================
+    // ==========================================
+    // 2. DỮ LIỆU BÊN PHẢI: LUẬT MÁY CHỦ (RULES)
+    // ==========================================
+    const rulesData = [
+        {
+            title: "🚫 1. Hack/Cheat & Lợi Dụng Lỗi",
+            rules: [
+                "Được dùng Autoclick cơ bản (spam đánh theo delay) & Freecam (chỉ để xây dựng/quan sát). Cấm dùng macro ngoài game (AutoHotKey, Razer...) để lách luật.",
+                "Cấm tuyệt đối mọi loại Hack/Cheat, X-ray, KillAura, Aimbot, Ghost Client hoặc mod ẩn (stealth mode).",
+                "Cấm dùng Litematica khi chưa báo Admin. Cấm mọi hành vi dupe item/block.",
+                "Cấm trục lợi từ bug game/plugin. Phát hiện lỗi phải báo BQT ngay, giấu giếm sẽ bị Ban vĩnh viễn."
+            ]
+        },
+        {
+            title: "⚔️ 2. Gameplay & PvP",
+            rules: [
+                "PvP ngoài safezone chỉ hợp lệ khi 2 bên tự nguyện. Không kill người trong safezone, spawn.",
+                "Cấm phá hoại (Griefing) công trình người khác bằng lava, nước, TNT, hoặc spam entity/hopper gây lag.",
+                "Cấm ăn cắp đồ, cấm lợi dụng quyền trust/nhờ mượn đồ để chiếm đoạt (Xử lý theo log).",
+                "Cấm trap/bait người chơi để giết lấy đồ (bao gồm AFK trap).",
+                "Cấm dùng nhiều tài khoản (clone/alt) để lấy kit, vote, event hoặc treo AFK farm."
+            ]
+        },
+        {
+            title: "🏡 3. Xây Dựng Farm & Base",
+            rules: [
+                "Xây dựng tự do, nhưng CẤM xây lag machine, redstone clock làm giảm TPS server.",
+                "Nếu farm gây lag (Staff đo bằng TPS/Spark), phải tắt ngay khi được nhắc nhở. Cố tình tái phạm sẽ bị xóa farm không báo trước.",
+                "Cấm xây công trình phản cảm, 18+, phân biệt chủng tộc hoặc liên quan đến chính trị.",
+                "Server không đảm bảo đền bù/restore mọi trường hợp; chỉ xem xét khi có log rõ ràng."
+            ]
+        },
+        {
+            title: "👮 4. Hành Xử Với BQT (Staff/Admin)",
+            rules: [
+                "Tôn trọng người chơi và BQT. Không xúc phạm, cãi vã hay gây rối.",
+                "Không năn nỉ xin quyền OP, Fly, Creative, xin items hoặc hối lộ BQT.",
+                "Cấm chụp/cắt ghép log, ảnh giả để bôi nhọ Staff.",
+                "Nghi ngờ Staff lạm quyền? Hãy khiếu nại lên Owner kèm bằng chứng (ảnh, log, video)."
+            ]
+        },
+        {
+            title: "💸 5. Giao Dịch & Mua Bán",
+            rules: [
+                "Chỉ giao dịch bằng tiền tệ/vật phẩm IN-GAME. Cấm giao dịch bằng tiền thật (VNĐ/Tiền ảo). Vi phạm Ban vĩnh viễn.",
+                "Cấm giao dịch liên server, qua trung gian ngoài hệ thống, hoặc lập chợ đen.",
+                "Cấm trade giftcode/thẻ cào giữa người chơi (Chỉ được Donate trực tiếp).",
+                "Cấm Scam (lừa đảo). Cấm bán slot top, thuê cày hộ."
+            ]
+        },
+        {
+            title: "🔐 6. Quyền Riêng Tư & Bảo Mật",
+            rules: [
+                "Không chia sẻ tài khoản. Tự chịu trách nhiệm nếu người dùng chung acc vi phạm luật.",
+                "Bị hack hoặc quên mật khẩu: Báo ngay cho Admin kèm thông tin chứng minh để khôi phục.",
+                "Cấm chia sẻ/đe dọa công khai thông tin cá nhân của người khác (Doxxing).",
+                "Cấm phát tán hình ảnh, tin nhắn riêng tư khi chưa được cho phép."
+            ]
+        },
+        {
+            title: "💬 7. Kênh Chat & Discord",
+            rules: [
+                "Không spam tin nhắn, spam lệnh, tag BQT vô cớ. Mở Ticket xong phải đóng.",
+                "Không chửi bới, phân biệt vùng miền, tôn giáo, chính trị, gửi nội dung 18+.",
+                "Cấm nhắc tên/IP server khác. Cấm gửi link ngoài, link rút gọn, file chứa mã độc.",
+                "Cấm lách filter chat (VD: h@ck). Cấm spam đổi tên, spam emoji, spam join/leave voice.",
+                "Phải vào Discord/Box để cập nhật thông báo. Không giải quyết nếu bạn bỏ lỡ thông báo server."
+            ]
+        },
+        {
+            title: "🎭 8. Mạo Danh & Quảng Cáo",
+            rules: [
+                "Cấm giả mạo BQT hoặc người chơi khác để lừa đảo.",
+                "Cấm quảng cáo server ngoài, hack/cheat hoặc dịch vụ cày thuê.",
+                "Cấm lôi kéo người chơi sang group khác hoặc DM nhắn tin rác qua Discord."
+            ]
+        },
+        {
+            title: "🏆 9. Event & Đua Top",
+            rules: [
+                "Mỗi người CHỈ dùng 1 tài khoản chính tham gia event.",
+                "Cấm dùng acc clone để buff, giữ đồ, farm phụ, chuyển tài nguyên... tính là vi phạm.",
+                "Cấm lợi dụng bug/hack hoặc thuê người cày top. Vi phạm tước quyền và phạt nặng."
+            ]
+        },
+        {
+            title: "⚖️ 10. Hệ Thống Hình Phạt",
+            rules: [
+                "Mức độ: Cảnh cáo/Mute/Jail ➔ Ban 1/3/7/45 ngày ➔ Ban Vĩnh Viễn.",
+                "Phạt song song (MC & Discord). Lách luật bằng alt bị phạt Gấp Đôi.",
+                "Lần đầu: Ban Acc (Được tạo acc mới chơi lại nhưng cấm nhận quà tân thủ/event).",
+                "Tạo acc mới để tiếp tục phá/hack: BAN IP VÀ HARDWARE toàn bộ tài khoản.",
+                "Staff có quyền xử lý các hành vi phá hoại chưa có trong luật. Chơi là mặc định đồng ý luật, không chấp nhận lý do 'Chưa đọc luật'!"
+            ]
+        }
+    ];
+
     const colorMap = {
         "yellow": "text-yellow-400 border-yellow-500/30",
         "red": "text-red-400 border-red-500/30",
@@ -341,100 +457,86 @@ async function renderGuides() {
         "purple": "text-purple-400 border-purple-500/30",
         "orange": "text-orange-400 border-orange-500/30",
         "cyan": "text-cyan-400 border-cyan-500/30",
-        "pink": "text-pink-400 border-pink-500/30",
         "white": "text-white border-gray-500/30"
     };
 
-    let staticHtml = guidesData.map(group => {
-        const videoBtn = group.videoLink ? `
-            <a href="${group.videoLink}" target="_blank" class="bg-red-500/20 text-red-400 border border-red-500/50 px-3 py-1 rounded text-xs font-bold flex items-center gap-1 hover:bg-red-500 hover:text-white transition">
-                ▶️ XEM VIDEO
-            </a>
-        ` : '';
-        const gridClass = group.colSpan ? "grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3" : "space-y-3";
-        const boxSpanClass = group.colSpan ? "md:col-span-2" : "";
-
-        const commandsHtml = group.commands.map(cmd => `
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                <code class="${colorMap[cmd.color] || colorMap['white']} bg-black/50 px-3 py-1.5 rounded font-mono border whitespace-nowrap">${cmd.cmd}</code>
-                <span class="text-gray-300 text-left sm:text-right flex-1 text-sm">${cmd.desc}</span>
-            </div>
-        `).join('');
-
-        return `
-        <div class="glass-panel p-6 rounded-2xl border border-purple-500/30 hover:border-cyan-400/50 transition-colors ${boxSpanClass}">
-            <div class="flex items-center justify-between border-b border-white/10 pb-3 mb-6">
-                <h3 class="text-2xl font-bold title-font text-cyan-400 flex items-center gap-2">
-                    ${group.title}
-                </h3>
-                ${videoBtn}
-            </div>
-            <div class="${gridClass}">
-                ${commandsHtml}
-            </div>
-        </div>
-        `;
-    }).join('');
-
-    // --- PHẦN 2: TẢI DỮ LIỆU ĐỘNG TỪ DATABASE (Ở DƯỚI) ---
-    let dynamicHtml = '';
-    try {
-        const guides = await fetchGuides();
-        const isStaff = ['admin', 'dev', 'helper'].includes(currentRole);
-
-        if (guides && guides.length > 0) {
-            dynamicHtml += `
-            <div class="md:col-span-2 mt-12 mb-4 border-b border-purple-500/30 pb-4 text-center">
-                <h3 class="text-3xl font-black title-font neon-text">📚 BÀI VIẾT HƯỚNG DẪN TỪ ADMIN</h3>
-                <p class="text-gray-400 text-sm mt-2">Đọc các bài viết chi tiết để hiểu rõ hơn về tính năng server</p>
-            </div>
-            `;
-
-            dynamicHtml += guides.map(item => {
-                const headerDisplay = item.imageUrl 
-                    ? `<div class="w-full h-48 mb-4 overflow-hidden rounded-lg border border-purple-500/30 relative">
-                         <img src="${item.imageUrl}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
-                       </div>`
-                    : `<div class="text-4xl mb-4 filter drop-shadow-[0_0_10px_rgba(34,211,238,0.5)]">📘</div>`;
-
-                // Xử lý chuỗi để tránh bị lỗi nháy đơn/nháy kép khi truyền vào Modal
-                const safeTitle = item.title.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-                const safeContent = item.content.replace(/'/g, "\\'").replace(/"/g, '&quot;').replace(/\n/g, '\\n');
-
-                return `
-                <div class="glass-panel p-6 rounded-2xl feature-card tilt-card relative group flex flex-col h-full bg-gradient-to-b from-white/5 to-black/20 border border-white/10 hover:border-cyan-400/50 hover:shadow-[0_0_25px_rgba(34,211,238,0.25)] transition-all duration-300">
+    // ==========================================
+    // 3. TẠO HTML CHO CỘT LỆNH
+    // ==========================================
+    let commandsHtml = `
+        <div class="space-y-4">
+            <h3 class="text-3xl font-black title-font text-cyan-400 mb-6 flex items-center gap-3 border-b border-cyan-500/30 pb-3">
+                <span class="text-4xl">📚</span> DANH SÁCH LỆNH
+            </h3>
+            ${commandsData.map(group => `
+                <div class="glass-panel rounded-2xl border border-purple-500/30 overflow-hidden shadow-[0_0_15px_rgba(139,92,246,0.1)]">
+                    <div class="p-5 flex justify-between items-center cursor-pointer hover:bg-white/5 transition select-none group"
+                         onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.toggle-icon').classList.toggle('rotate-180');">
+                        <h4 class="text-xl font-bold text-white title-font group-hover:text-cyan-300 transition-colors">${group.title}</h4>
+                        <span class="toggle-icon text-cyan-400 font-bold transition-transform duration-300">▼</span>
+                    </div>
                     
-                    ${headerDisplay}
-
-                    <h3 class="text-2xl font-bold title-font mb-3 text-cyan-300 group-hover:text-cyan-200 transition-colors drop-shadow-sm">${item.title}</h3>
-                    <p class="text-gray-200 leading-relaxed mb-4 line-clamp-3 flex-grow font-light">${item.content}</p>
-                    <div class="flex justify-between items-center mt-4 pt-4 border-t border-white/10">
-                        
-                        <button onclick="window.showCustomModal('${safeTitle}', '${safeContent}', 'info')" 
-                                class="text-cyan-300 hover:text-white font-bold text-sm hover:underline title-font flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                            ĐỌC TIẾP <span class="text-lg">→</span>
-                        </button>
-                        
-                        ${isStaff ? `
-                        <button onclick="window.deletePost('guides', '${item.id}')" 
-                                class="bg-red-500/10 hover:bg-red-500 text-red-400 hover:text-white border border-red-500/50 px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all shadow-lg shadow-red-900/20">
-                            🗑️ XÓA
-                        </button>` : ''}
-
+                    <div class="hidden p-5 border-t border-white/5 bg-black/40 space-y-3">
+                        ${group.commands.map(cmd => `
+                            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2 border-b border-white/5 pb-2 last:border-0 last:pb-0">
+                                <code class="${colorMap[cmd.color] || colorMap['white']} bg-black/50 px-3 py-1.5 rounded font-mono border whitespace-nowrap text-sm shadow-sm">${cmd.cmd}</code>
+                                <span class="text-gray-300 text-left xl:text-right flex-1 text-sm">${cmd.desc}</span>
+                            </div>
+                        `).join('')}
                     </div>
                 </div>
-                `;
-            }).join('');
-        }
-    } catch (error) {
-        console.error("Lỗi tải bài viết hướng dẫn:", error);
-    }
+            `).join('')}
+        </div>
+    `;
 
-    container.innerHTML = staticHtml + dynamicHtml;
+    // ==========================================
+    // 4. TẠO HTML CHO CỘT LUẬT
+    // ==========================================
+    let rulesHtml = `
+        <div class="space-y-4 mt-12 lg:mt-0">
+            <h3 class="text-3xl font-black title-font text-red-400 mb-6 flex items-center gap-3 border-b border-red-500/30 pb-3">
+                <span class="text-4xl">⚖️</span> LUẬT MÁY CHỦ
+            </h3>
+            ${rulesData.map(group => `
+                <div class="glass-panel rounded-2xl border border-red-500/30 overflow-hidden shadow-[0_0_15px_rgba(248,113,113,0.1)]">
+                    <div class="p-5 flex justify-between items-center cursor-pointer hover:bg-white/5 transition select-none group"
+                         onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.toggle-icon').classList.toggle('rotate-180');">
+                        <h4 class="text-xl font-bold text-red-100 title-font group-hover:text-red-300 transition-colors">${group.title}</h4>
+                        <span class="toggle-icon text-red-400 font-bold transition-transform duration-300">▼</span>
+                    </div>
+                    
+                    <div class="hidden p-5 border-t border-red-500/10 bg-red-950/20 space-y-3">
+                        ${group.rules.map(rule => `
+                            <div class="flex items-start gap-3">
+                                <span class="text-red-500 mt-0.5 text-lg">▪</span>
+                                <span class="text-gray-200 text-sm leading-relaxed">${rule}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    // ==========================================
+    // 5. GỘP CẢ 2 CỘT VÀ IN RA MÀN HÌNH
+    // ==========================================
+    container.innerHTML = `
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-16">
+            ${commandsHtml}
+            ${rulesHtml}
+        </div>
+    `;
+
+    // Gỡ class 'grid-cols-1 md:grid-cols-2' cũ của container ngoài HTML để tránh bị lồng grid
+    container.className = "";
 }
 
 // ==========================================
 // RENDER 4 BẢNG XẾP HẠNG (CHIA TAB)
+// ==========================================
+// ==========================================
+// RENDER 5 BẢNG XẾP HẠNG (CHIA TAB)
 // ==========================================
 async function renderRanking() {
     const container = document.getElementById('ranking-container');
@@ -442,23 +544,46 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "YKIhByu3CSIJFuAG"; // ID Bytebin của bạn
+    const exportID = "ChVVMS9Lxls2XjfQ"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
         const response = await fetch(rawDataUrl);
         const data = await response.json();
 
-        // 1. LẤY DỮ LIỆU VÀ SẮP XẾP TỪ CAO XUỐNG THẤP
+        // 1. LẤY DỮ LIỆU ĐỘNG TỪ API VÀ SẮP XẾP
         const moneyBoard = (data["vault_eco_balance"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
         const onlineBoard = (data["statistic_time_played"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
         const pointBoard = (data["playerpoints_points"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
         const killBoard = (data["statistic_player_kills"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
 
-        // 2. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
+        // 2. DỮ LIỆU TOP DONATE (Nhập thủ công)
+        const donateData = [
+            { namecache: "PE_Dellcotenok", value: 2225000 },
+            { namecache: "PE_PopOcean46064", value: 900000 },
+            { namecache: "Timmythanh007", value: 860000 },
+            { namecache: "luan198348", value: 620000 },
+            { namecache: "Glenn1", value: 1000000 },
+            { namecache: "ShaMein", value: 450000 },
+            { namecache: "NgiPam_06", value: 230000 },
+            { namecache: "LaShan", value: 200000 },
+            { namecache: "PE_Mine8889672", value: 200000 },
+            { namecache: "CharlesTwoK", value: 170000 },
+            { namecache: "111s", value: 100000 },
+            { namecache: "ScuHq", value: 50000 },
+            { namecache: "PE_Huyvippto6584", value: 50000 },
+            { namecache: "Kazuto207", value: 49000 },
+            { namecache: "Setroit", value: 30000 },
+            { namecache: "lehiepmc", value: 20000 }
+        ];
+        // Sắp xếp tự động từ cao xuống thấp
+        const donateBoard = donateData.sort((a, b) => b.value - a.value);
+
+        // 3. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
         let html = `
         <div class="flex flex-wrap justify-center gap-3 mb-8">
-            <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-green-600/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.3)]">💰 ĐẠI GIA</button>
+            <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-pink-600/20 text-pink-400 border border-pink-500/50 shadow-[0_0_15px_rgba(236,72,153,0.3)]">💖 TOP DONATE</button>
+            <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💰 ĐẠI GIA</button>
             <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">⏳ CHĂM CHỈ</button>
             <button onclick="window.switchRankTab('point')" id="tab-btn-point" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💎 TOP XU</button>
             <button onclick="window.switchRankTab('kill')" id="tab-btn-kill" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">⚔️ SÁT THỦ</button>
@@ -480,11 +605,11 @@ async function renderRanking() {
                 top10.forEach((player, index) => {
                     let val = parseFloat(player.value || 0).toLocaleString('vi-VN');
                     let playerName = player.namecache || "Ẩn danh";
-                    
+
                     let medal = `#${index + 1}`;
                     let medalClass = "text-gray-400 text-base font-bold";
                     let rowBorder = "border-white/10";
-                    
+
                     if (index === 0) { medal = '🥇'; medalClass = "text-3xl drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]"; rowBorder = "border-yellow-400/50 bg-gradient-to-r from-yellow-500/20 to-transparent"; }
                     else if (index === 1) { medal = '🥈'; medalClass = "text-2xl drop-shadow-[0_0_8px_rgba(148,163,184,0.8)]"; rowBorder = "border-gray-300/50 bg-gradient-to-r from-gray-400/20 to-transparent"; }
                     else if (index === 2) { medal = '🥉'; medalClass = "text-2xl drop-shadow-[0_0_8px_rgba(180,83,9,0.8)]"; rowBorder = "border-orange-400/50 bg-gradient-to-r from-orange-600/20 to-transparent"; }
@@ -509,16 +634,17 @@ async function renderRanking() {
             return boardHtml;
         };
 
-        // 3. VẼ 4 BẢNG VÀO HTML (Chỉ hiện Top Tiền, Ẩn 3 Top còn lại)
-        html += renderBoard("money", "💰 TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", false);
-        html += renderBoard("online", "⏳ TOP CHĂM CHỈ", onlineBoard, "", " Giờ", "text-cyan-400", "border-cyan-500/20", true); 
+        // 4. VẼ 5 BẢNG VÀO HTML (Mặc định hiện TOP DONATE, ẩn 4 Top còn lại)
+        html += renderBoard("donate", "💖 BẢNG VÀNG DONATE", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", false);
+        html += renderBoard("money", "💰 TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", true);
+        html += renderBoard("online", "⏳ TOP CHĂM CHỈ", onlineBoard, "", " Giờ", "text-cyan-400", "border-cyan-500/20", true);
         html += renderBoard("point", "💎 TOP ĐẠI GIA XU", pointBoard, "", " Xu", "text-yellow-400", "border-yellow-500/20", true);
         html += renderBoard("kill", "⚔️ TOP SÁT THỦ", killBoard, "", " Kill", "text-red-400", "border-red-500/20", true);
 
         html += '</div>'; // Đóng div max-w-2xl
-        
-        container.classList.remove('max-w-7xl'); 
-        container.classList.add('max-w-3xl');    
+
+        container.classList.remove('max-w-7xl');
+        container.classList.add('max-w-3xl');
         container.innerHTML = html;
 
     } catch (error) {
@@ -533,21 +659,55 @@ async function renderRanking() {
 window.switchRankTab = (tabName) => {
     // 1. Ẩn tất cả các bảng
     document.querySelectorAll('.rank-board').forEach(el => el.classList.add('hidden'));
-    
+
     // 2. Hiện bảng vừa được chọn
     const activeBoard = document.getElementById(`board-${tabName}`);
-    if(activeBoard) activeBoard.classList.remove('hidden');
+    if (activeBoard) activeBoard.classList.remove('hidden');
 
     // 3. Reset style tất cả các nút bấm về màu xám mờ
-    ['money', 'online', 'point', 'kill'].forEach(t => {
+    ['donate', 'money', 'online', 'point', 'kill'].forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
-        if(btn) btn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10';
+        if (btn) btn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10';
     });
 
     // 4. Bật sáng nút bấm vừa được chọn với màu tương ứng
     const activeBtn = document.getElementById(`tab-btn-${tabName}`);
-    if(activeBtn) {
-        if(tabName === 'money') {
+    if (activeBtn) {
+        if (tabName === 'donate') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-pink-600/20 text-pink-400 border border-pink-500/50 shadow-[0_0_15px_rgba(236,72,153,0.3)]';
+        } else if (tabName === 'money') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-green-600/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.3)]';
+        } else if (tabName === 'online') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-cyan-600/20 text-cyan-400 border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.3)]';
+        } else if (tabName === 'point') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-yellow-600/20 text-yellow-400 border border-yellow-500/50 shadow-[0_0_15px_rgba(250,204,21,0.3)]';
+        } else if (tabName === 'kill') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-red-600/20 text-red-400 border border-red-500/50 shadow-[0_0_15px_rgba(248,113,113,0.3)]';
+        }
+    }
+};
+
+// ==========================================
+// HÀM CHUYỂN TAB RANKING
+// ==========================================
+window.switchRankTab = (tabName) => {
+    // 1. Ẩn tất cả các bảng
+    document.querySelectorAll('.rank-board').forEach(el => el.classList.add('hidden'));
+
+    // 2. Hiện bảng vừa được chọn
+    const activeBoard = document.getElementById(`board-${tabName}`);
+    if (activeBoard) activeBoard.classList.remove('hidden');
+
+    // 3. Reset style tất cả các nút bấm về màu xám mờ
+    ['money', 'online', 'point', 'kill'].forEach(t => {
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (btn) btn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10';
+    });
+
+    // 4. Bật sáng nút bấm vừa được chọn với màu tương ứng
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    if (activeBtn) {
+        if (tabName === 'money') {
             activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-green-600/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.3)]';
         } else if (tabName === 'online') {
             activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-cyan-600/20 text-cyan-400 border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.3)]';
@@ -564,7 +724,7 @@ window.switchRankTab = (tabName) => {
 // ==========================================
 async function updateServerStatus() {
     // Thay IP thành IP thật server Minecraft của bạn nhé
-    const serverIP = "45.117.166.6:25522"; 
+    const serverIP = "103.161.119.246:25017";
     const apiUrl = `https://api.mcsrvstat.us/2/${serverIP}`;
 
     try {
@@ -580,16 +740,16 @@ async function updateServerStatus() {
         if (data.online) {
             // Nếu Server đang MỞ
             const currentPlayers = data.players.online;
-            
+
             // 1. Cập nhật số to đùng ở phần LIVE STATISTICS
             if (statOnlineEl) statOnlineEl.innerText = currentPlayers;
-            
+
             // 2. Cập nhật chữ trên thanh Menu Navbar
             if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers} </span>`;
-            
+
             // Cập nhật chấm tròn nhấp nháy thành màu xanh lá
             if (statusDot) {
-                statusDot.style.background = '#4ade80'; 
+                statusDot.style.background = '#4ade80';
                 statusDot.style.boxShadow = '0 0 10px #4ade80';
             }
 
@@ -892,7 +1052,7 @@ function handleAuthUI(user, role) {
 
     if (user) {
         // 1. XỬ LÝ GIAO DIỆN ĐĂNG NHẬP
-        const avatar = user.photoURL || `https://mc-heads.net/avatar/${user.displayName}`; 
+        const avatar = user.photoURL || `https://mc-heads.net/avatar/${user.displayName}`;
         authDisplay.innerHTML = `
             <div class="relative group z-50">
                 <button class="flex items-center gap-2 glass-panel px-3 py-1.5 rounded-full hover:bg-white/10 transition border border-cyan-400/30">
@@ -1030,7 +1190,7 @@ window.addEventListener('load', async () => {
         // 1. Tạo link cho mobile từ menu desktop (để không phải viết lại HTML)
         const links = desktopLinks.querySelectorAll('a');
         let mobileHtml = '';
-        
+
         links.forEach(link => {
             const target = link.getAttribute('data-nav');
             const text = link.innerText;

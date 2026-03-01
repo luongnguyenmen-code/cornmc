@@ -781,3 +781,27 @@ body {
 .copy-success {
     animation: copySuccess 0.3s ease;
 }
+
+/* CSS riêng cho chế độ hiển thị tin tức 70% */
+.modal.active .modal-content.is-news {
+    width: 70% !important;
+    max-width: 1200px !important;
+    max-height: 85vh !important;
+    border: 1px solid var(--accent-cyan); /* Dùng biến màu cyan từ root của bạn */
+    box-shadow: 0 0 40px rgba(34, 211, 238, 0.2);
+}
+
+/* Chỉnh nội dung tin tức canh lề trái cho dễ đọc */
+.is-news #global-modal-message {
+    text-align: left !important;
+    padding: 15px 5px;
+    font-size: 1.05rem;
+    line-height: 1.7;
+}
+
+/* Tự động nhảy về 95% trên điện thoại để không bị vỡ khung */
+@media (max-width: 1024px) {
+    .modal.active .modal-content.is-news {
+        width: 95% !important;
+    }
+}

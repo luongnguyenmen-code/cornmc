@@ -146,3 +146,53 @@ def convert_skin():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+
+@app.route('/api/merge', methods=['POST', 'OPTIONS'])
+def merge_skin():
+    if request.method == 'OPTIONS': 
+        return '', 200
+        
+    if 'head' not in request.files or 'body' not in request.files or 'legs' not in request.files:
+        return jsonify({"error": "Vui lòng upload đủ 3 file ảnh Đầu, Thân và Chân!"}), 400
+    
+    try:
+        # Mở 3 file ảnh skin
+        img_dau = Image.open(request.files['head']).convert("RGBA")
+        img_than = Image.open(request.files['body']).convert("RGBA")
+        img_chan = Image.open(request.files['legs']).convert("RGBA")
+
+        # Lấy file Thân làm nền gốc (vì nó chứa phần ngực và tay)
+        skin_hoan_thien = img_than.copy()
+
+        # 1. XỬ LÝ GHÉP ĐẦU (Tọa độ: 0,0 -> 64,16)
+        khung_dau = (0, 0, 64, 16)
+        phan_dau = img_dau.crop(khung_dau)
+        skin_hoan_thien.paste(phan_dau, khung_dau, mask=phan_dau)
+
+        # 2. XỬ LÝ GHÉP CHÂN TỪ ẢNH CHÂN (Chuẩn Minecraft 64x64)
+        # Chân Phải
+        khung_chan_phai = (0, 16, 16, 32)
+        skin_hoan_thien.paste(img_chan.crop(khung_chan_phai), khung_chan_phai, mask=img_chan.crop(khung_chan_phai))
+        
+        # Lớp giáp/quần chân phải (Layer 2)
+        khung_quan_phai = (0, 32, 16, 48)
+        skin_hoan_thien.paste(img_chan.crop(khung_quan_phai), khung_quan_phai, mask=img_chan.crop(khung_quan_phai))
+        
+        # Chân Trái
+        khung_chan_trai = (16, 48, 32, 64)
+        skin_hoan_thien.paste(img_chan.crop(khung_chan_trai), khung_chan_trai, mask=img_chan.crop(khung_chan_trai))
+        
+        # Lớp giáp/quần chân trái (Layer 2)
+        khung_quan_trai = (0, 48, 16, 64)
+        skin_hoan_thien.paste(img_chan.crop(khung_quan_trai), khung_quan_trai, mask=img_chan.crop(khung_quan_trai))
+
+        # Xuất file gửi về web
+        img_io = io.BytesIO()
+        skin_hoan_thien.save(img_io, 'PNG')
+        img_io.seek(0)
+
+        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="Skin_Custom_Full.png")
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
