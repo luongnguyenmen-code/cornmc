@@ -166,22 +166,33 @@ def merge_skin():
         skin_final = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
 
         # BƯỚC 2: Ráp ĐẦU (Head + Hat) từ Skin Đầu
-        box_head = (0, 0, 64, 16)
-        skin_final.paste(img_dau.crop(box_head), box_head, mask=img_dau.crop(box_head))
+        # BƯỚC 1: Ráp ĐẦU (Head 0,0,32,16 + Hat 32,0,64,16)
+        box_head_full = (0, 0, 64, 16)
+        skin_final.paste(img_dau.crop(box_head_full), box_head_full, mask=img_dau.crop(box_head_full))
 
-        # BƯỚC 3: Ráp THÂN & TAY (Body + Arms + Layers) từ Skin Thân
-        # Tọa độ chuẩn cho Body/Arms trong skin 64x64
-        box_body_arms = (16, 16, 64, 48)
-        skin_final.paste(img_than.crop(box_body_arms), box_body_arms, mask=img_than.crop(box_body_arms))
+        # BƯỚC 2: Ráp THÂN (Body 16,16,32,32 + Jacket 16,32,32,48)
+        box_body_full = (16, 16, 32, 48)
+        skin_final.paste(img_than.crop(box_body_full), box_body_full, mask=img_than.crop(box_body_full))
 
-        # BƯỚC 4: Ráp CHÂN (Legs + Pants) từ Skin Chân
-        # Chân phải (0,16 -> 16,48)
+        # BƯỚC 3: Ráp CÁNH TAY (Lấy từ Skin THÂN)
+        # Tay Phải (Right Arm 40,16,48,32 + Sleeve 40,32,48,48)
+        box_arm_r = (40, 16, 48, 48)
+        skin_final.paste(img_than.crop(box_arm_r), box_arm_r, mask=img_than.crop(box_arm_r))
+        # Tay Trái (Left Arm 32,48,40,64 + Sleeve 48,48,56,64)
+        box_arm_l_main = (32, 48, 40, 64)
+        box_arm_l_sleeve = (48, 48, 56, 64)
+        skin_final.paste(img_than.crop(box_arm_l_main), box_arm_l_main, mask=img_than.crop(box_arm_l_main))
+        skin_final.paste(img_than.crop(box_arm_l_sleeve), box_arm_l_sleeve, mask=img_than.crop(box_arm_l_sleeve))
+
+        # BƯỚC 4: Ráp CHÂN (Lấy từ Skin CHÂN)
+        # Chân Phải (Right Leg 0,16,16,32 + Pants 0,32,16,48)
         box_leg_r = (0, 16, 16, 48)
         skin_final.paste(img_chan.crop(box_leg_r), box_leg_r, mask=img_chan.crop(box_leg_r))
-        
-        # Chân trái (16,48 -> 64,64) - Bao gồm cả phần layer 2 của chân trái
-        box_leg_l = (16, 48, 64, 64)
-        skin_final.paste(img_chan.crop(box_leg_l), box_leg_l, mask=img_chan.crop(box_leg_l))
+        # Chân Trái (Left Leg 16,48,24,64 + Pants 0,48,8,64)
+        box_leg_l_main = (16, 48, 24, 64)
+        box_leg_l_pants = (0, 48, 8, 64)
+        skin_final.paste(img_chan.crop(box_leg_l_main), box_leg_l_main, mask=img_chan.crop(box_leg_l_main))
+        skin_final.paste(img_chan.crop(box_leg_l_pants), box_leg_l_pants, mask=img_chan.crop(box_leg_l_pants))
 
         # BƯỚC 5: Xuất file qua RAM (Sử dụng io.BytesIO)
         img_io = io.BytesIO()
