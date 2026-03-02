@@ -1,32 +1,44 @@
 <div class="tools-wrapper">
     <div class="tool-selector">
         <button id="tab-merge" class="tab-btn active" onclick="openTool('merge')">✂️ Tool Ghép Skin Toàn Diện</button>
-        <button id="tab-convert" class="tab-btn" onclick="openTool('convert')">🎨 Tool Chuyển Skin -> 3D Schematic</button>
+        <button id="tab-convert" class="tab-btn" onclick="openTool('convert')">🎨 Tool Chuyển Skin -> 3D
+            Schematic</button>
     </div>
 
     <div id="tool-merge" class="tool-container">
-        <h2>✂️ Ghép Đầu + Thân + Chân</h2>
-        <p>Chọn 3 mảnh skin khác nhau để tạo ra phiên bản hoàn hảo nhất.</p>
-        
-        <div class="upload-area" style="text-align: left;">
-            <label style="color: #bac2de; font-weight: bold; display: block; margin-bottom: 5px;">1. Skin lấy ĐẦU (Head & Hat):</label>
-            <input type="file" id="skinHead" accept="image/png" style="margin-bottom: 15px; width: 100%;" />
-            
-            <label style="color: #bac2de; font-weight: bold; display: block; margin-bottom: 5px;">2. Skin lấy THÂN (Body & Arms):</label>
-            <input type="file" id="skinBody" accept="image/png" style="margin-bottom: 15px; width: 100%;" />
-
-            <label style="color: #bac2de; font-weight: bold; display: block; margin-bottom: 5px;">3. Skin lấy CHÂN (Legs & Pants):</label>
-            <input type="file" id="skinLegs" accept="image/png" style="width: 100%;" />
+        <h2>✂️ Ghép Skin Tùy Chỉnh</h2>
+        <div class="merge-options" style="margin-bottom: 20px; display: flex; gap: 10px; justify-content: center;">
+            <label><input type="radio" name="mergeMode" value="full" checked onclick="toggleInputs('full')"> Toàn
+                diện</label>
+            <label><input type="radio" name="mergeMode" value="headbody" onclick="toggleInputs('headbody')"> Đầu +
+                Thân</label>
+            <label><input type="radio" name="mergeMode" value="bodylegs" onclick="toggleInputs('bodylegs')"> Thân +
+                Chân</label>
         </div>
 
+        <div class="upload-area" style="text-align: left;">
+            <div id="input-head">
+                <label style="color: #bac2de; font-weight: bold;">1. Skin lấy ĐẦU:</label>
+                <input type="file" id="skinHead" accept="image/png" style="margin-bottom: 15px; width: 100%;" />
+            </div>
+
+            <div id="input-body">
+                <label style="color: #bac2de; font-weight: bold;">2. Skin lấy THÂN:</label>
+                <input type="file" id="skinBody" accept="image/png" style="margin-bottom: 15px; width: 100%;" />
+            </div>
+
+            <div id="input-legs">
+                <label style="color: #bac2de; font-weight: bold;">3. Skin lấy CHÂN:</label>
+                <input type="file" id="skinLegs" accept="image/png" style="width: 100%;" />
+            </div>
+        </div>
         <button id="btnMerge" class="action-btn" onclick="mergeSkin()">Ghép Lại Ngay 🚀</button>
-        <p id="msgMerge" class="status-message"></p>
     </div>
 
     <div id="tool-convert" class="tool-container" style="display: none;">
         <h2>🎨 Tool Chuyển Skin -> 3D Schematic</h2>
         <p>Chọn file Skin Minecraft của bạn (định dạng .png) để chuyển đổi thành file .schem dùng cho WorldEdit.</p>
-        
+
         <div class="upload-area">
             <input type="file" id="skinInput" accept="image/png" />
         </div>
@@ -37,20 +49,118 @@
 </div>
 
 <style>
-    .tools-wrapper { display: flex; flex-direction: column; align-items: center; padding: 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    .tool-selector { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; }
-    .tab-btn { background-color: #181825; color: #a6adc8; border: 2px solid #313244; padding: 15px 25px; font-size: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
-    .tab-btn:hover { background-color: #313244; color: #cdd6f4; }
-    .tab-btn.active { background-color: #89b4fa; color: #11111b; border-color: #89b4fa; transform: scale(1.05); }
-    .tool-container { background-color: #1e1e2e; color: #cdd6f4; width: 100%; max-width: 500px; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.4); text-align: center; border: 1px solid #313244; animation: fadeIn 0.3s ease-in-out; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-    .tool-container h2 { color: #89b4fa; margin-top: 0; }
-    .upload-area { margin: 20px 0; padding: 20px; border: 2px dashed #6c7086; border-radius: 8px; background-color: #181825; }
-    input[type="file"] { color: #a6adc8; }
-    .action-btn { background-color: #a6e3a1; color: #11111b; border: none; padding: 12px 24px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: all 0.2s; width: 100%; margin-top: 10px; }
-    .action-btn:hover { background-color: #94e2d5; transform: scale(1.02); }
-    .action-btn:disabled { background-color: #585b70; cursor: not-allowed; transform: none; }
-    .status-message { margin-top: 15px; font-weight: bold; min-height: 20px; }
+    .tools-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .tool-selector {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .tab-btn {
+        background-color: #181825;
+        color: #a6adc8;
+        border: 2px solid #313244;
+        padding: 15px 25px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+        background-color: #313244;
+        color: #cdd6f4;
+    }
+
+    .tab-btn.active {
+        background-color: #89b4fa;
+        color: #11111b;
+        border-color: #89b4fa;
+        transform: scale(1.05);
+    }
+
+    .tool-container {
+        background-color: #1e1e2e;
+        color: #cdd6f4;
+        width: 100%;
+        max-width: 500px;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+        text-align: center;
+        border: 1px solid #313244;
+        animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .tool-container h2 {
+        color: #89b4fa;
+        margin-top: 0;
+    }
+
+    .upload-area {
+        margin: 20px 0;
+        padding: 20px;
+        border: 2px dashed #6c7086;
+        border-radius: 8px;
+        background-color: #181825;
+    }
+
+    input[type="file"] {
+        color: #a6adc8;
+    }
+
+    .action-btn {
+        background-color: #a6e3a1;
+        color: #11111b;
+        border: none;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .action-btn:hover {
+        background-color: #94e2d5;
+        transform: scale(1.02);
+    }
+
+    .action-btn:disabled {
+        background-color: #585b70;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .status-message {
+        margin-top: 15px;
+        font-weight: bold;
+        min-height: 20px;
+    }
 </style>
 
 <script>
@@ -104,7 +214,7 @@
             const a = document.createElement('a');
             a.href = downloadUrl;
             a.download = 'Skin_Ghep_Toan_Dien.png';
-            
+
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -122,6 +232,11 @@
         }
     }
 
+    function toggleInputs(mode) {
+        document.getElementById('input-head').style.display = (mode === 'bodylegs') ? 'none' : 'block';
+        document.getElementById('input-legs').style.display = (mode === 'headbody') ? 'none' : 'block';
+    }
+
     // 2. CONVERT SCHEMATIC
     async function convertSkin() {
         const fileInput = document.getElementById('skinInput');
@@ -130,14 +245,14 @@
 
         if (fileInput.files.length === 0) {
             statusMsg.textContent = '⚠️ Vui lòng chọn một file ảnh skin (.png) trước!';
-            statusMsg.style.color = '#f38ba8'; 
+            statusMsg.style.color = '#f38ba8';
             return;
         }
 
         convertBtn.disabled = true;
         convertBtn.textContent = '⏳ Đang xử lý...';
         statusMsg.textContent = 'Đang tải ảnh lên và phân tích màu sắc...';
-        statusMsg.style.color = '#f9e2af'; 
+        statusMsg.style.color = '#f9e2af';
 
         const formData = new FormData();
         formData.append('skin', fileInput.files[0]);
@@ -159,14 +274,14 @@
             a.href = downloadUrl;
             let originalName = fileInput.files[0].name.replace('.png', '');
             a.download = originalName + '_3D.schem';
-            
+
             document.body.appendChild(a);
-            a.click(); 
-            a.remove(); 
-            window.URL.revokeObjectURL(downloadUrl); 
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
 
             statusMsg.textContent = '✅ Thành công! File .schem đã tải về.';
-            statusMsg.style.color = '#a6e3a1'; 
+            statusMsg.style.color = '#a6e3a1';
 
         } catch (error) {
             statusMsg.textContent = '❌ Thất bại: ' + error.message;

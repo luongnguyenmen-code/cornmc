@@ -151,55 +151,47 @@ def convert_skin():
 
 @app.route('/api/merge', methods=['POST', 'OPTIONS'])
 def merge_skin():
-    if request.method == 'OPTIONS': 
-        return '', 200
-        
-    if 'head' not in request.files or 'body' not in request.files or 'legs' not in request.files:
-        return jsonify({"error": "Vui lòng upload đủ 3 file ảnh Đầu, Thân và Chân!"}), 400
-    
     try:
-        img_dau = Image.open(request.files['head']).convert("RGBA")
-        img_than = Image.open(request.files['body']).convert("RGBA")
-        img_chan = Image.open(request.files['legs']).convert("RGBA")
+        # Lấy file từ request, nếu thiếu thì gán None
+        file_head = request.files.get('head')
+        file_body = request.files.get('body')
+        file_legs = request.files.get('legs')
 
-        # BƯỚC 1: Tạo canvas trống hoàn toàn
+        img_body = Image.open(file_body).convert("RGBA")
+        # Nếu không có file đầu/chân riêng, mặc định lấy từ file Thân
+        img_head = Image.open(file_head).convert("RGBA") if file_head else img_body
+        img_legs = Image.open(file_legs).convert("RGBA") if file_legs else img_body
+
         skin_final = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
 
-        # BƯỚC 2: Ráp ĐẦU (Head + Hat) từ Skin Đầu
-        # BƯỚC 1: Ráp ĐẦU (Head 0,0,32,16 + Hat 32,0,64,16)
-        box_head_full = (0, 0, 64, 16)
-        skin_final.paste(img_dau.crop(box_head_full), box_head_full, mask=img_dau.crop(box_head_full))
+        # 1. GHÉP ĐẦU (Head + Hat)
+        box_head = (0, 0, 64, 16)
+        skin_final.paste(img_head.crop(box_head), box_head, mask=img_head.crop(box_head))
 
-        # BƯỚC 2: Ráp THÂN (Body 16,16,32,32 + Jacket 16,32,32,48)
-        box_body_full = (16, 16, 32, 48)
-        skin_final.paste(img_than.crop(box_body_full), box_body_full, mask=img_than.crop(box_body_full))
+        # 2. GHÉP THÂN & TAY (Cánh tay TRÁI và PHẢI kèm lớp phủ)
+        # Thân & Tay Phải
+        box_body_r_arm = (16, 16, 64, 48) 
+        skin_final.paste(img_body.crop(box_body_r_arm), box_body_r_arm, mask=img_body.crop(box_body_r_arm))
+        # Tay Trái & Lớp phủ (Cấu trúc 1.8+)
+        box_l_arm = (32, 48, 40, 64)
+        box_l_sleeve = (48, 48, 56, 64)
+        skin_final.paste(img_body.crop(box_l_arm), box_l_arm, mask=img_body.crop(box_l_arm))
+        skin_final.paste(img_body.crop(box_l_sleeve), box_l_sleeve, mask=img_body.crop(box_l_sleeve))
 
-        # BƯỚC 3: Ráp CÁNH TAY (Lấy từ Skin THÂN)
-        # Tay Phải (Right Arm 40,16,48,32 + Sleeve 40,32,48,48)
-        box_arm_r = (40, 16, 48, 48)
-        skin_final.paste(img_than.crop(box_arm_r), box_arm_r, mask=img_than.crop(box_arm_r))
-        # Tay Trái (Left Arm 32,48,40,64 + Sleeve 48,48,56,64)
-        box_arm_l_main = (32, 48, 40, 64)
-        box_arm_l_sleeve = (48, 48, 56, 64)
-        skin_final.paste(img_than.crop(box_arm_l_main), box_arm_l_main, mask=img_than.crop(box_arm_l_main))
-        skin_final.paste(img_than.crop(box_arm_l_sleeve), box_arm_l_sleeve, mask=img_than.crop(box_arm_l_sleeve))
-
-        # BƯỚC 4: Ráp CHÂN (Lấy từ Skin CHÂN)
-        # Chân Phải (Right Leg 0,16,16,32 + Pants 0,32,16,48)
+        # 3. GHÉP CHÂN (Chân TRÁI và PHẢI kèm lớp phủ)
+        # Chân Phải (0,16 -> 16,48)
         box_leg_r = (0, 16, 16, 48)
-        skin_final.paste(img_chan.crop(box_leg_r), box_leg_r, mask=img_chan.crop(box_leg_r))
-        # Chân Trái (Left Leg 16,48,24,64 + Pants 0,48,8,64)
-        box_leg_l_main = (16, 48, 24, 64)
-        box_leg_l_pants = (0, 48, 8, 64)
-        skin_final.paste(img_chan.crop(box_leg_l_main), box_leg_l_main, mask=img_chan.crop(box_leg_l_main))
-        skin_final.paste(img_chan.crop(box_leg_l_pants), box_leg_l_pants, mask=img_chan.crop(box_leg_l_pants))
+        skin_final.paste(img_legs.crop(box_leg_r), box_leg_r, mask=img_legs.crop(box_leg_r))
+        # Chân Trái (16,48 -> 24,64 chính & 0,48 -> 8,64 lớp quần)
+        box_leg_l = (16, 48, 24, 64)
+        box_pants_l = (0, 48, 8, 64)
+        skin_final.paste(img_legs.crop(box_leg_l), box_leg_l, mask=img_legs.crop(box_leg_l))
+        skin_final.paste(img_legs.crop(box_pants_l), box_pants_l, mask=img_legs.crop(box_pants_l))
 
-        # BƯỚC 5: Xuất file qua RAM (Sử dụng io.BytesIO)
         img_io = io.BytesIO()
         skin_final.save(img_io, 'PNG')
         img_io.seek(0)
-
-        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="CornNetwork_Skin.png")
+        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="CornSkin_Custom.png")
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
