@@ -153,42 +153,54 @@ def merge_skin():
     try:
         # 1. Lấy file từ request
         file_head = request.files.get('head')  # File lấy Đầu
-        file_main = request.files.get('body')  # FILE GỐC (Chứa Thân+Chân hoặc Đầu+Thân)
-        file_legs = request.files.get('legs')  # File lấy Chân
+        file_main = request.files.get('body')  # Skin GỐC (Lấy Thân & Chân)
+        file_legs = request.files.get('legs')  # File lấy Chân (nếu có)
 
         if not file_main:
             return jsonify({"error": "Thiếu file Skin Gốc!"}), 400
 
-        # 2. Mở ảnh gốc để làm nền
+        # 2. Mở ảnh gốc và tạo bản sao để xử lý
         img_main = Image.open(file_main).convert("RGBA")
-        skin_final = img_main.copy() # Giữ nguyên mọi thứ của file gốc
+        skin_final = img_main.copy()
 
-        # 3. CHẾ ĐỘ: GHÉP ĐẦU (Thay Đầu mới vào Thân+Chân gốc)
+        # 3. BƯỚC QUAN TRỌNG: CLEAR ĐẦU CŨ
+        # Nếu người dùng có upload đầu mới, ta xóa trắng vùng đầu cũ trên skin_final
         if file_head:
-            img_head = Image.open(file_head).convert("RGBA")
-            # Tọa độ ĐẦU chuẩn (0,0 -> 64,16) bao gồm cả lớp phủ Layer 2
-            box_head = (0, 0, 64, 16)
-            # Xóa vùng đầu cũ bằng cách paste đè mảnh mới lên
-            skin_final.paste(img_head.crop(box_head), box_head, mask=img_head.crop(box_head))
+            # Tọa độ vùng đầu trong Minecraft Skin (0,0 đến 64,16)
+            # Vùng này bao gồm cả Head và Hat (lớp phủ 3D)
+            clear_box = (0, 0, 64, 16)
+            
+            # Tạo một miếng trong suốt hoàn toàn để "tẩy" vùng đầu
+            empty_head = Image.new("RGBA", (64, 16), (0, 0, 0, 0))
+            skin_final.paste(empty_head, (0, 0)) # Xóa sạch vùng (0,0,64,16)
 
-        # 4. CHẾ ĐỘ: GHÉP CHÂN (Thay Chân mới vào Đầu+Thân gốc)
+            # 4. RÁP ĐẦU MỚI VÀO
+            img_head = Image.open(file_head).convert("RGBA")
+            new_head_part = img_head.crop(clear_box)
+            # Paste đầu mới vào vị trí đã được dọn sạch
+            skin_final.paste(new_head_part, (0, 0), mask=new_head_part)
+
+        # 5. GHÉP CHÂN (Nếu có file chân riêng thì thực hiện tương tự)
         if file_legs:
             img_legs = Image.open(file_legs).convert("RGBA")
-            # Chân Phải & Lớp phủ (0,16 -> 16,48)
-            box_leg_r = (0, 16, 16, 48)
-            skin_final.paste(img_legs.crop(box_leg_r), box_leg_r, mask=img_legs.crop(box_leg_r))
+            # Xóa & Ráp chân phải (0,16 -> 16,48)
+            box_r_leg = (0, 16, 16, 48)
+            skin_final.paste(Image.new("RGBA", (16, 32), (0,0,0,0)), (0, 16))
+            skin_final.paste(img_legs.crop(box_r_leg), (0, 16), mask=img_legs.crop(box_r_leg))
             
-            # Chân Trái & Lớp phủ (Phần chính: 16,48-24,64 | Lớp phủ: 0,48-8,64)
-            box_leg_l_main = (16, 48, 24, 64)
-            box_leg_l_pants = (0, 48, 8, 64)
-            skin_final.paste(img_legs.crop(box_leg_l_main), box_leg_l_main, mask=img_legs.crop(box_leg_l_main))
-            skin_final.paste(img_legs.crop(box_leg_l_pants), box_leg_l_pants, mask=img_legs.crop(box_leg_l_pants))
+            # Xóa & Ráp chân trái (Gồm Layer 1: 16,48-24,64 và Layer 2: 0,48-8,64)
+            box_l_leg_1 = (16, 48, 24, 64)
+            box_l_leg_2 = (0, 48, 8, 64)
+            skin_final.paste(Image.new("RGBA", (8, 16), (0,0,0,0)), (16, 48))
+            skin_final.paste(Image.new("RGBA", (8, 16), (0,0,0,0)), (0, 48))
+            skin_final.paste(img_legs.crop(box_l_leg_1), (16, 48), mask=img_legs.crop(box_l_leg_1))
+            skin_final.paste(img_legs.crop(box_l_leg_2), (0, 48), mask=img_legs.crop(box_l_leg_2))
 
-        # 5. Xuất file qua RAM (Sử dụng io đã import)
+        # 6. Xuất file qua BytesIO (nhớ import io ở đầu file)
         img_io = io.BytesIO()
         skin_final.save(img_io, 'PNG')
         img_io.seek(0)
-        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="CornNetwork_Fix.png")
+        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="Corntoll_Skin.png")
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
