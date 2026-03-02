@@ -172,26 +172,25 @@
     // 1. GHÉP SKIN (ĐẦU + THÂN + CHÂN)
     async function mergeSkin() {
         const headInput = document.getElementById('skinHead');
-        const bodyInput = document.getElementById('skinBody');
-        const legsInput = document.getElementById('skinLegs'); // Đã thêm ô CHÂN
-        const statusMsg = document.getElementById('msgMerge');
+        const bodyInput = document.getElementById('skinBody'); // Đây là Skin Gốc
+        const legsInput = document.getElementById('skinLegs');
+        const statusMsg = document.getElementById('statusMessage'); // Sửa lại đúng ID trong HTML của bạn
         const btn = document.getElementById('btnMerge');
 
-        if (headInput.files.length === 0 || bodyInput.files.length === 0 || legsInput.files.length === 0) {
-            statusMsg.textContent = '⚠️ Vui lòng chọn đủ cả 3 file ảnh (Đầu, Thân, Chân)!';
+        // CHỈ BẮT BUỘC có Skin Gốc
+        if (bodyInput.files.length === 0) {
+            statusMsg.textContent = '⚠️ Vui lòng chọn Skin GỐC để làm nền!';
             statusMsg.style.color = '#f38ba8';
             return;
         }
 
         btn.disabled = true;
         btn.textContent = '⏳ Đang xử lý...';
-        statusMsg.textContent = 'Đang cắt ghép trên máy chủ...';
-        statusMsg.style.color = '#f9e2af';
 
         const formData = new FormData();
-        formData.append('head', headInput.files[0]);
         formData.append('body', bodyInput.files[0]);
-        formData.append('legs', legsInput.files[0]); // Đẩy thêm file Chân lên Vercel
+        if (headInput.files.length > 0) formData.append('head', headInput.files[0]);
+        if (legsInput.files.length > 0) formData.append('legs', legsInput.files[0]);
 
         try {
             const response = await fetch('/api/merge', {

@@ -148,47 +148,47 @@ def convert_skin():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     
-
 @app.route('/api/merge', methods=['POST', 'OPTIONS'])
 def merge_skin():
     try:
-        # Lấy các file từ request
-        file_head = request.files.get('head')
-        file_body = request.files.get('body') # Đây là file chính (chứa Thân+Chân hoặc Đầu+Thân)
-        file_legs = request.files.get('legs')
+        # 1. Lấy file từ request
+        file_head = request.files.get('head')  # File lấy Đầu
+        file_main = request.files.get('body')  # FILE GỐC (Chứa Thân+Chân hoặc Đầu+Thân)
+        file_legs = request.files.get('legs')  # File lấy Chân
 
-        # Mở ảnh Thân (file bắt buộc phải có)
-        img_main = Image.open(file_body).convert("RGBA")
-        
-        # Tạo canvas mới từ file chính để giữ nguyên các phần không bị thay thế
-        skin_final = img_main.copy()
+        if not file_main:
+            return jsonify({"error": "Thiếu file Skin Gốc!"}), 400
 
-        # TRƯỜNG HỢP 1: GHÉP ĐẦU (Thay đầu mới vào bộ Skin cũ)
+        # 2. Mở ảnh gốc để làm nền
+        img_main = Image.open(file_main).convert("RGBA")
+        skin_final = img_main.copy() # Giữ nguyên mọi thứ của file gốc
+
+        # 3. CHẾ ĐỘ: GHÉP ĐẦU (Thay Đầu mới vào Thân+Chân gốc)
         if file_head:
             img_head = Image.open(file_head).convert("RGBA")
-            # Xóa vùng đầu cũ (0,0,64,16) bằng cách paste đè
+            # Tọa độ ĐẦU chuẩn (0,0 -> 64,16) bao gồm cả lớp phủ Layer 2
             box_head = (0, 0, 64, 16)
-            # Lấy đầu từ file_head đè lên skin_final
+            # Xóa vùng đầu cũ bằng cách paste đè mảnh mới lên
             skin_final.paste(img_head.crop(box_head), box_head, mask=img_head.crop(box_head))
 
-        # TRƯỜNG HỢP 2: GHÉP CHÂN (Thay chân mới vào bộ Skin cũ)
+        # 4. CHẾ ĐỘ: GHÉP CHÂN (Thay Chân mới vào Đầu+Thân gốc)
         if file_legs:
             img_legs = Image.open(file_legs).convert("RGBA")
-            # Chân Phải (0,16 -> 16,48)
+            # Chân Phải & Lớp phủ (0,16 -> 16,48)
             box_leg_r = (0, 16, 16, 48)
             skin_final.paste(img_legs.crop(box_leg_r), box_leg_r, mask=img_legs.crop(box_leg_r))
-            # Chân Trái (32,48 -> 40,64 và lớp phủ 48,48 -> 56,64)
-            # Lưu ý: Tọa độ này lấy chuẩn 1.8+ để không mất lớp phủ 3D
+            
+            # Chân Trái & Lớp phủ (Phần chính: 16,48-24,64 | Lớp phủ: 0,48-8,64)
             box_leg_l_main = (16, 48, 24, 64)
             box_leg_l_pants = (0, 48, 8, 64)
             skin_final.paste(img_legs.crop(box_leg_l_main), box_leg_l_main, mask=img_legs.crop(box_leg_l_main))
             skin_final.paste(img_legs.crop(box_leg_l_pants), box_leg_l_pants, mask=img_legs.crop(box_leg_l_pants))
 
-        # Xuất file
+        # 5. Xuất file qua RAM (Sử dụng io đã import)
         img_io = io.BytesIO()
         skin_final.save(img_io, 'PNG')
         img_io.seek(0)
-        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="CornNetwork_Merged.png")
+        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="CornNetwork_Fix.png")
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
