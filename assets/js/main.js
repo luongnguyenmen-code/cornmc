@@ -723,47 +723,45 @@ window.switchRankTab = (tabName) => {
 // CẬP NHẬT TRẠNG THÁI SERVER (SỐ NGƯỜI CHƠI)
 // ==========================================
 async function updateServerStatus() {
-    // Thay IP thành IP thật server Minecraft của bạn nhé
-    const apiUrl = `https://mcapi.us/server/status?ip=103.161.119.246&port=25017`;
+    const apiUrl = `https://api.mcsrvstat.us/2/103.161.119.246:25017`;
 
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        // Lấy các thẻ HTML cần điền số
         const statOnlineEl = document.getElementById('stat-online');
         const navOnlineEl = document.getElementById('nav-online');
-        const statVersionEl = document.getElementById('stat-peak'); // Thẻ hiển thị Version
+        const statVersionEl = document.getElementById('stat-peak'); 
         const statusDot = document.querySelector('.status-dot');
 
-        if (data.online) {
-            // Nếu Server đang MỞ
-            const currentPlayers = data.players.now || 0;
+        if (data.online === true) {
+            // 1. LẤY SỐ NGƯỜI ONLINE: data.players.online (Trong JSON của bạn là 20)
+            const currentPlayers = data.players.online || 0;
 
-            // 1. Cập nhật số to đùng ở phần LIVE STATISTICS
             if (statOnlineEl) statOnlineEl.innerText = currentPlayers;
 
-           if (navOnlineEl) {
+            if (navOnlineEl) {
                 navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers}</span>`;
             }
 
-            // Cập nhật chấm tròn xanh nhấp nháy
+            // Chấm tròn xanh trạng thái
             if (statusDot) {
                 statusDot.style.background = '#4ade80';
                 statusDot.style.boxShadow = '0 0 10px #4ade80';
             }
 
-            if (statVersionEl && data.server && data.server.name) {
-                const versionString = data.server.name; 
+            // 2. LẤY PHIÊN BẢN: data.version (Trong JSON là "Leaf 1.21.8")
+            if (statVersionEl && data.version) {
+                const versionString = data.version; 
                 // Regex lọc lấy số (ví dụ: 1.21.8)
                 const cleanVersion = versionString.match(/\d+\.\d+(\.\d+)?/);
                 statVersionEl.innerText = cleanVersion ? cleanVersion[0] : versionString;
             }
 
         } else {
-            // Nếu Server ĐÓNG / BẢO TRÌ
+            // Xử lý khi Offline
             if (statOnlineEl) statOnlineEl.innerText = "OFF";
-            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFF</span>`;
+            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFFLINE</span>`;
             if (statusDot) {
                 statusDot.style.background = '#f87171';
                 statusDot.style.boxShadow = '0 0 10px #f87171';
@@ -773,7 +771,6 @@ async function updateServerStatus() {
         console.error("Lỗi kết nối API Server:", error);
     }
 }
-
 async function renderForum(filterMode = 'approved') {
     // filterMode có 3 dạng: 'approved' (chung), 'pending' (admin duyệt), 'mine' (bài của tôi)
 
