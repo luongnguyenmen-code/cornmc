@@ -7,30 +7,25 @@
 
     <div id="tool-merge" class="tool-container">
         <h2>✂️ Ghép Skin Tùy Chỉnh</h2>
-        <div class="merge-options" style="margin-bottom: 20px; display: flex; gap: 10px; justify-content: center;">
-            <label><input type="radio" name="mergeMode" value="full" checked onclick="toggleInputs('full')"> Toàn
-                diện</label>
-            <label><input type="radio" name="mergeMode" value="headbody" onclick="toggleInputs('headbody')"> Đầu +
-                Thân</label>
-            <label><input type="radio" name="mergeMode" value="bodylegs" onclick="toggleInputs('bodylegs')"> Thân +
-                Chân</label>
+        <div class="merge-tabs" style="display: flex; gap: 5px; margin-bottom: 15px;">
+            <button onclick="setMergeMode('full')" class="sub-tab active">Full (3 Mảnh)</button>
+            <button onclick="setMergeMode('head')" class="sub-tab">Ghép Đầu vào Thân</button>
+            <button onclick="setMergeMode('legs')" class="sub-tab">Ghép Chân vào Thân</button>
         </div>
 
-        <div class="upload-area" style="text-align: left;">
-            <div id="input-head">
-                <label style="color: #bac2de; font-weight: bold;">1. Skin lấy ĐẦU:</label>
-                <input type="file" id="skinHead" accept="image/png" style="margin-bottom: 15px; width: 100%;" />
-            </div>
+        <div id="area-head">
+            <label>🎯 Skin lấy ĐẦU:</label>
+            <input type="file" id="skinHead">
+        </div>
 
-            <div id="input-body">
-                <label style="color: #bac2de; font-weight: bold;">2. Skin lấy THÂN:</label>
-                <input type="file" id="skinBody" accept="image/png" style="margin-bottom: 15px; width: 100%;" />
-            </div>
+        <div id="area-body">
+            <label>👕 Skin GỐC (Thân/Chân):</label>
+            <input type="file" id="skinBody">
+        </div>
 
-            <div id="input-legs">
-                <label style="color: #bac2de; font-weight: bold;">3. Skin lấy CHÂN:</label>
-                <input type="file" id="skinLegs" accept="image/png" style="width: 100%;" />
-            </div>
+        <div id="area-legs">
+            <label>👖 Skin lấy CHÂN:</label>
+            <input type="file" id="skinLegs">
         </div>
         <button id="btnMerge" class="action-btn" onclick="mergeSkin()">Ghép Lại Ngay 🚀</button>
     </div>
@@ -232,9 +227,16 @@
         }
     }
 
-    function toggleInputs(mode) {
-        document.getElementById('input-head').style.display = (mode === 'bodylegs') ? 'none' : 'block';
-        document.getElementById('input-legs').style.display = (mode === 'headbody') ? 'none' : 'block';
+    function setMergeMode(mode) {
+        // Ẩn hiện các ô input tùy theo chế độ
+        document.getElementById('area-head').style.display = (mode === 'legs') ? 'none' : 'block';
+        document.getElementById('area-legs').style.display = (mode === 'head') ? 'none' : 'block';
+
+        // Đổi chữ nhãn cho dễ hiểu
+        const bodyLabel = document.querySelector('#area-body label');
+        if (mode === 'head') bodyLabel.innerText = '👕 Skin lấy THÂN & CHÂN:';
+        else if (mode === 'legs') bodyLabel.innerText = '👕 Skin lấy ĐẦU & THÂN:';
+        else bodyLabel.innerText = '👕 Skin lấy THÂN:';
     }
 
     // 2. CONVERT SCHEMATIC

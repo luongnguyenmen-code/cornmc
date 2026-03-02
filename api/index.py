@@ -152,46 +152,43 @@ def convert_skin():
 @app.route('/api/merge', methods=['POST', 'OPTIONS'])
 def merge_skin():
     try:
-        # Lấy file từ request, nếu thiếu thì gán None
+        # Lấy các file từ request
         file_head = request.files.get('head')
-        file_body = request.files.get('body')
+        file_body = request.files.get('body') # Đây là file chính (chứa Thân+Chân hoặc Đầu+Thân)
         file_legs = request.files.get('legs')
 
-        img_body = Image.open(file_body).convert("RGBA")
-        # Nếu không có file đầu/chân riêng, mặc định lấy từ file Thân
-        img_head = Image.open(file_head).convert("RGBA") if file_head else img_body
-        img_legs = Image.open(file_legs).convert("RGBA") if file_legs else img_body
+        # Mở ảnh Thân (file bắt buộc phải có)
+        img_main = Image.open(file_body).convert("RGBA")
+        
+        # Tạo canvas mới từ file chính để giữ nguyên các phần không bị thay thế
+        skin_final = img_main.copy()
 
-        skin_final = Image.new("RGBA", (64, 64), (0, 0, 0, 0))
+        # TRƯỜNG HỢP 1: GHÉP ĐẦU (Thay đầu mới vào bộ Skin cũ)
+        if file_head:
+            img_head = Image.open(file_head).convert("RGBA")
+            # Xóa vùng đầu cũ (0,0,64,16) bằng cách paste đè
+            box_head = (0, 0, 64, 16)
+            # Lấy đầu từ file_head đè lên skin_final
+            skin_final.paste(img_head.crop(box_head), box_head, mask=img_head.crop(box_head))
 
-        # 1. GHÉP ĐẦU (Head + Hat)
-        box_head = (0, 0, 64, 16)
-        skin_final.paste(img_head.crop(box_head), box_head, mask=img_head.crop(box_head))
+        # TRƯỜNG HỢP 2: GHÉP CHÂN (Thay chân mới vào bộ Skin cũ)
+        if file_legs:
+            img_legs = Image.open(file_legs).convert("RGBA")
+            # Chân Phải (0,16 -> 16,48)
+            box_leg_r = (0, 16, 16, 48)
+            skin_final.paste(img_legs.crop(box_leg_r), box_leg_r, mask=img_legs.crop(box_leg_r))
+            # Chân Trái (32,48 -> 40,64 và lớp phủ 48,48 -> 56,64)
+            # Lưu ý: Tọa độ này lấy chuẩn 1.8+ để không mất lớp phủ 3D
+            box_leg_l_main = (16, 48, 24, 64)
+            box_leg_l_pants = (0, 48, 8, 64)
+            skin_final.paste(img_legs.crop(box_leg_l_main), box_leg_l_main, mask=img_legs.crop(box_leg_l_main))
+            skin_final.paste(img_legs.crop(box_leg_l_pants), box_leg_l_pants, mask=img_legs.crop(box_leg_l_pants))
 
-        # 2. GHÉP THÂN & TAY (Cánh tay TRÁI và PHẢI kèm lớp phủ)
-        # Thân & Tay Phải
-        box_body_r_arm = (16, 16, 64, 48) 
-        skin_final.paste(img_body.crop(box_body_r_arm), box_body_r_arm, mask=img_body.crop(box_body_r_arm))
-        # Tay Trái & Lớp phủ (Cấu trúc 1.8+)
-        box_l_arm = (32, 48, 40, 64)
-        box_l_sleeve = (48, 48, 56, 64)
-        skin_final.paste(img_body.crop(box_l_arm), box_l_arm, mask=img_body.crop(box_l_arm))
-        skin_final.paste(img_body.crop(box_l_sleeve), box_l_sleeve, mask=img_body.crop(box_l_sleeve))
-
-        # 3. GHÉP CHÂN (Chân TRÁI và PHẢI kèm lớp phủ)
-        # Chân Phải (0,16 -> 16,48)
-        box_leg_r = (0, 16, 16, 48)
-        skin_final.paste(img_legs.crop(box_leg_r), box_leg_r, mask=img_legs.crop(box_leg_r))
-        # Chân Trái (16,48 -> 24,64 chính & 0,48 -> 8,64 lớp quần)
-        box_leg_l = (16, 48, 24, 64)
-        box_pants_l = (0, 48, 8, 64)
-        skin_final.paste(img_legs.crop(box_leg_l), box_leg_l, mask=img_legs.crop(box_leg_l))
-        skin_final.paste(img_legs.crop(box_pants_l), box_pants_l, mask=img_legs.crop(box_pants_l))
-
+        # Xuất file
         img_io = io.BytesIO()
         skin_final.save(img_io, 'PNG')
         img_io.seek(0)
-        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="CornSkin_Custom.png")
+        return send_file(img_io, mimetype='image/png', as_attachment=True, download_name="CornNetwork_Merged.png")
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
