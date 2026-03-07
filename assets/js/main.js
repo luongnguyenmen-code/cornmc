@@ -544,7 +544,7 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "ChVVMS9Lxls2XjfQ"; // ID Bytebin của bạn
+    const exportID = "v3GN1L3B2aximGz8"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
@@ -723,7 +723,7 @@ window.switchRankTab = (tabName) => {
 // CẬP NHẬT TRẠNG THÁI SERVER (SỐ NGƯỜI CHƠI)
 // ==========================================
 async function updateServerStatus() {
-    const apiUrl = `https://api.mcsrvstat.us/2/103.161.119.246:25017`;
+    const apiUrl = `https://api.mcsrvstat.us/2/103.161.119.28:25017`;
 
     try {
         const response = await fetch(apiUrl);
