@@ -544,7 +544,7 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "429WFMdzSdJu2GCC"; // ID Bytebin của bạn
+    const exportID = "YbD6p4wCZpANwosX"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
@@ -584,7 +584,8 @@ async function renderRanking() {
             { namecache: "CuCoMuiKhai", value: 30000 },
             { namecache: "linhcute2006", value: 25000 },
             { namecache: "lehiepmc", value: 20000 },
-            { namecache: "sangvu", value: 15000 }
+            { namecache: "sangvu", value: 15000 },
+            {  namecache: "linhcte2006", value: 1168000 }
         ];
         // Sắp xếp tự động từ cao xuống thấp
         const donateBoard = donateData.sort((a, b) => b.value - a.value);
