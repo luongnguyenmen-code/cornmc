@@ -544,7 +544,7 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "vrWvFmL9ef1scbZd"; // ID Bytebin của bạn
+    const exportID = "vHNriQO1Ehuxj7H0"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
@@ -604,7 +604,8 @@ async function renderRanking() {
         <div class="relative w-full max-w-2xl mx-auto">
         `;
 
-        const renderBoard = (tabId, title, boardData, prefix, suffix, colorClass, borderGlow, isHidden, limit = 10, useShortFormat = false) => {
+        // Hàm hỗ trợ vẽ 1 bảng (Đã thêm formatType: 'short' hoặc 'time')
+        const renderBoard = (tabId, title, boardData, prefix, suffix, colorClass, borderGlow, isHidden, limit = 10, formatType = 'none') => {
             let boardHtml = `<div id="board-${tabId}" class="rank-board ${isHidden ? 'hidden' : ''} glass-intense p-4 sm:p-6 rounded-2xl border ${borderGlow} shadow-[0_0_30px_rgba(0,0,0,0.2)] relative overflow-hidden group transition-all duration-300">`;
             boardHtml += `<div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>`;
             boardHtml += `<h3 class="text-2xl font-black title-font text-center mb-6 ${colorClass} drop-shadow-md relative z-10">${title}</h3>`;
@@ -619,18 +620,42 @@ async function renderRanking() {
                     let numVal = parseFloat(player.value || 0);
                     let val = "";
                     
-                    // Xử lý làm ngắn gọn số tiền
-                    if (useShortFormat) {
+                   // XỬ LÝ FORMAT HIỂN THỊ DỮ LIỆU
+                    if (formatType === 'time') {
+                        // Data lưu bằng Giây (Seconds)
+                        let totalSeconds = Math.floor(numVal);
+                        
+                        let w = Math.floor(totalSeconds / 604800); // 1 tuần = 604800 giây
+                        let d = Math.floor((totalSeconds % 604800) / 86400); // 1 ngày = 86400 giây
+                        let h = Math.floor((totalSeconds % 86400) / 3600); // 1 giờ = 3600 giây
+                        
+                        let timeParts = [];
+                        if (w > 0) timeParts.push(w + 'w');
+                        if (d > 0) timeParts.push(d + 'd');
+                        if (h > 0) timeParts.push(h + 'h');
+                        
+                        if (timeParts.length === 0) {
+                            // Nếu chưa chơi đủ 1 giờ thì tính phút hoặc giây
+                            let m = Math.floor(totalSeconds / 60);
+                            val = m > 0 ? m + 'm' : totalSeconds + 's';
+                        } else {
+                            // Cắt bớt, chỉ lấy 2 đơn vị lớn nhất cho ngắn gọn (VD: hiện "1w 2d" thay vì "1w 2d 5h")
+                            val = timeParts.slice(0, 2).join(' ');
+                        }
+                        suffix = ""; // Bỏ chữ mặc định
+                    } 
+                    else if (formatType === 'short') {
+                        // Rút gọn 1K, 1M, 1B
                         if (numVal >= 1000000000) val = (numVal / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
                         else if (numVal >= 1000000) val = (numVal / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
                         else if (numVal >= 1000) val = (numVal / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
                         else val = numVal.toLocaleString('vi-VN');
-                    } else {
+                    } 
+                    else {
                         val = numVal.toLocaleString('vi-VN');
                     }
 
                     let playerName = player.namecache || "Ẩn danh";
-
                     let medal = `#${index + 1}`;
                     let medalClass = "text-gray-400 text-base font-bold";
                     let rowBorder = "border-white/10";
@@ -659,8 +684,14 @@ async function renderRanking() {
             return boardHtml;
         };
 
-        // // Hàm hỗ trợ vẽ 1 bảng
-        // const renderBoard = (tabId, title, boardData, prefix, suffix, colorClass, borderGlow, isHidden) => {
+        // 4. VẼ 5 BẢNG VÀO HTML (Truyền format 'time' cho bảng Online)
+        html += renderBoard("donate", "💖 BẢNG VÀNG DONATE", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", false, 20, 'short');
+        html += renderBoard("money", "💰 TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", true, 10, 'short');
+        html += renderBoard("online", "⏳ TOP CHĂM CHỈ", onlineBoard, "", "", "text-cyan-400", "border-cyan-500/20", true, 20, 'time');
+        html += renderBoard("point", "💎 TOP ĐẠI GIA XU", pointBoard, "", " Xu", "text-yellow-400", "border-yellow-500/20", true, 10, 'short');
+        html += renderBoard("kill", "⚔️ TOP SÁT THỦ", killBoard, "", " Kill", "text-red-400", "border-red-500/20", true, 10, 'short');
+
+        // const renderBoard = (tabId, title, boardData, prefix, suffix, colorClass, borderGlow, isHidden, limit = 10, useShortFormat = false) => {
         //     let boardHtml = `<div id="board-${tabId}" class="rank-board ${isHidden ? 'hidden' : ''} glass-intense p-4 sm:p-6 rounded-2xl border ${borderGlow} shadow-[0_0_30px_rgba(0,0,0,0.2)] relative overflow-hidden group transition-all duration-300">`;
         //     boardHtml += `<div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>`;
         //     boardHtml += `<h3 class="text-2xl font-black title-font text-center mb-6 ${colorClass} drop-shadow-md relative z-10">${title}</h3>`;
@@ -669,9 +700,23 @@ async function renderRanking() {
         //     if (boardData.length === 0) {
         //         boardHtml += `<div class="text-center py-8 text-gray-500 italic text-sm">Chưa có dữ liệu</div>`;
         //     } else {
-        //         const top10 = boardData.slice(0, 10);
-        //         top10.forEach((player, index) => {
-        //             let val = parseFloat(player.value || 0).toLocaleString('vi-VN');
+        //         // Cắt danh sách theo limit truyền vào
+        //         const topList = boardData.slice(0, limit);
+        //         topList.forEach((player, index) => {
+        //             let numVal = parseFloat(player.value || 0);
+        //             let val = "";
+                    
+        //             // Xử lý làm ngắn gọn số tiền
+                    
+        //             if (useShortFormat) {
+        //                 if (numVal >= 1000000000) val = (numVal / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+        //                 else if (numVal >= 1000000) val = (numVal / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+        //                 else if (numVal >= 1000) val = (numVal / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+        //                 else val = numVal.toLocaleString('vi-VN');
+        //             } else {
+        //                 val = numVal.toLocaleString('vi-VN');
+        //             }
+
         //             let playerName = player.namecache || "Ẩn danh";
 
         //             let medal = `#${index + 1}`;
@@ -701,13 +746,6 @@ async function renderRanking() {
         //     boardHtml += `</div></div>`;
         //     return boardHtml;
         // };
-
-        // 4. VẼ 5 BẢNG VÀO HTML (Mặc định hiện TOP DONATE, ẩn 4 Top còn lại)
-        html += renderBoard("donate", "💖 BẢNG VÀNG DONATE", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", false, 20, false);
-        html += renderBoard("money", "💰 TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", true, 10, true);
-        html += renderBoard("online", "⏳ TOP CHĂM CHỈ", onlineBoard, "", " Giờ", "text-cyan-400", "border-cyan-500/20", true);
-        html += renderBoard("point", "💎 TOP ĐẠI GIA XU", pointBoard, "", " Xu", "text-yellow-400", "border-yellow-500/20", true);
-        html += renderBoard("kill", "⚔️ TOP SÁT THỦ", killBoard, "", " Kill", "text-red-400", "border-red-500/20", true);
 
         html += '</div>'; // Đóng div max-w-2xl
 
@@ -1167,7 +1205,7 @@ function handleAuthUI(user, role) {
 
     } else {
         // ... (Giữ nguyên phần chưa đăng nhập)
-        authDisplay.innerHTML = `<button id="login-trigger" class="cyber-btn px-6 py-2.5 rounded-lg font-bold text-sm title-font">LOGIN ⚡</button>`;
+        authDisplay.innerHTML = `<button id="login-trigger" class="cyber-btn px-6 py-2.5 rounded-lg font-bold text-sm title-font">LOGIN</button>`;
         document.getElementById('login-trigger').onclick = () => document.getElementById('auth-modal').classList.add('active');
         const btn = document.getElementById('create-post-trigger');
         if (btn) btn.classList.add('hidden');
@@ -1212,25 +1250,52 @@ const initParticles = () => {
     for (let i = 0; i < Math.floor((canvas.width * canvas.height) / 20000); i++) particlesArray.push(new Particle());
 
     function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        for (let i = 0; i < particlesArray.length; i++) {
-            particlesArray[i].update(); particlesArray[i].draw();
-            for (let j = i; j < particlesArray.length; j++) {
-                const dx = particlesArray[i].x - particlesArray[j].x;
-                const dy = particlesArray[i].y - particlesArray[j].y;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 100) {
-                    ctx.beginPath(); ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 - dist / 1000})`;
-                    ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
-                    ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
-                    ctx.stroke();
+        // KIỂM TRA: NẾU ĐANG BẬT LITE-MODE THÌ KHÔNG VẼ NỮA ĐỂ CỨU GPU
+        if (!document.body.classList.contains('lite-mode')) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update(); particlesArray[i].draw();
+                for (let j = i; j < particlesArray.length; j++) {
+                    const dx = particlesArray[i].x - particlesArray[j].x;
+                    const dy = particlesArray[i].y - particlesArray[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 100) {
+                        ctx.beginPath(); ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 - dist / 1000})`;
+                        ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                        ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                        ctx.stroke();
+                    }
                 }
             }
-        }
+        } 
         requestAnimationFrame(animate);
     }
     animate();
 };
+
+// ==========================================
+// CÔNG TẮC BẬT/TẮT CHẾ ĐỘ SIÊU MƯỢT (LITE MODE)
+// ==========================================
+window.togglePerformance = () => {
+    const body = document.body;
+    body.classList.toggle('lite-mode');
+    const isLite = body.classList.contains('lite-mode');
+    
+    // Lưu vào bộ nhớ trình duyệt
+    localStorage.setItem('liteMode', isLite ? 'on' : 'off');
+    
+    // Hiện thông báo
+    if (isLite) {
+        showCustomModal("CHẾ ĐỘ TỐI ƯU", "⚡ Đã BẬT chế độ Siêu Mượt!\nTắt hiệu ứng hạt, ảnh nền và kính mờ để tối ưu 100% GPU.", "info");
+    } else {
+        showCustomModal("CHẾ ĐỘ ĐỒ HỌA CAO", "✨ Đã TẮT chế độ Siêu Mượt!\nĐồ họa và các hiệu ứng đã được bật tối đa.", "info");
+    }
+};
+
+// Tự động kiểm tra xem người dùng có từng bật Lite Mode không khi vừa vào web
+if (localStorage.getItem('liteMode') === 'on') {
+    document.body.classList.add('lite-mode');
+}
 
 window.addEventListener('load', async () => {
     // 1. Setup UI
