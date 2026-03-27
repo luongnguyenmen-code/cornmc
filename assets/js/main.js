@@ -544,7 +544,7 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "vHNriQO1Ehuxj7H0"; // ID Bytebin của bạn
+    const exportID = "DJSvpLIkVDeO5QZr"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
@@ -1271,6 +1271,57 @@ const initParticles = () => {
         requestAnimationFrame(animate);
     }
     animate();
+};
+// ==========================================
+// MENU TẢI TÀI NGUYÊN (4 OPTIONS)
+// ==========================================
+window.showDownloadModal = () => {
+    // 🔴 QUAN TRỌNG: Thay thế ID file của bạn vào 4 link bên dưới
+    const linkShaderpacks = "https://drive.google.com/drive/folders/1ZKLCqALrOFLbDbzW_5DcOfozMk2suMK4?usp=sharing";
+    const linkResourcepacks = "https://drive.google.com/drive/folders/1c0kkKdMumDKh614uJizv4p3stRE5x3d9?usp=sharing";
+    const linkMods = "https://drive.google.com/drive/folders/1RvbSeqH3EGBn-7fIpoOmjeDd4L8EYW-0?usp=sharing";
+    const linkFullfile = "https://drive.google.com/uc?export=download&id=18ljz_bF_1_9AwWt5mdGDn9UxPXuoXH4B";
+
+    const htmlContent = `
+        <div class="space-y-3 text-center mt-4 pb-2">
+            <p class="text-gray-300 text-sm mb-4">Chọn mục bạn muốn tải. Hệ thống sẽ tải tệp .zip trực tiếp về máy!</p>
+            
+            <a href="${linkShaderpacks}" class="flex items-center justify-between w-full bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 hover:text-white font-bold py-3 px-5 rounded-xl border border-blue-500/50 shadow-[0_0_10px_rgba(59,130,246,0.2)] hover:shadow-[0_0_15px_rgba(59,130,246,0.5)] transition-all duration-300 group no-underline">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">✨</span>
+                    <span class="text-left block text-lg">shaderpacks</span>
+                </div>
+                <span class="text-xl animate-bounce">⬇️</span>
+            </a>
+            
+            <a href="${linkResourcepacks}" class="flex items-center justify-between w-full bg-green-600/20 hover:bg-green-600/40 text-green-300 hover:text-white font-bold py-3 px-5 rounded-xl border border-green-500/50 shadow-[0_0_10px_rgba(34,197,94,0.2)] hover:shadow-[0_0_15px_rgba(34,197,94,0.5)] transition-all duration-300 group no-underline">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">🎨</span>
+                    <span class="text-left block text-lg">resourcepacks</span>
+                </div>
+                <span class="text-xl animate-bounce">⬇️</span>
+            </a>
+
+            <a href="${linkMods}" class="flex items-center justify-between w-full bg-purple-600/20 hover:bg-purple-600/40 text-purple-300 hover:text-white font-bold py-3 px-5 rounded-xl border border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.2)] hover:shadow-[0_0_15px_rgba(168,85,247,0.5)] transition-all duration-300 group no-underline">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📦</span>
+                    <span class="text-left block text-lg">mods</span>
+                </div>
+                <span class="text-xl animate-bounce">⬇️</span>
+            </a>
+
+            <a href="${linkFullfile}" class="flex items-center justify-between w-full bg-pink-600/20 hover:bg-pink-600/40 text-pink-300 hover:text-white font-bold py-3 px-5 rounded-xl border border-pink-500/50 shadow-[0_0_10px_rgba(236,72,153,0.2)] hover:shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all duration-300 group no-underline">
+                <div class="flex items-center gap-3">
+                    <span class="text-2xl">📁</span>
+                    <span class="text-left block text-lg">fullfile</span>
+                </div>
+                <span class="text-xl animate-bounce">⬇️</span>
+            </a>
+        </div>
+    `;
+
+    // Gọi hàm Modal có sẵn của bạn để hiển thị
+    showCustomModal("TẢI TÀI NGUYÊN SERVER", htmlContent, "info");
 };
 
 // ==========================================
