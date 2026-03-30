@@ -544,7 +544,7 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "DJSvpLIkVDeO5QZr"; // ID Bytebin của bạn
+    const exportID = "RHImzAL44Oz18gDi"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
@@ -563,7 +563,7 @@ async function renderRanking() {
             { namecache: "PE_Dellcotenok", value: 2225000 },
             { namecache: "PE_PopOcean46064", value: 900000 },
             { namecache: "Timmythanh007", value: 860000 },
-            { namecache: "luan198348", value: 820000 },
+            { namecache: "luan198348", value: 820000+800000 },
             { namecache: "Ghast", value: 500000+2000000 },
             { namecache: "ShaMein", value: 450000 },
             { namecache: "NgiPam_06", value: 431000 },
@@ -571,9 +571,9 @@ async function renderRanking() {
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000 },
+            { namecache: "Sunnn06", value: 150000+ 50000 },
             { namecache: "111s", value: 100000 },
-            { namecache: "Haiyen01", value: 100000 },
+            { namecache: "Haiyen01", value: 100000+500000 },
             { namecache: "68_Hazy", value: 100000 },
             { namecache: "Hazon1409", value: 85000 },
             { namecache: "Yuna_Gaming", value: 70000 },
@@ -581,13 +581,14 @@ async function renderRanking() {
             { namecache: "PE_Huyvippto6584", value: 50000 },
             { namecache: "Kazuto207", value: 49000 },
             { namecache: "Setroit", value: 30000 },
-            { namecache: "CuCoMuiKhai", value: 30000 },
+            { namecache: "LuvHuna", value: 30000 },
             { namecache: "linhcute2006", value: 25000 },
             { namecache: "lehiepmc", value: 20000 },
             { namecache: "sangvu", value: 15000 },
             {  namecache: "linhcute2006", value: 1168000+1050000 },
             { namecache: "DraWind000", value: 250000 },
-            { namecache: "huy_holow", value: 230000 }
+            { namecache: "huy_holow", value: 230000 },
+            { namecache: "ConCuToBu", value: 500000 }
         ];
         // Sắp xếp tự động từ cao xuống thấp
         const donateBoard = donateData.sort((a, b) => b.value - a.value);
