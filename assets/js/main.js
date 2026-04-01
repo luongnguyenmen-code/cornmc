@@ -544,7 +544,7 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "RHImzAL44Oz18gDi"; // ID Bytebin của bạn
+    const exportID = "kTW91nVyeBb4JzUq"; // ID Bytebin của bạn
     const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
 
     try {
@@ -1281,7 +1281,7 @@ window.showDownloadModal = () => {
     const linkShaderpacks = "https://drive.google.com/drive/folders/1ZKLCqALrOFLbDbzW_5DcOfozMk2suMK4?usp=sharing";
     const linkResourcepacks = "https://drive.google.com/drive/folders/1c0kkKdMumDKh614uJizv4p3stRE5x3d9?usp=sharing";
     const linkMods = "https://drive.google.com/drive/folders/1RvbSeqH3EGBn-7fIpoOmjeDd4L8EYW-0?usp=sharing";
-    const linkFullfile = "https://drive.google.com/uc?export=download&id=18ljz_bF_1_9AwWt5mdGDn9UxPXuoXH4B";
+    const linkFullfile = "https://drive.google.com/uc?export=download&id=1oPo2PjK5qnnrE9FXfCm_ybS6zFR1eMGA";
 
     const htmlContent = `
         <div class="space-y-3 text-center mt-4 pb-2">
