@@ -197,9 +197,6 @@ def ai_photo_to_skin():
         mapping = Image.open(os.path.join(BASE_DIR, 'mapping_4px.png')).convert("RGBA")
         photo = Image.open(file_input).convert("RGBA")
         
-        try:
-        photo = Image.open(file_input).convert("RGBA")
-        
         # BƯỚC 1: AI Nhận diện mặt cho vùng Đầu
         face_pixel = detect_face_and_crop(photo)
         
