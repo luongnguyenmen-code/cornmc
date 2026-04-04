@@ -3,6 +3,4 @@ flask-cors
 Pillow
 mcschematic
 opencv-python-headless
-scikit-learn
 numpy
-rembg

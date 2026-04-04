@@ -1,9 +1,9 @@
 from flask import Flask, request, send_file, jsonify
 import mcschematic
 from PIL import Image
-from rembg import remove
-from sklearn.cluster import KMeans
 import cv2
+import numpy as np
+from PIL import Image, ImageStat
 import numpy as np
 import json
 import tempfile
@@ -119,16 +119,10 @@ def detect_face_and_crop(pil_image):
     return pil_image.resize((8, 8), Image.Resampling.LANCZOS)
 
 # nhan dien mau RGB tu dong 
-def get_smart_palette(pil_image, num_colors=8):
-    # Chuyển ảnh về mảng pixel
-    img_array = np.array(pil_image.convert("RGB")).reshape(-1, 3)
-    
-    # Dùng AI K-Means để tìm ra các nhóm màu chính
-    kmeans = KMeans(n_clusters=num_colors, n_init=10)
-    kmeans.fit(img_array)
-    
-    # Trả về danh sách các màu chủ đạo (RGB)
-    return kmeans.cluster_centers_.astype(int)
+def get_smart_palette_lite(pil_image):
+    """Lấy màu chủ đạo bằng ImageStat (Không tốn dung lượng)"""
+    stat = ImageStat.Stat(pil_image.convert("RGB"))
+    return tuple(int(x) for x in stat.median)
 
 @app.route('/api/convert', methods=['POST', 'OPTIONS'])
 def convert_skin():
@@ -201,8 +195,7 @@ def ai_photo_to_skin():
         face_pixel = detect_face_and_crop(photo)
         
         # BƯỚC 2: AI Phân tích màu chủ đạo cho trang phục (vùng Thân/Chân)
-        smart_colors = get_smart_palette(photo, num_colors=5)
-        main_theme_color = tuple(smart_colors[0]) # Lấy màu chiếm diện tích lớn nhất
+        main_theme_color = get_smart_palette_lite(photo) 
         
         # BƯỚC 3: Mapping thông minh
         mapping = Image.open(os.path.join(BASE_DIR, 'mapping_4px.png')).convert("RGBA")
