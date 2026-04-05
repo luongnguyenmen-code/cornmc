@@ -8,6 +8,7 @@ import {
     updateUserProfile, editDocument, registerUser, resetPassword,
     deleteDocument, fetchComments, addComment, deleteComment
 } from './core.js';
+import { uploadImageToFirebase } from './core.js';
 
 // Biến toàn cục lưu trạng thái
 let currentUser = null;
@@ -563,17 +564,17 @@ async function renderRanking() {
             { namecache: "PE_Dellcotenok", value: 2225000 },
             { namecache: "PE_PopOcean46064", value: 900000 },
             { namecache: "Timmythanh007", value: 860000 },
-            { namecache: "luan198348", value: 820000+800000 },
-            { namecache: "Ghast", value: 500000+2000000 },
+            { namecache: "luan198348", value: 820000 + 800000 },
+            { namecache: "Ghast", value: 500000 + 2000000 },
             { namecache: "ShaMein", value: 450000 },
             { namecache: "NgiPam_06", value: 431000 },
             { namecache: "Trungvippro", value: 420000 },
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000+ 50000 },
+            { namecache: "Sunnn06", value: 150000 + 50000 },
             { namecache: "111s", value: 100000 },
-            { namecache: "Haiyen01", value: 100000+500000 },
+            { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
             { namecache: "Hazon1409", value: 85000 },
             { namecache: "Yuna_Gaming", value: 70000 },
@@ -585,7 +586,7 @@ async function renderRanking() {
             { namecache: "linhcute2006", value: 25000 },
             { namecache: "lehiepmc", value: 20000 },
             { namecache: "sangvu", value: 15000 },
-            {  namecache: "linhcute2006", value: 1168000+1050000 },
+            { namecache: "linhcute2006", value: 1168000 + 1050000 },
             { namecache: "DraWind000", value: 250000 },
             { namecache: "huy_holow", value: 230000 },
             { namecache: "ConCuToBu", value: 500000 }
@@ -620,21 +621,21 @@ async function renderRanking() {
                 topList.forEach((player, index) => {
                     let numVal = parseFloat(player.value || 0);
                     let val = "";
-                    
-                   // XỬ LÝ FORMAT HIỂN THỊ DỮ LIỆU
+
+                    // XỬ LÝ FORMAT HIỂN THỊ DỮ LIỆU
                     if (formatType === 'time') {
                         // Data lưu bằng Giây (Seconds)
                         let totalSeconds = Math.floor(numVal);
-                        
+
                         let w = Math.floor(totalSeconds / 604800); // 1 tuần = 604800 giây
                         let d = Math.floor((totalSeconds % 604800) / 86400); // 1 ngày = 86400 giây
                         let h = Math.floor((totalSeconds % 86400) / 3600); // 1 giờ = 3600 giây
-                        
+
                         let timeParts = [];
                         if (w > 0) timeParts.push(w + 'w');
                         if (d > 0) timeParts.push(d + 'd');
                         if (h > 0) timeParts.push(h + 'h');
-                        
+
                         if (timeParts.length === 0) {
                             // Nếu chưa chơi đủ 1 giờ thì tính phút hoặc giây
                             let m = Math.floor(totalSeconds / 60);
@@ -644,14 +645,14 @@ async function renderRanking() {
                             val = timeParts.slice(0, 2).join(' ');
                         }
                         suffix = ""; // Bỏ chữ mặc định
-                    } 
+                    }
                     else if (formatType === 'short') {
                         // Rút gọn 1K, 1M, 1B
                         if (numVal >= 1000000000) val = (numVal / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
                         else if (numVal >= 1000000) val = (numVal / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
                         else if (numVal >= 1000) val = (numVal / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
                         else val = numVal.toLocaleString('vi-VN');
-                    } 
+                    }
                     else {
                         val = numVal.toLocaleString('vi-VN');
                     }
@@ -706,9 +707,9 @@ async function renderRanking() {
         //         topList.forEach((player, index) => {
         //             let numVal = parseFloat(player.value || 0);
         //             let val = "";
-                    
+
         //             // Xử lý làm ngắn gọn số tiền
-                    
+
         //             if (useShortFormat) {
         //                 if (numVal >= 1000000000) val = (numVal / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
         //                 else if (numVal >= 1000000) val = (numVal / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
@@ -1268,7 +1269,7 @@ const initParticles = () => {
                     }
                 }
             }
-        } 
+        }
         requestAnimationFrame(animate);
     }
     animate();
@@ -1332,10 +1333,10 @@ window.togglePerformance = () => {
     const body = document.body;
     body.classList.toggle('lite-mode');
     const isLite = body.classList.contains('lite-mode');
-    
+
     // Lưu vào bộ nhớ trình duyệt
     localStorage.setItem('liteMode', isLite ? 'on' : 'off');
-    
+
     // Hiện thông báo
     if (isLite) {
         showCustomModal("CHẾ ĐỘ TỐI ƯU", "⚡ Đã BẬT chế độ Siêu Mượt!\nTắt hiệu ứng hạt, ảnh nền và kính mờ để tối ưu 100% GPU.", "info");
@@ -1422,17 +1423,71 @@ window.addEventListener('load', async () => {
         });
     });
 
-    // 4. Setup Profile Save
+
+    // Tính năng: Hiển thị trước ảnh đại diện khi vừa chọn file
+    document.getElementById('edit-avatar-file')?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const preview = document.getElementById('edit-avatar-preview');
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('hidden');
+        }
+    });
+
+    // 4. Setup Profile Save (Đã nâng cấp Upload ảnh)
     document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = e.target.querySelector('button');
-        btn.innerHTML = "⏳...";
+        const statusText = document.getElementById('avatar-upload-status');
+
+        btn.innerHTML = "⏳ Đang xử lý...";
+        btn.disabled = true; 
+
         try {
-            await updateUserProfile(document.getElementById('edit-name').value, document.getElementById('edit-avatar').value);
+            // Mặc định lấy lại avatarUrl cũ đang có sẵn
+            let avatarUrl = document.getElementById('edit-avatar').value;
+
+            const fileInput = document.getElementById('edit-avatar-file');
+            const file = fileInput.files[0];
+
+            // Nếu người dùng CÓ chọn file ảnh mới -> Bắt đầu Upload
+            if (file) {
+                statusText.classList.remove('hidden');
+                statusText.innerText = '⏳ Đang tải ảnh lên...';
+                statusText.className = "text-xs mt-2 text-yellow-400 font-bold block animate-pulse";
+
+                // Upload vào thư mục 'user_avatars' trên Storage
+                avatarUrl = await uploadImageToFirebase(file, 'user_avatars');
+
+                statusText.innerText = '✅ Tải ảnh xong!';
+                statusText.className = "text-xs mt-2 text-green-400 font-bold block";
+            }
+
+            // Gọi hàm update Profile của Firebase với link avatar (cũ hoặc mới upload)
+            const newName = document.getElementById('edit-name').value;
+            await updateUserProfile(newName, avatarUrl);
+
             showCustomModal("THÀNH CÔNG", "Hồ sơ đã được cập nhật!", "info");
             document.getElementById('profile-modal').classList.remove('active');
-        } catch (err) { showCustomModal("LỖI", err.message, "danger"); }
-        finally { btn.innerHTML = "LƯU THAY ĐỔI 💾"; }
+
+            // Reset form ảnh sau khi update thành công
+            fileInput.value = '';
+            statusText.classList.add('hidden');
+
+            // Nhớ load lại giao diện để hiển thị ảnh mới (gọi hàm load thông tin user của bạn ở đây nếu cần)
+            // ...
+
+        } catch (err) {
+            showCustomModal("LỖI", err.message, "danger");
+            if (statusText) {
+                statusText.innerText = '❌ Lỗi tải ảnh!';
+                statusText.className = "text-xs mt-2 text-red-500 font-bold block";
+            }
+        }
+        finally {
+            btn.innerHTML = "LƯU THAY ĐỔI 💾";
+            btn.disabled = false;
+        }
     });
 
     // 6. Setup Create Post
