@@ -86,8 +86,8 @@ function showCustomModal(title, message, type = 'info', onConfirm = null) {
 
 // --- Tiện ích ---
 window.copyServerIP = () => {
-    navigator.clipboard.writeText("cornnetwork.site").then(() => {
-        showCustomModal("SERVER IP", "✅ Đã copy IP thành công:\n cornnetwork.site", "info");
+    navigator.clipboard.writeText("cornmc.vn").then(() => {
+        showCustomModal("SERVER IP", "✅ Đã copy IP thành công:\n cornmc.vn \n PC: play.cornmc.vn \n PE: pe.cornmc.vn port 26700", "info");
     });
 };
 
