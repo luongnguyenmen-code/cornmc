@@ -1441,7 +1441,7 @@ window.addEventListener('load', async () => {
         const statusText = document.getElementById('avatar-upload-status');
 
         btn.innerHTML = "⏳ Đang xử lý...";
-        btn.disabled = true; 
+        btn.disabled = true;
 
         try {
             // Mặc định lấy lại avatarUrl cũ đang có sẵn
@@ -1523,6 +1523,7 @@ window.addEventListener('load', async () => {
     renderRanking();
     updateServerStatus();
     subscribeToAuth(handleAuthUI);
+
 });
 
 // Các sự kiện click nút trang chủ
