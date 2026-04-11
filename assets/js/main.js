@@ -8,6 +8,7 @@ import {
     updateUserProfile, editDocument, registerUser, resetPassword,
     deleteDocument, fetchComments, addComment, deleteComment
 } from './core.js';
+import { uploadImageToFirebase } from './core.js';
 
 // Biến toàn cục lưu trạng thái
 let currentUser = null;
@@ -85,8 +86,8 @@ function showCustomModal(title, message, type = 'info', onConfirm = null) {
 
 // --- Tiện ích ---
 window.copyServerIP = () => {
-    navigator.clipboard.writeText("cornnetwork.site").then(() => {
-        showCustomModal("SERVER IP", "✅ Đã copy IP thành công:\n cornnetwork.site", "info");
+    navigator.clipboard.writeText("cornmc.vn").then(() => {
+        showCustomModal("SERVER IP", "✅ Đã copy IP thành công:\n cornmc.vn \n PC: play.cornmc.vn \n PE: pe.cornmc.vn port 26700", "info");
     });
 };
 
@@ -1495,17 +1496,71 @@ window.addEventListener('load', async () => {
         });
     });
 
-    // 4. Setup Profile Save
+
+    // Tính năng: Hiển thị trước ảnh đại diện khi vừa chọn file
+    document.getElementById('edit-avatar-file')?.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const preview = document.getElementById('edit-avatar-preview');
+            preview.src = URL.createObjectURL(file);
+            preview.classList.remove('hidden');
+        }
+    });
+
+    // 4. Setup Profile Save (Đã nâng cấp Upload ảnh)
     document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = e.target.querySelector('button');
-        btn.innerHTML = "⏳...";
+        const statusText = document.getElementById('avatar-upload-status');
+
+        btn.innerHTML = "⏳ Đang xử lý...";
+        btn.disabled = true;
+
         try {
-            await updateUserProfile(document.getElementById('edit-name').value, document.getElementById('edit-avatar').value);
+            // Mặc định lấy lại avatarUrl cũ đang có sẵn
+            let avatarUrl = document.getElementById('edit-avatar').value;
+
+            const fileInput = document.getElementById('edit-avatar-file');
+            const file = fileInput.files[0];
+
+            // Nếu người dùng CÓ chọn file ảnh mới -> Bắt đầu Upload
+            if (file) {
+                statusText.classList.remove('hidden');
+                statusText.innerText = '⏳ Đang tải ảnh lên...';
+                statusText.className = "text-xs mt-2 text-yellow-400 font-bold block animate-pulse";
+
+                // Upload vào thư mục 'user_avatars' trên Storage
+                avatarUrl = await uploadImageToFirebase(file, 'user_avatars');
+
+                statusText.innerText = '✅ Tải ảnh xong!';
+                statusText.className = "text-xs mt-2 text-green-400 font-bold block";
+            }
+
+            // Gọi hàm update Profile của Firebase với link avatar (cũ hoặc mới upload)
+            const newName = document.getElementById('edit-name').value;
+            await updateUserProfile(newName, avatarUrl);
+
             showCustomModal("THÀNH CÔNG", "Hồ sơ đã được cập nhật!", "info");
             document.getElementById('profile-modal').classList.remove('active');
-        } catch (err) { showCustomModal("LỖI", err.message, "danger"); }
-        finally { btn.innerHTML = "LƯU THAY ĐỔI 💾"; }
+
+            // Reset form ảnh sau khi update thành công
+            fileInput.value = '';
+            statusText.classList.add('hidden');
+
+            // Nhớ load lại giao diện để hiển thị ảnh mới (gọi hàm load thông tin user của bạn ở đây nếu cần)
+            // ...
+
+        } catch (err) {
+            showCustomModal("LỖI", err.message, "danger");
+            if (statusText) {
+                statusText.innerText = '❌ Lỗi tải ảnh!';
+                statusText.className = "text-xs mt-2 text-red-500 font-bold block";
+            }
+        }
+        finally {
+            btn.innerHTML = "LƯU THAY ĐỔI 💾";
+            btn.disabled = false;
+        }
     });
 
     // 6. Setup Create Post
@@ -1541,6 +1596,7 @@ window.addEventListener('load', async () => {
     renderRanking();
     updateServerStatus();
     subscribeToAuth(handleAuthUI);
+
 });
 
 // Các sự kiện click nút trang chủ

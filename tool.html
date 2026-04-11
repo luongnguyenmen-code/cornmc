@@ -3,8 +3,8 @@
         <button id="tab-pixel" class="tab-btn" onclick="openTool('pixel')">👾 AI Pixel Scanner</button>
         <button id="tab-ai" class="tab-btn" onclick="openTool('ai')">✨ AI Photo to Skin</button>
         <button id="tab-merge" class="tab-btn active" onclick="openTool('merge')">✂️ Tool Ghép Skin Toàn Diện</button>
-        <button id="tab-convert" class="tab-btn" onclick="openTool('convert')">🎨 Tool Chuyển Skin -> 3D
-            Schematic</button>
+        <button id="tab-convert" class="tab-btn" onclick="openTool('convert')">🎨 Tool Chuyển Skin -> 3D Schematic</button>
+        <button id="tab-upload" class="tab-btn" onclick="openTool('upload')">📤 Skin Uploader (Mojang)</button>
     </div>
 
     <div id="tool-pixel" class="tool-container" style="display: none;">
@@ -75,6 +75,39 @@
         <button id="convertBtn" class="action-btn" onclick="convertSkin()">Chuyển Đổi Ngay 🚀</button>
         <p id="statusMessage" class="status-message"></p>
     </div>
+    
+    <div id="tool-upload" class="tool-container" style="display: none; max-width: 450px;">
+        <div class="flex items-center justify-center gap-3 mb-4">
+            <i class="fa-solid fa-shirt text-green-400 text-2xl"></i>
+            <h2 style="margin: 0;">Skin Uploader</h2>
+        </div>
+        <p class="text-sm" style="color: #a6adc8; margin-bottom: 20px;">
+            Tải ảnh Skin (.png) lên để nhận link chuẩn của Mojang. Phù hợp cho plugin SkinsRestorer.
+        </p>
+
+        <div class="upload-area" style="border-style: solid; border-width: 1px; border-color: #313244;">
+            <label class="text-xs font-bold text-slate-500 uppercase block mb-3">Chọn tệp ảnh skin</label>
+            <input type="file" id="skinInputUpload" accept="image/png" style="font-size: 12px;">
+        </div>
+
+        <button id="uploadBtn" onclick="uploadToMineSkin()" class="action-btn" 
+            style="background-color: #6366f1; color: white;">
+            <i class="fa-solid fa-cloud-arrow-up"></i> TẢI LÊN MINESKIN
+        </button>
+
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #313244; text-align: left;">
+            <label class="text-xs font-bold text-slate-500 uppercase block mb-2">Link chuẩn Mojang (Texture URL)</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="resultUrl" readonly placeholder="Link sẽ hiện ở đây..."
+                    style="flex-grow: 1; background: #11111b; border: 1px solid #313244; border-radius: 8px; padding: 10px; color: #a6e3a1; font-size: 11px; font-family: monospace; outline: none;">
+                <button onclick="copyLink()" class="tab-btn" style="padding: 10px 15px; margin: 0; font-size: 14px;">
+                    <i class="fa-solid fa-copy"> Coppy</i>
+                </button>
+            </div>
+            <p id="statusMsgUpload" class="status-message" style="font-size: 11px; margin-top: 10px;"></p>
+        </div>
+    </div>
+
 </div>
 
 <style>
@@ -194,15 +227,76 @@
 
 <script>
     function openTool(toolName) {
-        // Ẩn tất cả các khung chứa công cụ
         document.querySelectorAll('.tool-container').forEach(el => el.style.display = 'none');
-
-        // Gỡ bỏ trạng thái "active" của tất cả các nút bấm trên thanh chọn
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
 
-        // Hiển thị đúng công cụ được chọn và kích hoạt nút tương ứng
         document.getElementById('tool-' + toolName).style.display = 'block';
         document.getElementById('tab-' + toolName).classList.add('active');
+    }
+
+    // --- HÀM GỌI API MINESKIN ---
+    async function uploadToMineSkin() {
+        const fileInput = document.getElementById('skinInputUpload');
+        const btn = document.getElementById('uploadBtn');
+        const status = document.getElementById('statusMsgUpload');
+        const result = document.getElementById('resultUrl');
+        
+        // Key của bạn
+        const apiKey = "msk_HW9Ijlzo_Al820AIANVL8YnNh7j5_uxxaaQzyi4W3DiN2Gg1HUVG68xctA6Zq-VB_VLJOuCcT"; 
+
+        if (!fileInput.files[0]) {
+            status.textContent = "⚠️ Bạn chưa chọn file skin!";
+            status.style.color = "#f38ba8";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ĐANG XỬ LÝ...';
+        status.textContent = "Đang gửi dữ liệu đến MineSkin API...";
+        status.style.color = "#f9e2af";
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            const response = await fetch('https://api.mineskin.org/generate/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: formData
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Lỗi API');
+            }
+
+            const data = await response.json();
+            const mojangUrl = data.data.texture.url; 
+
+            result.value = mojangUrl;
+            status.textContent = "✅ Thành công! Link đã sẵn sàng.";
+            status.style.color = "#a6e3a1";
+
+        } catch (err) {
+            status.textContent = "❌ Lỗi: " + err.message;
+            status.style.color = "#f38ba8";
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i> TẢI LÊN MINESKIN';
+        }
+    }
+
+    // --- TIỆN ÍCH COPY ---
+    function copyLink() {
+        const input = document.getElementById('resultUrl');
+        if (input.value) {
+            input.select();
+            input.setSelectionRange(0, 99999); // Cho mobile
+            navigator.clipboard.writeText(input.value);
+            alert("Đã copy link texture chuẩn Mojang!");
+        }
     }
 
     // 1. GHÉP SKIN (ĐẦU + THÂN + CHÂN)
