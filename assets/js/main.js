@@ -346,15 +346,73 @@ async function renderGuides() {
                 { cmd: "/crawl", desc: "Bò trườn", color: "pink" },
                 { cmd: "/spin", desc: "Xoay vòng vòng", color: "pink" }
             ]
+        },
+        {
+            title: "💼 Hệ Thống Nghề Nghiệp (Jobs)",
+            commands: [
+                { cmd: "/jobs join <Tên>", desc: "Tham gia nghề (VD: /jobs join Miner)", color: "green" },
+                { cmd: "/jobs leave <Tên>", desc: "Rời khỏi nghề hiện tại", color: "red" },
+                { cmd: "/jobs browse", desc: "Xem danh sách và lương từng nghề", color: "cyan" },
+                { cmd: "/jobs stats", desc: "Xem cấp độ nghề của bản thân", color: "yellow" }
+            ],
+            showJobsList: true
+        },
+    ];
+
+    const jobsCategories = [
+        {
+            title: "⚗️ Nhóm Chế Tạo & Phép Thuật",
+            color: "purple",
+            jobs: [
+                { en: "Alchemist", vi: "Nhà Giả Kim" },
+                { en: "Enchanter", vi: "Người Phù Phép" },
+                { en: "Crafter", vi: "Thợ Chế Tạo" },
+                { en: "Smelter", vi: "Thợ Luyện Kim" }
+            ]
+        },
+        {
+            title: "⚒️ Nhóm Xây Dựng & Khai Thác",
+            color: "cyan",
+            jobs: [
+                { en: "Builder", vi: "Thợ Xây Dựng" },
+                { en: "Blacksmith", vi: "Thợ Rèn" },
+                { en: "Miner", vi: "Thợ Mỏ" },
+                { en: "Demolitionist", vi: "Chuyên Gia Phá Dỡ" },
+                { en: "Lumberjack", vi: "Tiều Phu" }
+            ]
+        },
+        {
+            title: "🌾 Nhóm Nông Nghiệp & Chăn Nuôi",
+            color: "green",
+            jobs: [
+                { en: "Farmer", vi: "Nông Dân" },
+                { en: "Breeder", vi: "Người Chăn Nuôi" },
+                { en: "Shepherd", vi: "Người Chăn Cừu" }
+            ]
+        },
+        {
+            title: "🏹 Nhóm Sinh Tồn & Khám Phá",
+            color: "red",
+            jobs: [
+                { en: "Hunter", vi: "Thợ Săn" },
+                { en: "Fisherman", vi: "Ngư Dân" },
+                { en: "Explorer", vi: "Nhà Thám Hiểm" },
+                { en: "Tamer", vi: "Người Thuần Hóa" }
+            ]
+        },
+        {
+            title: "🎨 Nhóm Thủ Công & Khác",
+            color: "orange",
+            jobs: [
+                { en: "Dyer", vi: "Thợ Nhuộm" },
+                { en: "Brusher", vi: "Người Cọ Rửa" },
+                { en: "Griller", vi: "Người Nướng" },
+                { en: "Gourmet", vi: "Người Sành Ăn" },
+                { en: "Trader", vi: "Thương Nhân" }
+            ]
         }
     ];
 
-    // ==========================================
-    // 2. DỮ LIỆU BÊN PHẢI: LUẬT MÁY CHỦ (RULES)
-    // ==========================================
-    // ==========================================
-    // 2. DỮ LIỆU BÊN PHẢI: LUẬT MÁY CHỦ (RULES)
-    // ==========================================
     const rulesData = [
         {
             title: "🚫 1. Hack/Cheat & Lợi Dụng Lỗi",
@@ -465,24 +523,45 @@ async function renderGuides() {
     // ==========================================
     let commandsHtml = `
         <div class="space-y-4">
-            <h3 class="text-3xl font-black title-font text-cyan-400 mb-6 flex items-center gap-3 border-b border-cyan-500/30 pb-3">
-                <span class="text-4xl">📚</span> DANH SÁCH LỆNH
-            </h3>
+            <h3 class="text-3xl font-black title-font text-cyan-400 mb-6 border-b border-cyan-500/30 pb-3">📚 LỆNH CƠ BẢN</h3>
             ${commandsData.map(group => `
-                <div class="glass-panel rounded-2xl border border-purple-500/30 overflow-hidden shadow-[0_0_15px_rgba(139,92,246,0.1)]">
-                    <div class="p-5 flex justify-between items-center cursor-pointer hover:bg-white/5 transition select-none group"
-                         onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.toggle-icon').classList.toggle('rotate-180');">
-                        <h4 class="text-xl font-bold text-white title-font group-hover:text-cyan-300 transition-colors">${group.title}</h4>
-                        <span class="toggle-icon text-cyan-400 font-bold transition-transform duration-300">▼</span>
+                <div class="glass-panel rounded-2xl border border-purple-500/30 overflow-hidden mb-3">
+                    <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition group"
+                        onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.toggle-icon').classList.toggle('rotate-180');">
+                        <h4 class="font-bold text-white title-font group-hover:text-cyan-300 transition-colors">${group.title}</h4>
+                        <span class="toggle-icon text-cyan-400 font-bold transition-transform duration-300 text-xs">▼</span>
                     </div>
                     
-                    <div class="hidden p-5 border-t border-white/5 bg-black/40 space-y-3">
-                        ${group.commands.map(cmd => `
-                            <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-2 border-b border-white/5 pb-2 last:border-0 last:pb-0">
-                                <code class="${colorMap[cmd.color] || colorMap['white']} bg-black/50 px-3 py-1.5 rounded font-mono border whitespace-nowrap text-sm shadow-sm">${cmd.cmd}</code>
-                                <span class="text-gray-300 text-left xl:text-right flex-1 text-sm">${cmd.desc}</span>
+                    <div class="hidden p-4 border-t border-white/5 bg-black/40 space-y-4">
+                        <div class="space-y-2">
+                            ${group.commands.map(cmd => `
+                                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-white/5 pb-1">
+                                    <code class="${colorMap[cmd.color]} bg-black/50 px-2 py-0.5 rounded font-mono text-xs border border-white/5">${cmd.cmd}</code>
+                                    <span class="text-gray-400 text-[11px]">${cmd.desc}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        ${group.showJobsList ? `
+                            <div class="mt-4 pt-4 border-t border-white/10">
+                                <p class="text-[10px] text-orange-300 mb-3 italic">Bảng tra cứu tên nghề (Sử dụng cho lệnh /jobs join):</p>
+                                <div class="grid grid-cols-1 gap-4">
+                                    ${jobsCategories.map(cat => `
+                                        <div class="bg-white/5 p-2 rounded-lg border border-white/5">
+                                            <div class="text-[11px] font-bold text-cyan-400 mb-2 uppercase tracking-wider">${cat.title}</div>
+                                            <div class="grid grid-cols-2 gap-x-4 gap-y-1">
+                                                ${cat.jobs.map(j => `
+                                                    <div class="flex items-center justify-between text-[10px]">
+                                                        <span class="text-white font-mono font-bold">${j.en}</span>
+                                                        <span class="text-gray-500">→ ${j.vi}</span>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
-                        `).join('')}
+                        ` : ''}
                     </div>
                 </div>
             `).join('')}
@@ -532,12 +611,6 @@ async function renderGuides() {
     container.className = "";
 }
 
-// ==========================================
-// RENDER 4 BẢNG XẾP HẠNG (CHIA TAB)
-// ==========================================
-// ==========================================
-// RENDER 5 BẢNG XẾP HẠNG (CHIA TAB)
-// ==========================================
 async function renderRanking() {
     const container = document.getElementById('ranking-container');
     if (!container) return;
@@ -563,17 +636,17 @@ async function renderRanking() {
             { namecache: "PE_Dellcotenok", value: 2225000 },
             { namecache: "PE_PopOcean46064", value: 900000 },
             { namecache: "Timmythanh007", value: 860000 },
-            { namecache: "luan198348", value: 820000+800000 },
-            { namecache: "Ghast", value: 500000+2000000 },
+            { namecache: "luan198348", value: 820000 + 800000 },
+            { namecache: "Ghast", value: 500000 + 2000000 },
             { namecache: "ShaMein", value: 450000 },
             { namecache: "NgiPam_06", value: 431000 },
             { namecache: "Trungvippro", value: 420000 },
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000+ 50000 },
+            { namecache: "Sunnn06", value: 150000 + 50000 },
             { namecache: "111s", value: 100000 },
-            { namecache: "Haiyen01", value: 100000+500000 },
+            { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
             { namecache: "Hazon1409", value: 85000 },
             { namecache: "Yuna_Gaming", value: 70000 },
@@ -585,7 +658,7 @@ async function renderRanking() {
             { namecache: "linhcute2006", value: 25000 },
             { namecache: "lehiepmc", value: 20000 },
             { namecache: "sangvu", value: 15000 },
-            {  namecache: "linhcute2006", value: 1168000+1050000 },
+            { namecache: "linhcute2006", value: 1168000 + 1050000 },
             { namecache: "DraWind000", value: 250000 },
             { namecache: "huy_holow", value: 230000 },
             { namecache: "ConCuToBu", value: 500000 }
@@ -620,21 +693,21 @@ async function renderRanking() {
                 topList.forEach((player, index) => {
                     let numVal = parseFloat(player.value || 0);
                     let val = "";
-                    
-                   // XỬ LÝ FORMAT HIỂN THỊ DỮ LIỆU
+
+                    // XỬ LÝ FORMAT HIỂN THỊ DỮ LIỆU
                     if (formatType === 'time') {
                         // Data lưu bằng Giây (Seconds)
                         let totalSeconds = Math.floor(numVal);
-                        
+
                         let w = Math.floor(totalSeconds / 604800); // 1 tuần = 604800 giây
                         let d = Math.floor((totalSeconds % 604800) / 86400); // 1 ngày = 86400 giây
                         let h = Math.floor((totalSeconds % 86400) / 3600); // 1 giờ = 3600 giây
-                        
+
                         let timeParts = [];
                         if (w > 0) timeParts.push(w + 'w');
                         if (d > 0) timeParts.push(d + 'd');
                         if (h > 0) timeParts.push(h + 'h');
-                        
+
                         if (timeParts.length === 0) {
                             // Nếu chưa chơi đủ 1 giờ thì tính phút hoặc giây
                             let m = Math.floor(totalSeconds / 60);
@@ -644,14 +717,14 @@ async function renderRanking() {
                             val = timeParts.slice(0, 2).join(' ');
                         }
                         suffix = ""; // Bỏ chữ mặc định
-                    } 
+                    }
                     else if (formatType === 'short') {
                         // Rút gọn 1K, 1M, 1B
                         if (numVal >= 1000000000) val = (numVal / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
                         else if (numVal >= 1000000) val = (numVal / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
                         else if (numVal >= 1000) val = (numVal / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
                         else val = numVal.toLocaleString('vi-VN');
-                    } 
+                    }
                     else {
                         val = numVal.toLocaleString('vi-VN');
                     }
@@ -706,9 +779,9 @@ async function renderRanking() {
         //         topList.forEach((player, index) => {
         //             let numVal = parseFloat(player.value || 0);
         //             let val = "";
-                    
+
         //             // Xử lý làm ngắn gọn số tiền
-                    
+
         //             if (useShortFormat) {
         //                 if (numVal >= 1000000000) val = (numVal / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
         //                 else if (numVal >= 1000000) val = (numVal / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
@@ -1268,7 +1341,7 @@ const initParticles = () => {
                     }
                 }
             }
-        } 
+        }
         requestAnimationFrame(animate);
     }
     animate();
@@ -1332,10 +1405,10 @@ window.togglePerformance = () => {
     const body = document.body;
     body.classList.toggle('lite-mode');
     const isLite = body.classList.contains('lite-mode');
-    
+
     // Lưu vào bộ nhớ trình duyệt
     localStorage.setItem('liteMode', isLite ? 'on' : 'off');
-    
+
     // Hiện thông báo
     if (isLite) {
         showCustomModal("CHẾ ĐỘ TỐI ƯU", "⚡ Đã BẬT chế độ Siêu Mượt!\nTắt hiệu ứng hạt, ảnh nền và kính mờ để tối ưu 100% GPU.", "info");
