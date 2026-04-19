@@ -161,6 +161,34 @@ window.approvePost = (docId) => {
     );
 };
 
+// Hàm hiển thị Modal tải MC PE
+window.showMcPeModal = () => {
+    const linkDrive = "https://drive.google.com/file/d/1dDdYl9VwbFZpq_ib9nuQV0tPJah5lwXc/view?usp=sharing";
+
+    const htmlContent = `
+        <div class="space-y-4 text-center mt-4">
+            <p class="text-gray-300 text-sm">Phiên bản Minecraft PE đã được tối ưu cho máy chủ <b>CornMC</b>.</p>
+            
+            <div class="glass-panel p-4 rounded-xl border border-cyan-500/20 bg-cyan-500/5">
+                <p class="text-xs text-cyan-400 mb-2">Thông tin file:</p>
+                <ul class="text-[11px] text-gray-400 text-left list-disc list-inside">
+                    <li>Dung lượng: ~450MB</li>
+                    <li>Phiên bản: 1.21.124 (Latest)</li>
+                    <li>Hỗ trợ: Android (apk)</li>
+                </ul>
+            </div>
+            <a href="${linkDrive}" target="_blank">
+                <span>TẢI XUỐNG NGAY</span>
+                <span class="text-xl animate-bounce">⬇️</span>
+            </a>
+            
+        </div>
+    `;
+
+    // Gọi hàm Modal có sẵn
+    window.showCustomModal("TẢI MINECRAFT PE", htmlContent, "info");
+};
+
 // --- Chức năng Diễn đàn ---
 window.filterForum = (status) => {
     const btnApproved = document.getElementById('tab-approved');
@@ -357,6 +385,15 @@ async function renderGuides() {
                 { cmd: "/jobs stats", desc: "Xem cấp độ nghề của bản thân", color: "yellow" }
             ],
             showJobsList: true
+        },
+        {
+            title: "📊 Hệ Thống Thông Tin & Chat",
+            commands: [
+                { cmd: "/bangthongtin", desc: "Bật/Tắt bảng thông tin bên phải màn hình", color: "cyan" },
+                { cmd: "/taixiu toggle", desc: "Ẩn hoặc hiện các thông báo Tài Xỉu", color: "orange" },
+                { cmd: "/chatgame toggle", desc: "Ẩn hoặc hiện các thông báo Minigame", color: "green" },
+                { cmd: "/chattoggle", desc: "Tắt hoàn toàn chat từ người chơi khác", color: "red" }
+            ]
         },
     ];
 
@@ -618,16 +655,41 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const exportID = "j0VQsIwWO5m94FZW"; // ID Bytebin của bạn
-    const rawDataUrl = `https://bytebin.ajg0702.us/${exportID}`;
+    const CURRENT_ID = "j0VQsIwWO5m94FZW";
+    const BASE_ID = "tUMtH07Un21y6tMK";
 
     try {
-        const response = await fetch(rawDataUrl);
-        const data = await response.json();
+        const [resCurrent, resBase] = await Promise.all([
+            fetch(`https://bytebin.ajg0702.us/${CURRENT_ID}`),
+            fetch(`https://bytebin.ajg0702.us/${BASE_ID}`)
+        ]);
+
+
+        const dataCurrent = await resCurrent.json();
+        const data = await resBase.json();
 
         // 1. LẤY DỮ LIỆU ĐỘNG TỪ API VÀ SẮP XẾP
         const moneyBoard = (data["vault_eco_balance"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
-        const onlineBoard = (data["statistic_time_played"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
+        const currentOnlineRaw = dataCurrent["statistic_time_played"] || [];
+        const baseOnlineRaw = data["statistic_time_played"] || [];
+
+        const onlineBoard = currentOnlineRaw.map(player => {
+            // Tìm người chơi này trong dữ liệu mốc (Base)
+            const basePlayer = baseOnlineRaw.find(b => b.namecache === player.namecache);
+
+            const currentTime = parseFloat(player.value || 0); // Giá trị hiện tại (Lớn)
+            const baseTime = basePlayer ? parseFloat(basePlayer.value || 0) : 0; // Giá trị mốc (Nhỏ)
+
+            // Tính toán: Base - Current
+            let result = baseTime - currentTime;
+
+            return {
+                ...player,
+                // Dùng Math.abs để đảm bảo con số hiển thị là số dương cho bảng xếp hạng
+                value: Math.abs(result)
+            };
+        }).sort((a, b) => b.value - a.value);
+
         const pointBoard = (data["playerpoints_points"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
         const killBoard = (data["statistic_player_kills"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
 
@@ -645,7 +707,7 @@ async function renderRanking() {
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000 + 50000 },
+            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 },
             { namecache: "111s", value: 100000 },
             { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
@@ -1417,6 +1479,21 @@ window.togglePerformance = () => {
         showCustomModal("CHẾ ĐỘ ĐỒ HỌA CAO", "✨ Đã TẮT chế độ Siêu Mượt!\nĐồ họa và các hiệu ứng đã được bật tối đa.", "info");
     }
 };
+
+// --- LOGIC THIẾT LẬP MẶC ĐỊNH LÀ LITE MODE ---
+const savedLiteMode = localStorage.getItem('liteMode');
+
+// Nếu người dùng chưa từng chỉnh (lần đầu vào web) 
+// HOẶC đang để là 'on' thì mặc định bật Lite Mode
+if (savedLiteMode === null || savedLiteMode === 'on') {
+    document.body.classList.add('lite-mode');
+    // Lưu lại trạng thái 'on' vào máy người dùng nếu là lần đầu
+    if (savedLiteMode === null) localStorage.setItem('liteMode', 'on');
+} else {
+    // Nếu người dùng đã chủ động tắt (off), thì giữ nguyên (không add class)
+    document.body.classList.remove('lite-mode');
+}
+
 
 // Tự động kiểm tra xem người dùng có từng bật Lite Mode không khi vừa vào web
 if (localStorage.getItem('liteMode') === 'on') {

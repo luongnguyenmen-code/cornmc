@@ -306,7 +306,8 @@
                                 style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.4), rgba(34, 211, 238, 0.4));">
                             </div>
 
-                            <div class="relative z-10 text-center">
+                            <div class="relative z-10 text-center cursor-pointer w-full h-full flex items-center justify-center"
+                                onclick="window.showMcPeModal()">
                                 <span class="text-2xl font-bold text-white drop-shadow-md">MC PE</span>
                             </div>
                         </div>
@@ -653,7 +654,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                             </div>
 
                         </div>
@@ -769,7 +770,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                         </div>
 
                     </div>
@@ -974,15 +975,15 @@
                     <div class="flex items-center gap-3">
                         <input type="file" id="edit-avatar-file" accept="image/*"
                             class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer bg-black/50 border border-gray-700 rounded-lg outline-none transition">
-                        
+
                         <input type="hidden" id="edit-avatar">
                     </div>
-                    
+
                     <p id="avatar-upload-status" class="text-xs mt-2 hidden"></p>
-                    
-                    <img id="edit-avatar-preview" src="" 
+
+                    <img id="edit-avatar-preview" src=""
                         class="hidden mt-3 w-16 h-16 object-cover rounded-full border-2 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]">
-                    
+
                     <p class="text-[10px] text-gray-500 mt-2">Để trống để dùng Skin Minecraft theo tên.</p>
                 </div>
 
@@ -1004,8 +1005,7 @@
             </div>
 
             <div class="flex-1 w-full rounded-xl overflow-hidden bg-black/60 border border-white/10">
-                <iframe src="tool.html" class="w-full h-full border-none custom-scrollbar"
-                    title="CornMC Tool"></iframe>
+                <iframe src="tool.html" class="w-full h-full border-none custom-scrollbar" title="CornMC Tool"></iframe>
             </div>
 
         </div>
