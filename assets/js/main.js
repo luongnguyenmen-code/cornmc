@@ -163,7 +163,7 @@ window.approvePost = (docId) => {
 
 // Hàm hiển thị Modal tải MC PE
 window.showMcPeModal = () => {
-    const linkDrive = "https://drive.google.com/file/d/1WqYzmPiKlG8yoxY6lxOfL_pmgzpTdiBT/view?usp=sharing";
+    const linkDrive = "https://drive.google.com/file/d/1Q-SBCm5FcK8a9q_7WE3bwV5RKavStbXR/view?usp=sharing";
 
     const htmlContent = `
         <div class="space-y-4 text-center mt-4">
@@ -173,7 +173,7 @@ window.showMcPeModal = () => {
                 <p class="text-xs text-cyan-400 mb-2">Thông tin file:</p>
                 <ul class="text-[11px] text-gray-400 text-left list-disc list-inside">
                     <li>Dung lượng: ~450MB</li>
-                    <li>Phiên bản: 1.21.124 (Latest)</li>
+                    <li>Phiên bản: 1.21.60 (Latest)</li>
                     <li>Hỗ trợ: Android (apk)</li>
                 </ul>
             </div>
