@@ -163,7 +163,7 @@ window.approvePost = (docId) => {
 
 // Hàm hiển thị Modal tải MC PE
 window.showMcPeModal = () => {
-    const linkDrive = "https://drive.google.com/file/d/1dDdYl9VwbFZpq_ib9nuQV0tPJah5lwXc/view?usp=sharing";
+    const linkDrive = "https://drive.google.com/file/d/1WqYzmPiKlG8yoxY6lxOfL_pmgzpTdiBT/view?usp=sharing";
 
     const htmlContent = `
         <div class="space-y-4 text-center mt-4">
