@@ -656,7 +656,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "j0VQsIwWO5m94FZW";
-    const BASE_ID = "Kp4Y7oY6NeRdWRM1";
+    const BASE_ID = "aH50lGLC4TajvC1r";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -707,7 +707,7 @@ async function renderRanking() {
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000},
+            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 +100000},
             { namecache: "111s", value: 100000 },
             { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
@@ -728,6 +728,11 @@ async function renderRanking() {
             { namecache: "SenPai_Cuong", value: 420000 },
             { namecache: "saoky", value: 20000 },
             { namecache: "BkunZ", value: 10000 },
+            { namecache: "Synxbao", value: 100000 },
+            { namecache: "Kezuu", value: 100000 },
+            { namecache: "NguoiTai0Dinh", value: 60000 },
+            { namecache: "GiaHani", value: 70000 },
+            { namecache: "zr0m", value: 200000 },
         ];
         // Sắp xếp tự động từ cao xuống thấp
         const donateBoard = donateData.sort((a, b) => b.value - a.value);
