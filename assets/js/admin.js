@@ -2,10 +2,10 @@ import {
     subscribeToAuth, loginGoogle, logout,
     fetchNews, fetchGuides, fetchForumPosts, createPost, 
     fetchAllUsers, deleteUserAndData, updateUserProfile, editDocument, 
-    deleteDocument, fetchComments, addComment, deleteComment,
-    uploadImageToFirebase // <--- THÊM CÁI NÀY VÀO
+    deleteDocument, fetchComments, addComment, deleteComment
 } from './core.js';
 
+import { uploadImage } from './core.js';
 let currentTab = 'dashboard';
 
 // 1. KIỂM TRA QUYỀN ADMIN KHI VÀO TRANG
@@ -85,7 +85,7 @@ document.getElementById('edit-image-file')?.addEventListener('change', async (e)
 
     try {
         // Upload lên Firebase Storage
-        const imageUrl = await uploadImageToFirebase(file, 'news_images');
+        const imageUrl = await uploadImage(file);
         
         // Gắn link Firebase trả về vào thẻ input ẩn để hàm Submit mang đi lưu
         urlInput.value = imageUrl;
