@@ -8,7 +8,7 @@ import {
     updateUserProfile, editDocument, registerUser, resetPassword,
     deleteDocument, fetchComments, addComment, deleteComment
 } from './core.js';
-import { uploadImageToFirebase } from './core.js';
+import { uploadImage } from './core.js';
 
 // Biến toàn cục lưu trạng thái
 let currentUser = null;
@@ -656,7 +656,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "j0VQsIwWO5m94FZW";
-    const BASE_ID = "aH50lGLC4TajvC1r";
+    const BASE_ID = "SbNhrO9yzYlzyEvq";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -681,8 +681,8 @@ async function renderRanking() {
             const baseTime = basePlayer ? parseFloat(basePlayer.value || 0) : 0; // Giá trị mốc (Nhỏ)
 
             // Tính toán: Base - Current
-            let result = baseTime - currentTime;
-
+            //let result = baseTime - currentTime;
+            let result = baseTime;
             return {
                 ...player,
                 // Dùng Math.abs để đảm bảo con số hiển thị là số dương cho bảng xếp hạng
@@ -1614,8 +1614,8 @@ window.addEventListener('load', async () => {
                 statusText.innerText = '⏳ Đang tải ảnh lên...';
                 statusText.className = "text-xs mt-2 text-yellow-400 font-bold block animate-pulse";
 
-                // Upload vào thư mục 'user_avatars' trên Storage
-                avatarUrl = await uploadImageToFirebase(file, 'user_avatars');
+                // SỬA DÒNG NÀY: Dùng hàm uploadImage mới (ImgBB không cần truyền folderName nữa)
+                avatarUrl = await uploadImage(file);
 
                 statusText.innerText = '✅ Tải ảnh xong!';
                 statusText.className = "text-xs mt-2 text-green-400 font-bold block";
@@ -1633,7 +1633,6 @@ window.addEventListener('load', async () => {
             statusText.classList.add('hidden');
 
             // Nhớ load lại giao diện để hiển thị ảnh mới (gọi hàm load thông tin user của bạn ở đây nếu cần)
-            // ...
 
         } catch (err) {
             showCustomModal("LỖI", err.message, "danger");
