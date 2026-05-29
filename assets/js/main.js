@@ -656,7 +656,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "j0VQsIwWO5m94FZW";
-    const BASE_ID = "SbNhrO9yzYlzyEvq";
+    const BASE_ID = "C77fZKx08mHFEGq1";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
