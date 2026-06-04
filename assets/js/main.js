@@ -655,8 +655,8 @@ async function renderRanking() {
 
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
-    const CURRENT_ID = "j0VQsIwWO5m94FZW";
-    const BASE_ID = "i7E2VpkoiVLVXYSE";
+    const CURRENT_ID = "i7E2VpkoiVLVXYSE";
+    const BASE_ID = "GnGmSCVfRnKbUKlR";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -681,8 +681,14 @@ async function renderRanking() {
             const baseTime = basePlayer ? parseFloat(basePlayer.value || 0) : 0; // Giá trị mốc (Nhỏ)
 
             // Tính toán: Base - Current
-            //let result = baseTime - currentTime;
-            let result = baseTime;
+            let result = baseTime - currentTime;
+
+            if (player.namecache === "WolfMC") {
+                result = result - 600000;
+                if (result < 0) result = 0; // Đảm bảo thời gian không bị rớt xuống âm
+            }
+
+            //let result = baseTime;
             return {
                 ...player,
                 // Dùng Math.abs để đảm bảo con số hiển thị là số dương cho bảng xếp hạng
@@ -695,10 +701,11 @@ async function renderRanking() {
 
         // 2. DỮ LIỆU TOP DONATE (Nhập thủ công)
         const donateData = [
+            // --- DANH SÁCH CŨ (Đã cộng dồn tiền mới nếu có) ---
             { namecache: "Glenn1", value: 2700000 },
             { namecache: "PE_Dellcotenok", value: 2225000 },
             { namecache: "PE_PopOcean46064", value: 900000 },
-            { namecache: "Timmythanh007", value: 860000 },
+            { namecache: "Timmythanh007", value: 860000 + 500000 }, // Cũ 860k + Mới 500k
             { namecache: "luan198348", value: 820000 + 800000 },
             { namecache: "Ghast", value: 500000 + 2000000 },
             { namecache: "ShaMein", value: 450000 },
@@ -707,7 +714,7 @@ async function renderRanking() {
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 +100000},
+            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 }, // Cũ + Mới 725k
             { namecache: "111s", value: 100000 },
             { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
@@ -717,12 +724,12 @@ async function renderRanking() {
             { namecache: "PE_Huyvippto6584", value: 50000 },
             { namecache: "Kazuto207", value: 49000 },
             { namecache: "Setroit", value: 30000 },
-            { namecache: "LuvHuna", value: 30000 + 20000},
+            { namecache: "LuvHuna", value: 30000 + 20000 },
             { namecache: "lehiepmc", value: 20000 },
             { namecache: "sangvu", value: 15000 },
-            { namecache: "linhcute2006", value: 1168000 + 1050000+ 25000+ 2100000 },
-            { namecache: "DraWind000", value: 250000 + 300000 },
-            { namecache: "huy_holow", value: 230000 + 50000},
+            { namecache: "linhcute2006", value: 1168000 + 1050000 + 25000 + 2100000 + 1000000 }, // Cũ + Mới 1M
+            { namecache: "DraWind000", value: 250000 + 300000 + 900000 }, // Cũ + Mới 900k
+            { namecache: "huy_holow", value: 230000 + 50000 },
             { namecache: "ConCuToBu", value: 500000 },
             { namecache: "imtrhie", value: 115000 },
             { namecache: "SenPai_Cuong", value: 420000 },
@@ -733,14 +740,84 @@ async function renderRanking() {
             { namecache: "NguoiTai0Dinh", value: 60000 },
             { namecache: "GiaHani", value: 70000 },
             { namecache: "zr0m", value: 200000 },
+
+            // --- DANH SÁCH NHỮNG NGƯỜI DONATE MỚI HOÀN TOÀN ---
+            { namecache: "KING_NTV", value: 4000000 },
+            { namecache: "Rickynguyen", value: 450000 },
+            { namecache: "tetinhxuan", value: 500000 },
+            { namecache: "nhan", value: 350000 },
+            { namecache: "Linhyumy24", value: 200000 + 50000 },
+            { namecache: "bill199204", value: 100000 + 50000 },
+            { namecache: "toan909", value: 100000 },
+            { namecache: "imnotlgb", value: 70000 },
+            { namecache: "swipey166", value: 50000 },
+            { namecache: "Hiro2003", value: 20000 },
+            { namecache: "ChanhOI", value: 2000000 },
+            { namecache: "WolfMC", value: 40000 },
+            { namecache: "Chooty_427", value: 450000 },
+            { namecache: "LSArt203", value: 170000 + 20000 + 20000 },
+            { namecache: "BomYeuEm", value: 20000 + 20000},
+            { namecache: "PE_Hhnoo1", value: 200000 },
+            { namecache: "Zevss_Gamer", value: 300000 },
+            { namecache: "zeen1207", value: 20000 },
+            { namecache: "RUKY_MC", value: 20000 },
+            { namecache: "huynhtri", value: 10000 },
+            { namecache: "jonnyzip", value: 20000 }
+            
         ];
-        // Sắp xếp tự động từ cao xuống thấp
+
+         // Sắp xếp tự động từ cao xuống thấp
         const donateBoard = donateData.sort((a, b) => b.value - a.value);
 
-        // 3. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
+        // ==========================================
+        // 3. DỮ LIỆU TOP DONATE THÁNG 6
+        // ==========================================
+        const donateJuneData = [
+            { namecache: "KING_NTV", value: 4000000 },
+            { namecache: "ChanhOI", value: 2000000 },
+            { namecache: "linhcute2006", value: 1000000 },
+            { namecache: "DraWind000", value: 900000 },
+            { namecache: "Sunnn06", value: 725000 },
+            { namecache: "Timmythanh007", value: 500000 },
+            { namecache: "Rickynguyen", value: 450000 },
+            { namecache: "Chooty_427", value: 450000 },
+            { namecache: "nhan", value: 350000 },
+            { namecache: "Linhyumy24", value: 200000 },
+            { namecache: "PE_Hhnoo1", value: 200000 },
+            { namecache: "LSArt203", value: 170000 },
+            { namecache: "bill199204", value: 100000 },
+            { namecache: "toan909", value: 100000 },
+            { namecache: "imnotlgb", value: 70000 },
+            { namecache: "swipey166", value: 50000 },
+            { namecache: "WolfMC", value: 40000 },
+            { namecache: "Hiro2003", value: 20000 }
+        ];
+
+        // Sắp xếp tự động từ cao xuống thấp
+        const donateJuneBoard = donateJuneData.sort((a, b) => b.value - a.value);
+
+        // Render ra giao diện (HTML)
+        const juneContainer = document.getElementById('top-june-container');
+        if (juneContainer) {
+            juneContainer.innerHTML = donateJuneBoard.map((player, index) => {
+                // Tạo hiệu ứng màu vàng/bạc/đồng cho Top 1, 2, 3
+                let rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-normal';
+                
+                return `
+                <div class="ranking-row ${rankClass}">
+                    <span class="rank-number">#${index + 1}</span>
+                    <span class="player-name">${player.namecache}</span>
+                    <span class="player-value">${player.value.toLocaleString('vi-VN')} VNĐ</span>
+                </div>
+                `;
+            }).join('');
+        }
+
+       // 3. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
         let html = `
         <div class="flex flex-wrap justify-center gap-3 mb-8">
-            <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-pink-600/20 text-pink-400 border border-pink-500/50 shadow-[0_0_15px_rgba(236,72,153,0.3)]">💖 TOP DONATE</button>
+            <button onclick="window.switchRankTab('june')" id="tab-btn-june" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">🔥 TOP THÁNG 6</button>
+            <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💖 TOP TỔNG</button>
             <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💰 ĐẠI GIA</button>
             <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">⏳ CHĂM CHỈ</button>
             <button onclick="window.switchRankTab('point')" id="tab-btn-point" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💎 TOP XU</button>
@@ -829,8 +906,14 @@ async function renderRanking() {
             return boardHtml;
         };
 
-        // 4. VẼ 5 BẢNG VÀO HTML (Truyền format 'time' cho bảng Online)
-        html += renderBoard("donate", "💖 BẢNG VÀNG DONATE", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", false, 20, 'short');
+        // 4. VẼ CÁC BẢNG VÀO HTML
+        // Bảng Tháng 6 (Hiện đầu tiên - false)
+        html += renderBoard("june", "🔥 TOP DONATE THÁNG 6", donateJuneBoard, "", " VNĐ", "text-orange-400", "border-orange-500/20", false, 20, 'short');
+        
+        // Bảng Donate Tổng (Chuyển sang Ẩn - true)
+        html += renderBoard("donate", "💖 BẢNG VÀNG DONATE TỔNG", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", true, 20, 'short');
+        
+        // Các bảng còn lại giữ nguyên...
         html += renderBoard("money", "💰 TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", true, 10, 'short');
         html += renderBoard("online", "⏳ TOP CHĂM CHỈ", onlineBoard, "", "", "text-cyan-400", "border-cyan-500/20", true, 20, 'time');
         html += renderBoard("point", "💎 TOP ĐẠI GIA XU", pointBoard, "", " Xu", "text-yellow-400", "border-yellow-500/20", true, 10, 'short');
@@ -915,8 +998,8 @@ window.switchRankTab = (tabName) => {
     const activeBoard = document.getElementById(`board-${tabName}`);
     if (activeBoard) activeBoard.classList.remove('hidden');
 
-    // 3. Reset style tất cả các nút bấm về màu xám mờ
-    ['donate', 'money', 'online', 'point', 'kill'].forEach(t => {
+    // 3. Reset style tất cả các nút bấm về màu xám mờ (Thêm 'june' vào danh sách)
+    ['june', 'donate', 'money', 'online', 'point', 'kill'].forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
         if (btn) btn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10';
     });
@@ -924,7 +1007,9 @@ window.switchRankTab = (tabName) => {
     // 4. Bật sáng nút bấm vừa được chọn với màu tương ứng
     const activeBtn = document.getElementById(`tab-btn-${tabName}`);
     if (activeBtn) {
-        if (tabName === 'donate') {
+        if (tabName === 'june') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]';
+        } else if (tabName === 'donate') {
             activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-pink-600/20 text-pink-400 border border-pink-500/50 shadow-[0_0_15px_rgba(236,72,153,0.3)]';
         } else if (tabName === 'money') {
             activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-green-600/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.3)]';
