@@ -334,7 +334,7 @@ async function loadPendingForum() {
 window.currentPunishType = 'bans'; 
 
 // URL dẫn tới file API PHP của bạn (Sửa lại nếu file api-band.php nằm ở thư mục khác/domain khác)
-const LITEBANS_API_URL = 'http://bans.bachsbanhsmif.info/inc/api-band.php';;
+const LITEBANS_API_URL = 'https://ban.menmaume.id.vn/inc/api-band.php';
 
 window.loadPunishments = async (type) => {
     window.currentPunishType = type;
