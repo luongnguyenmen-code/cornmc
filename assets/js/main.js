@@ -656,7 +656,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "i7E2VpkoiVLVXYSE";
-    const BASE_ID = "GnGmSCVfRnKbUKlR";
+    const BASE_ID = "mNk1tslLjIqdoxYg";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -714,7 +714,7 @@ async function renderRanking() {
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 }, // Cũ + Mới 725k
+            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 +50000}, // Cũ + Mới 725k
             { namecache: "111s", value: 100000 },
             { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
@@ -752,7 +752,7 @@ async function renderRanking() {
             { namecache: "imnotlgb", value: 70000 },
             { namecache: "swipey166", value: 50000 },
             { namecache: "Hiro2003", value: 20000 },
-            { namecache: "ChanhOI", value: 2000000 },
+            { namecache: "ChanhOI", value: 2000000 + 650000},
             { namecache: "WolfMC", value: 40000 },
             { namecache: "Chooty_427", value: 450000 },
             { namecache: "LSArt203", value: 170000 + 20000 + 20000 },
@@ -762,6 +762,8 @@ async function renderRanking() {
             { namecache: "zeen1207", value: 20000 },
             { namecache: "RUKY_MC", value: 20000 },
             { namecache: "huynhtri", value: 10000 },
+            { namecache: "Sanganhzaki", value: 10000 +10000},
+            { namecache: "Demon0ra", value: 60000 },
             { namecache: "jonnyzip", value: 20000 }
             
         ];
@@ -774,10 +776,10 @@ async function renderRanking() {
         // ==========================================
         const donateJuneData = [
             { namecache: "KING_NTV", value: 4000000 },
-            { namecache: "ChanhOI", value: 2000000 },
+            { namecache: "ChanhOI", value: 2000000 + 650000},
             { namecache: "linhcute2006", value: 1000000 },
             { namecache: "DraWind000", value: 900000 },
-            { namecache: "Sunnn06", value: 725000 },
+            { namecache: "Sunnn06", value: 725000 + 50000},
             { namecache: "Timmythanh007", value: 500000 },
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "Chooty_427", value: 450000 },
@@ -790,7 +792,10 @@ async function renderRanking() {
             { namecache: "imnotlgb", value: 70000 },
             { namecache: "swipey166", value: 50000 },
             { namecache: "WolfMC", value: 40000 },
+            { namecache: "Sanganhzaki", value: 10000},
+            { namecache: "Demon0ra", value: 60000 },
             { namecache: "Hiro2003", value: 20000 }
+            
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
