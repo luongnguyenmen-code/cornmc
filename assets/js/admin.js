@@ -41,6 +41,7 @@ window.switchTab = (tabName) => {
     if(tabName === 'news') loadPosts('news');
     if(tabName === 'guides') loadPosts('guides');
     if(tabName === 'forum') loadPendingForum();
+    if(tabName === 'punishments') loadPunishments('bans');
 };
 
 // 3. LOAD DASHBOARD (THỐNG KÊ)
@@ -324,6 +325,108 @@ async function loadPendingForum() {
         </div>
     `).join('');
 }
+
+// ==========================================
+// 8. HỆ THỐNG XỬ PHẠT (LITEBANS API)
+// ==========================================
+
+// Biến lưu trạng thái tab đang chọn
+window.currentPunishType = 'bans'; 
+
+// URL dẫn tới file API PHP của bạn (Sửa lại nếu file api-band.php nằm ở thư mục khác/domain khác)
+const LITEBANS_API_URL = 'http://bans.bachsbanhsmif.info/inc/api-band.php';;
+
+window.loadPunishments = async (type) => {
+    window.currentPunishType = type;
+
+    // 1. Cập nhật giao diện (Đổi màu nút Tab đang chọn)
+    document.querySelectorAll('.punish-tab-btn').forEach(btn => {
+        btn.className = "punish-tab-btn text-gray-400 hover:text-white px-4 py-2 rounded text-sm font-bold transition";
+    });
+    const activeBtn = document.getElementById(`btn-type-${type}`);
+    if(activeBtn) {
+        // Highlight tab đang chọn bằng màu đỏ (nếu là bans) hoặc xanh/tím tùy ý
+        const bgColor = type === 'bans' ? 'bg-red-600' : 'bg-purple-600';
+        activeBtn.className = `punish-tab-btn ${bgColor} text-white px-4 py-2 rounded text-sm font-bold transition shadow-lg shadow-black/50`;
+    }
+
+    const list = document.getElementById('punishments-list');
+    list.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-cyan-400 animate-pulse font-bold">⏳ Đang tải dữ liệu xử phạt...</td></tr>';
+
+    // Ẩn/Hiện cột "Hết hạn" vì Kicks không có thời hạn
+    const thExpires = document.getElementById('th-expires');
+    if (thExpires) {
+        thExpires.style.display = type === 'kicks' ? 'none' : 'table-cell';
+    }
+
+    try {
+        // 2. Fetch dữ liệu từ API
+        const response = await fetch(`${LITEBANS_API_URL}?type=${type}`);
+        const result = await response.json();
+
+        // Kiểm tra lỗi từ Backend
+        if (result.status !== 'success') {
+            list.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500 font-bold">❌ Lỗi: ${result.message}</td></tr>`;
+            return;
+        }
+
+        const data = result.data;
+
+        // Nếu không có dữ liệu
+        if (!data || data.length === 0) {
+            list.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500 bg-white/5 rounded-lg">✅ Không có dữ liệu cho mục <b>${type.toUpperCase()}</b>.</td></tr>`;
+            return;
+        }
+
+        // 3. Render dữ liệu ra bảng
+        list.innerHTML = data.map(p => {
+            // Litebans lưu thời gian bằng Milliseconds
+            const timeStr = new Date(Number(p.time)).toLocaleString('vi-VN');
+            
+            // Xử lý cột Hết hạn
+            let expiresTd = '';
+            if (type !== 'kicks') {
+                let expiresText = '';
+                if (Number(p.expires) <= 0) {
+                    expiresText = '<span class="text-red-500 font-bold">Vĩnh viễn</span>';
+                } else {
+                    expiresText = new Date(Number(p.expires)).toLocaleString('vi-VN');
+                }
+                expiresTd = `<td class="p-4 text-xs text-gray-300 font-medium">${expiresText}</td>`;
+            }
+
+            // Xử lý Cột Trạng Thái (Active)
+            let statusBadge = '';
+            if (type !== 'kicks') {
+                const isActive = Number(p.active) === 1;
+                if (isActive) {
+                    statusBadge = '<span class="bg-red-500/20 border border-red-500/50 text-red-400 px-2 py-1 rounded text-xs font-bold shadow-[0_0_8px_rgba(239,68,68,0.2)]">ĐANG PHẠT</span>';
+                } else {
+                    statusBadge = '<span class="bg-green-500/20 border border-green-500/50 text-green-400 px-2 py-1 rounded text-xs font-bold">ĐÃ HẾT HẠN/GỠ</span>';
+                }
+            } else {
+                statusBadge = '<span class="bg-gray-500/20 border border-gray-500/50 text-gray-400 px-2 py-1 rounded text-xs font-bold">ĐÃ KICK</span>';
+            }
+
+            return `
+            <tr class="hover:bg-white/5 transition border-b border-white/5 group">
+                <td class="p-4 flex items-center gap-3">
+                    <img src="https://mc-heads.net/avatar/${p.name || p.uuid}/32" class="w-8 h-8 rounded border border-gray-700 bg-black group-hover:border-purple-500 transition">
+                    <span class="font-bold text-white">${p.name || 'Unknown'}</span>
+                </td>
+                <td class="p-4 text-xs text-gray-300 max-w-[200px] truncate" title="${p.reason}">${p.reason}</td>
+                <td class="p-4 text-xs font-bold text-cyan-400">${p.banner}</td>
+                <td class="p-4 text-xs text-gray-400">${timeStr}</td>
+                ${expiresTd}
+                <td class="p-4">${statusBadge}</td>
+            </tr>`;
+        }).join('');
+
+    } catch (error) {
+        console.error("Fetch Error:", error);
+        list.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500 font-bold">❌ Lỗi kết nối đến Server API (Có thể do sai đường dẫn hoặc lỗi CORS).</td></tr>`;
+    }
+};
 
 window.approveForumPost = async (id) => {
     if(confirm("Duyệt bài viết này lên trang chủ?")) {

@@ -46,6 +46,8 @@
             <div class="sidebar-link px-6 py-3 text-gray-400" onclick="switchTab('forum')">💬 Duyệt bài Diễn đàn <span
                     id="pending-badge" class="bg-red-500 text-white text-[10px] px-1.5 rounded ml-2 hidden">0</span>
             </div>
+            <div class="sidebar-link px-6 py-3 text-gray-400" onclick="switchTab('punishments')">🔨 Lịch sử Xử phạt
+            </div>
         </nav>
         <div class="p-4 border-t border-purple-500/20">
             <a href="index.html" class="block text-center text-sm text-gray-500 hover:text-white mb-3">⬅️ Về trang
@@ -128,6 +130,50 @@
                 <h2 class="text-3xl font-bold mb-6 title-font text-white">DUYỆT BÀI VIẾT</h2>
                 <div id="forum-pending-list" class="space-y-4"></div>
             </div>
+
+            <div id="tab-punishments" class="admin-tab hidden">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold title-font text-white">HỆ THỐNG XỬ PHẠT (LITEBANS)</h2>
+                    <button onclick="loadPunishments(window.currentPunishType)"
+                        class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded font-bold transition">🔄 Làm
+                        mới</button>
+                </div>
+
+                <!-- Nút phân loại -->
+                <div class="flex gap-2 mb-6 bg-black/40 p-2 rounded-lg border border-purple-500/20 w-fit">
+                    <button onclick="loadPunishments('bans')" id="btn-type-bans"
+                        class="punish-tab-btn bg-red-600 text-white px-4 py-2 rounded text-sm font-bold transition">BANS
+                        (CẤM)</button>
+                    <button onclick="loadPunishments('mutes')" id="btn-type-mutes"
+                        class="punish-tab-btn text-gray-400 hover:text-white px-4 py-2 rounded text-sm font-bold transition">MUTES
+                        (CẤM CHÁT)</button>
+                    <button onclick="loadPunishments('warnings')" id="btn-type-warnings"
+                        class="punish-tab-btn text-gray-400 hover:text-white px-4 py-2 rounded text-sm font-bold transition">WARNINGS
+                        (CẢNH CÁO)</button>
+                    <button onclick="loadPunishments('kicks')" id="btn-type-kicks"
+                        class="punish-tab-btn text-gray-400 hover:text-white px-4 py-2 rounded text-sm font-bold transition">KICKS
+                        (ĐUỔI)</button>
+                </div>
+
+                <div class="admin-card rounded-xl overflow-hidden">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-900/50 text-xs uppercase text-gray-400 border-b border-gray-700">
+                            <tr>
+                                <th class="p-4">Người chơi</th>
+                                <th class="p-4">Lý do</th>
+                                <th class="p-4">Người xử lý</th>
+                                <th class="p-4">Ngày xử lý</th>
+                                <th class="p-4" id="th-expires">Hết hạn</th>
+                                <th class="p-4">Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody id="punishments-list" class="text-sm divide-y divide-gray-800">
+                            <!-- Data đổ vào đây -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
         </div>
     </main>
 
@@ -146,19 +192,20 @@
                 <div>
                     <label class="block text-xs text-gray-400 mb-1">Danh mục (Cho Tin tức)</label>
                     <input type="text" id="edit-cat"
-                        class="w-full bg-black/50 border border-gray-700 rounded p-3 text-white focus:border-cyan-500 outline-none" placeholder="VD: SỰ KIỆN, BẢO TRÌ">
+                        class="w-full bg-black/50 border border-gray-700 rounded p-3 text-white focus:border-cyan-500 outline-none"
+                        placeholder="VD: SỰ KIỆN, BẢO TRÌ">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-cyan-400 mb-1">Chọn Ảnh Tải Lên</label>
                     <div class="flex items-center gap-3">
                         <input type="file" id="edit-image-file" accept="image/*"
                             class="w-full text-sm text-gray-300 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500 cursor-pointer bg-black/50 border border-gray-700 rounded-lg outline-none transition">
-                        
+
                         <input type="hidden" id="edit-image">
                     </div>
-                    
+
                     <p id="upload-status" class="text-xs mt-2 hidden"></p>
-                    
+
                     <img id="edit-image-preview" src=""
                         class="hidden mt-3 h-40 w-full object-cover rounded-lg border border-cyan-500/50 shadow-lg">
                 </div>
