@@ -4,7 +4,7 @@
 import {
     subscribeToAuth, loginEmail, registerEmail, loginGoogle, logout,
     fetchNews, fetchGuides, fetchForumPosts, createPost,
-    fetchAllUsers, fetchMyPosts, defaultConfig, loginUser, deleteUserAndData,
+    fetchAllUsers, fetchMyPosts, fetchStaffMembers, defaultConfig, loginUser, deleteUserAndData,
     updateUserProfile, editDocument, registerUser, resetPassword,
     deleteDocument, fetchComments, addComment, deleteComment
 } from './core.js';
@@ -649,6 +649,85 @@ async function renderGuides() {
     container.className = "";
 }
 
+// ==========================================
+// RENDER STAFF (ĐỘI NGŨ BAN QUẢN TRỊ)
+// ==========================================
+async function renderStaff() {
+    // Đảm bảo bạn có thẻ <div id="staff-container"></div> bên trong HTML
+    const container = document.getElementById('staff-container');
+    if (!container) return;
+
+    // Hiển thị hiệu ứng loading
+    container.innerHTML = `
+        <div class="text-center py-12">
+            <div class="loader-ring w-12 h-12 mx-auto mb-4"></div>
+            <p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải danh sách đội ngũ...</p>
+        </div>`;
+
+    try {
+        // Lấy dữ liệu từ core.js
+        const staffList = await fetchStaffMembers();
+
+        if (!staffList || staffList.length === 0) {
+            container.innerHTML = `<div class="glass-panel p-6 text-center text-gray-400 italic rounded-xl border border-dashed border-gray-700">Chưa có thông tin Ban Quản Trị.</div>`;
+            return;
+        }
+
+        // Định nghĩa màu sắc & nhãn hiển thị cho từng Role
+        const roleConfig = {
+            'admin': { name: 'Admin', icon: '👑', color: 'text-red-400', border: 'border-red-500/50', bg: 'bg-red-500/10 shadow-[0_0_15px_rgba(248,113,113,0.2)]' },
+            'dev': { name: 'Developer', icon: '💻', color: 'text-yellow-400', border: 'border-yellow-500/50', bg: 'bg-yellow-500/10 shadow-[0_0_15px_rgba(250,204,21,0.2)]' },
+            'staff': { name: 'Staff', icon: '🛡️', color: 'text-purple-400', border: 'border-purple-500/50', bg: 'bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.2)]' },
+            'media': { name: 'Media', icon: '🎬', color: 'text-pink-400', border: 'border-pink-500/50', bg: 'bg-pink-500/10 shadow-[0_0_15px_rgba(236,72,153,0.2)]' },
+            'helper': { name: 'Helper', icon: '🤝', color: 'text-green-400', border: 'border-green-500/50', bg: 'bg-green-500/10 shadow-[0_0_15px_rgba(74,222,128,0.2)]' }
+        };
+
+        // Ưu tiên sắp xếp (Admin hiện trước -> Dev -> Staff -> Media -> Helper)
+        const rolePriority = { 'admin': 1, 'dev': 2, 'staff': 3, 'media': 4, 'helper': 5 };
+        staffList.sort((a, b) => (rolePriority[a.role] || 99) - (rolePriority[b.role] || 99));
+
+        const html = staffList.map(staff => {
+            const avatar = staff.photoURL || `https://mc-heads.net/avatar/${staff.username || 'Steve'}`;
+            const conf = roleConfig[staff.role] || { name: staff.role.toUpperCase(), icon: '👤', color: 'text-gray-400', border: 'border-gray-500/50', bg: 'bg-gray-500/10' };
+
+            // Xử lý link mạng xã hội (Discord & Website) đã được thêm ở tính năng Profile
+            let socialsHtml = '';
+            if (staff.discordLink || staff.websiteLink) {
+                if (staff.discordLink) socialsHtml += `<a href="${staff.discordLink}" target="_blank" class="px-3 py-1.5 rounded bg-[#5865F2]/20 hover:bg-[#5865F2]/40 text-[#5865F2] hover:text-white border border-[#5865F2]/30 transition text-xs font-bold flex items-center gap-1">💬 Discord</a>`;
+                if (staff.websiteLink) socialsHtml += `<a href="${staff.websiteLink}" target="_blank" class="px-3 py-1.5 rounded bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-400 hover:text-white border border-cyan-500/30 transition text-xs font-bold flex items-center gap-1">🌐 Web</a>`;
+            } else {
+                socialsHtml = `<span class="text-gray-600 text-[10px] italic">Chưa liên kết MXH</span>`;
+            }
+
+            return `
+            <div class="glass-panel p-6 rounded-2xl flex flex-col items-center border-t-4 ${conf.border} ${conf.bg} hover:-translate-y-2 hover:scale-[1.02] transition-all duration-300 group">
+                <div class="relative">
+                    <img src="${avatar}" alt="${staff.username}" class="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl mb-4 border-2 ${conf.border} shadow-lg object-cover bg-gray-900 group-hover:shadow-[0_0_20px_currentColor] transition-all">
+                    <span class="absolute -bottom-2 -right-2 text-2xl drop-shadow-md bg-black/50 rounded-full w-8 h-8 flex items-center justify-center">${conf.icon}</span>
+                </div>
+                
+                <h4 class="text-xl sm:text-2xl font-black text-white title-font drop-shadow-md text-center line-clamp-1 w-full">${staff.username || 'Ẩn danh'}</h4>
+                
+                <span class="inline-block px-4 py-1 mt-2 rounded-full text-xs sm:text-sm font-bold tracking-widest uppercase border ${conf.border} ${conf.color} bg-black/40">
+                    ${conf.name}
+                </span>
+                
+                <div class="mt-5 pt-4 w-full flex justify-center gap-2 border-t border-white/5">
+                    ${socialsHtml}
+                </div>
+            </div>
+            `;
+        }).join('');
+
+        // In ra giao diện (Chia cột: Mobile 2 cột, PC 3-4 cột)
+        container.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">${html}</div>`;
+
+    } catch (error) {
+        console.error("Lỗi khi renderStaff:", error);
+        container.innerHTML = `<div class="text-red-500 text-center glass-panel p-6 border border-red-500/30 rounded-xl shadow-[0_0_15px_rgba(248,113,113,0.1)]">❌ Có lỗi xảy ra khi tải danh sách BQT. Hãy thử lại sau!</div>`;
+    }
+}
+
 async function renderRanking() {
     const container = document.getElementById('ranking-container');
     if (!container) return;
@@ -714,7 +793,7 @@ async function renderRanking() {
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 +50000}, // Cũ + Mới 725k
+            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 + 50000 }, // Cũ + Mới 725k
             { namecache: "111s", value: 100000 },
             { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
@@ -752,23 +831,23 @@ async function renderRanking() {
             { namecache: "imnotlgb", value: 70000 },
             { namecache: "swipey166", value: 50000 },
             { namecache: "Hiro2003", value: 20000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000},
+            { namecache: "ChanhOI", value: 2000000 + 650000 },
             { namecache: "WolfMC", value: 40000 },
             { namecache: "Chooty_427", value: 450000 },
             { namecache: "LSArt203", value: 170000 + 20000 + 20000 },
-            { namecache: "BomYeuEm", value: 20000 + 20000},
+            { namecache: "BomYeuEm", value: 20000 + 20000 },
             { namecache: "PE_Hhnoo1", value: 200000 },
             { namecache: "Zevss_Gamer", value: 300000 },
             { namecache: "zeen1207", value: 20000 },
             { namecache: "RUKY_MC", value: 20000 },
             { namecache: "huynhtri", value: 10000 },
-            { namecache: "Sanganhzaki", value: 10000 +10000},
+            { namecache: "Sanganhzaki", value: 10000 + 10000 },
             { namecache: "Demon0ra", value: 60000 },
             { namecache: "jonnyzip", value: 20000 }
-            
+
         ];
 
-         // Sắp xếp tự động từ cao xuống thấp
+        // Sắp xếp tự động từ cao xuống thấp
         const donateBoard = donateData.sort((a, b) => b.value - a.value);
 
         // ==========================================
@@ -776,10 +855,10 @@ async function renderRanking() {
         // ==========================================
         const donateJuneData = [
             { namecache: "KING_NTV", value: 4000000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000},
+            { namecache: "ChanhOI", value: 2000000 + 650000 },
             { namecache: "linhcute2006", value: 1000000 },
             { namecache: "DraWind000", value: 900000 },
-            { namecache: "Sunnn06", value: 725000 + 50000},
+            { namecache: "Sunnn06", value: 725000 + 50000 },
             { namecache: "Timmythanh007", value: 500000 },
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "Chooty_427", value: 450000 },
@@ -792,10 +871,10 @@ async function renderRanking() {
             { namecache: "imnotlgb", value: 70000 },
             { namecache: "swipey166", value: 50000 },
             { namecache: "WolfMC", value: 40000 },
-            { namecache: "Sanganhzaki", value: 10000},
+            { namecache: "Sanganhzaki", value: 10000 },
             { namecache: "Demon0ra", value: 60000 },
             { namecache: "Hiro2003", value: 20000 }
-            
+
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
@@ -807,7 +886,7 @@ async function renderRanking() {
             juneContainer.innerHTML = donateJuneBoard.map((player, index) => {
                 // Tạo hiệu ứng màu vàng/bạc/đồng cho Top 1, 2, 3
                 let rankClass = index === 0 ? 'rank-1' : index === 1 ? 'rank-2' : index === 2 ? 'rank-3' : 'rank-normal';
-                
+
                 return `
                 <div class="ranking-row ${rankClass}">
                     <span class="rank-number">#${index + 1}</span>
@@ -818,7 +897,7 @@ async function renderRanking() {
             }).join('');
         }
 
-       // 3. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
+        // 3. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
         let html = `
         <div class="flex flex-wrap justify-center gap-3 mb-8">
             <button onclick="window.switchRankTab('june')" id="tab-btn-june" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">🔥 TOP THÁNG 6</button>
@@ -914,10 +993,10 @@ async function renderRanking() {
         // 4. VẼ CÁC BẢNG VÀO HTML
         // Bảng Tháng 6 (Hiện đầu tiên - false)
         html += renderBoard("june", "🔥 TOP DONATE THÁNG 6", donateJuneBoard, "", " VNĐ", "text-orange-400", "border-orange-500/20", false, 20, 'short');
-        
+
         // Bảng Donate Tổng (Chuyển sang Ẩn - true)
         html += renderBoard("donate", "💖 BẢNG VÀNG DONATE TỔNG", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", true, 20, 'short');
-        
+
         // Các bảng còn lại giữ nguyên...
         html += renderBoard("money", "💰 TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", true, 10, 'short');
         html += renderBoard("online", "⏳ TOP CHĂM CHỈ", onlineBoard, "", "", "text-cyan-400", "border-cyan-500/20", true, 20, 'time');
@@ -1040,7 +1119,7 @@ window.switchRankTab = (tabName) => {
     if (activeBoard) activeBoard.classList.remove('hidden');
 
     // 3. Reset style tất cả các nút bấm về màu xám mờ
-    ['june','donate','money', 'online', 'point', 'kill'].forEach(t => {
+    ['june', 'donate', 'money', 'online', 'point', 'kill'].forEach(t => {
         const btn = document.getElementById(`tab-btn-${t}`);
         if (btn) btn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10';
     });
@@ -1050,11 +1129,11 @@ window.switchRankTab = (tabName) => {
     if (activeBtn) {
         if (tabName === 'money') {
             activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-green-600/20 text-green-400 border border-green-500/50 shadow-[0_0_15px_rgba(74,222,128,0.3)]';
-        }else if (tabName === 'june') {
-           activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]';
-        }else if (tabName === 'donate') {
+        } else if (tabName === 'june') {
+            activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]';
+        } else if (tabName === 'donate') {
             activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-cyan-300/20 text-cyan-400 border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.3)]';
-        }else if (tabName === 'online') {
+        } else if (tabName === 'online') {
             activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-cyan-600/20 text-cyan-400 border border-cyan-500/50 shadow-[0_0_15px_rgba(34,211,238,0.3)]';
         } else if (tabName === 'point') {
             activeBtn.className = 'px-5 py-2.5 rounded-xl font-bold text-sm transition bg-yellow-600/20 text-yellow-400 border border-yellow-500/50 shadow-[0_0_15px_rgba(250,204,21,0.3)]';
@@ -1415,9 +1494,14 @@ function handleAuthUI(user, role) {
         // Gán sự kiện click
         document.getElementById('btn-logout').onclick = () => { showCustomModal("ĐĂNG XUẤT", "Bạn có chắc chắn muốn đăng xuất?", "confirm", () => logout()); };
         document.getElementById('btn-profile').onclick = () => {
-            document.getElementById('edit-name').value = user.displayName;
-            document.getElementById('edit-avatar').value = user.photoURL || '';
-            document.getElementById('profile-preview').src = avatar;
+            if (document.getElementById('edit-name')) document.getElementById('edit-name').value = user.displayName || '';
+            if (document.getElementById('edit-avatar')) document.getElementById('edit-avatar').value = user.photoURL || '';
+            if (document.getElementById('profile-preview')) document.getElementById('profile-preview').src = avatar;
+
+            // Check an toàn: Nếu HTML có ô nhập Discord/Web thì mới gán giá trị
+            if (document.getElementById('edit-discord-link')) document.getElementById('edit-discord-link').value = user.discordLink || '';
+            if (document.getElementById('edit-website-link')) document.getElementById('edit-website-link').value = user.websiteLink || '';
+
             document.getElementById('profile-modal').classList.add('active');
         };
         if (document.getElementById('btn-admin')) {
@@ -1691,6 +1775,11 @@ window.addEventListener('load', async () => {
         e.preventDefault();
         const btn = e.target.querySelector('button');
         const statusText = document.getElementById('avatar-upload-status');
+        // Sửa lại đoạn này trong profile-form submit
+        const newName = document.getElementById('edit-name')?.value.trim() || '';
+        const discordLink = document.getElementById('edit-discord-link')?.value.trim() || '';
+        const websiteLink = document.getElementById('edit-website-link')?.value.trim() || '';
+        await updateUserProfile(newName, avatarUrl, discordLink, websiteLink);
 
         btn.innerHTML = "⏳ Đang xử lý...";
         btn.disabled = true;
@@ -1716,8 +1805,10 @@ window.addEventListener('load', async () => {
             }
 
             // Gọi hàm update Profile của Firebase với link avatar (cũ hoặc mới upload)
-            const newName = document.getElementById('edit-name').value;
-            await updateUserProfile(newName, avatarUrl);
+            const newName = document.getElementById('edit-name').value.trim();
+            const discordLink = document.getElementById('edit-discord-link').value.trim();
+            const websiteLink = document.getElementById('edit-website-link').value.trim();
+            await updateUserProfile(newName, avatarUrl, discordLink, websiteLink);
 
             showCustomModal("THÀNH CÔNG", "Hồ sơ đã được cập nhật!", "info");
             document.getElementById('profile-modal').classList.remove('active');
@@ -1771,6 +1862,7 @@ window.addEventListener('load', async () => {
     renderNews();
     renderGuides();
     renderForum('approved');
+    renderStaff();
     renderRanking();
     updateServerStatus();
     subscribeToAuth(handleAuthUI);

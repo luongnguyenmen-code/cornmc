@@ -130,19 +130,21 @@ export async function logout() {
     return await signOut(auth);
 }
 
-export async function updateUserProfile(displayName, photoURL) {
+export async function updateUserProfile(displayName, photoURL, discordLink, websiteLink) {
     const user = auth.currentUser;
     if (!user) throw new Error("No user logged in");
 
     // Update Auth
     await updateProfile(user, { displayName, photoURL });
 
-    // Update Firestore
+    // Update Firestore, bao gồm các trường mới
+    // Sử dụng toán tử spread (...) để merge các trường mới vào object data
+    // Nếu discordLink/websiteLink là undefined, chúng sẽ không được thêm vào object
     const userRef = doc(db, "users", user.uid);
-    await updateDoc(userRef, {
-        username: displayName,
-        photoURL: photoURL
-    });
+    const updateData = { username: displayName, photoURL: photoURL };
+    if (discordLink !== undefined) updateData.discordLink = discordLink;
+    if (websiteLink !== undefined) updateData.websiteLink = websiteLink;
+    await updateDoc(userRef, updateData);
 }
 
 // ==========================================
@@ -176,6 +178,15 @@ export async function fetchAllUsers() {
     const snap = await getDocs(q);
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
+
+// Lấy danh sách thành viên Staff (Media, Helper, Dev, Admin)
+export async function fetchStaffMembers() {
+    const staffRoles = ['media', 'helper', 'dev', 'admin'];
+    const q = query(collection(db, "users"), where("role", "in", staffRoles), orderBy("role", "desc"), orderBy("joinedAt", "asc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
 
 export async function fetchMyPosts(uid) {
     const q = query(
@@ -264,4 +275,52 @@ export async function deleteComment(postId, commentId) {
 // User Management (Admin)
 export async function deleteUserAndData(uid) {
     return await deleteDoc(doc(db, "users", uid));
+}
+
+// ==========================================
+// D. NHÂN SỰ & BÁO CÁO (INTERNAL SYSTEM)
+// ==========================================
+
+// Gửi báo cáo công việc
+export async function submitWorkReport(data) {
+    const user = auth.currentUser;
+    return await addDoc(collection(db, "work_reports"), {
+        ...data,
+        uid: user.uid,
+        author: user.displayName,
+        status: 'pending',
+        createdAt: serverTimestamp()
+    });
+}
+
+// Lấy danh sách báo cáo (Cho Staff/Admin)
+export async function fetchAllWorkReports() {
+    const q = query(collection(db, "work_reports"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+// Lấy lịch sử lương thưởng cá nhân
+export async function fetchMyPayroll(uid) {
+    const q = query(collection(db, "payroll_history"), where("uid", "==", uid), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+// Tạo phiếu lương/thưởng (Chỉ Admin)
+export async function createPayrollEntry(targetUid, amount, reason) {
+    await addDoc(collection(db, "payroll_history"), {
+        uid: targetUid,
+        amount: Number(amount),
+        reason: reason,
+        createdAt: serverTimestamp()
+    });
+    
+    // Tự động tạo một thông báo cho người nhận
+    return await addDoc(collection(db, "notifications"), {
+        uid: targetUid,
+        message: `💰 Bạn vừa nhận được ${Number(amount).toLocaleString()} VNĐ cho: ${reason}`,
+        isRead: false,
+        createdAt: serverTimestamp()
+    });
 }

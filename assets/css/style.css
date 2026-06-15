@@ -662,12 +662,36 @@ body {
 }
 
 .modal-content {
-    max-width: 500px;
     width: 100%;
-    max-height: 90%;
+    max-height: 90vh;
     overflow-y: auto;
     animation: modalSlide 0.4s cubic-bezier(0.075, 0.82, 0.165, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
+
+/* Modal Sizes */
+.modal-sm { max-width: 400px; }
+.modal-md { max-width: 600px; }
+.modal-lg { max-width: 900px; }
+.modal-xl { max-width: 1200px; }
+.modal-full { max-width: 95vw; height: 90vh; }
+
+/* Standard Modal Header/Body */
+.modal-header {
+    padding: 1.5rem 2rem;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modal-body {
+    padding: 2rem;
+    flex: 1;
+}
+
 
 @keyframes modalSlide {
     from {
@@ -784,10 +808,9 @@ body {
 
 /* CSS riêng cho chế độ hiển thị tin tức 70% */
 .modal.active .modal-content.is-news {
-    width: 70% !important;
-    max-width: 1200px !important;
+    max-width: 1000px !important;
     max-height: 85vh !important;
-    border: 1px solid var(--accent-cyan); /* Dùng biến màu cyan từ root của bạn */
+    border: 1px solid var(--accent-cyan);
     box-shadow: 0 0 40px rgba(34, 211, 238, 0.2);
 }
 
