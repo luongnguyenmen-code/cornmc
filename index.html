@@ -587,72 +587,71 @@
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="profile-modal" class="modal">
-            <div class="modal-content glass-intense p-8 rounded-2xl max-w-md">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-black title-font neon-text">👤 HỒ SƠ CÁ NHÂN</h2>
-                    <button class="close-modal text-purple-300 hover:text-white">✕</button>
+    <div id="profile-modal" class="modal">
+        <div class="modal-content glass-intense p-8 rounded-2xl max-w-md">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-black title-font neon-text">👤 HỒ SƠ CÁ NHÂN</h2>
+                <button class="close-modal text-purple-300 hover:text-white">✕</button>
+            </div>
+
+            <form id="profile-form" class="space-y-6">
+                <div class="flex justify-center">
+                    <div class="relative group">
+                        <img id="profile-preview" src=""
+                            class="w-24 h-24 rounded-full border-2 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.3)] object-cover">
+                        <div
+                            class="absolute inset-0 rounded-full border-2 border-dashed border-white/50 animate-spin-slow pointer-events-none">
+                        </div>
+                    </div>
                 </div>
 
-                <form id="profile-form" class="space-y-6">
-                    <div class="flex justify-center">
-                        <div class="relative group">
-                            <img id="profile-preview" src=""
-                                class="w-24 h-24 rounded-full border-2 border-cyan-400 shadow-[0_0_20px_rgba(34,211,238,0.3)] object-cover">
-                            <div
-                                class="absolute inset-0 rounded-full border-2 border-dashed border-white/50 animate-spin-slow pointer-events-none">
-                            </div>
-                        </div>
+                <div>
+                    <label class="text-xs font-bold text-purple-300 uppercase block mb-2">Tên hiển thị</label>
+                    <input type="text" id="edit-name"
+                        class="cyber-input w-full px-4 py-3 rounded-lg text-white font-bold"
+                        placeholder="Nhập tên mới...">
+                </div>
+
+                <div>
+                    <label class="text-xs font-bold text-purple-300 uppercase block mb-2">Đổi Ảnh Đại Diện </label>
+                    <div class="flex items-center gap-3">
+                        <input type="file" id="edit-avatar-file" accept="image/*"
+                            class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer bg-black/50 border border-gray-700 rounded-lg outline-none transition">
+
+                        <input type="hidden" id="edit-avatar">
                     </div>
 
-                    <div>
-                        <label class="text-xs font-bold text-purple-300 uppercase block mb-2">Tên hiển thị</label>
-                        <input type="text" id="edit-name"
-                            class="cyber-input w-full px-4 py-3 rounded-lg text-white font-bold"
-                            placeholder="Nhập tên mới...">
-                    </div>
+                    <p id="avatar-upload-status" class="text-xs mt-2 hidden"></p>
 
-                    <div>
-                        <label class="text-xs font-bold text-purple-300 uppercase block mb-2">Đổi Ảnh Đại Diện </label>
-                        <div class="flex items-center gap-3">
-                            <input type="file" id="edit-avatar-file" accept="image/*"
-                                class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-purple-600 file:text-white hover:file:bg-purple-500 cursor-pointer bg-black/50 border border-gray-700 rounded-lg outline-none transition">
+                    <img id="edit-avatar-preview" src=""
+                        class="hidden mt-3 w-16 h-16 object-cover rounded-full border-2 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]">
 
-                            <input type="hidden" id="edit-avatar">
-                        </div>
+                    <p class="text-[10px] text-gray-500 mt-2">Để trống để dùng Skin Minecraft theo tên.</p>
+                </div>
 
-                        <p id="avatar-upload-status" class="text-xs mt-2 hidden"></p>
+                <div class="mb-4">
+                    <label class="block text-cyan-400 text-xs font-bold mb-2">Link Discord cá nhân (Tùy
+                        chọn)</label>
+                    <input type="text" id="edit-discord-link" class="cyber-input w-full px-4 py-2 rounded-lg text-sm"
+                        placeholder="VD: https://discordapp.com/users/...">
+                </div>
 
-                        <img id="edit-avatar-preview" src=""
-                            class="hidden mt-3 w-16 h-16 object-cover rounded-full border-2 border-purple-500/50 shadow-[0_0_10px_rgba(168,85,247,0.3)]">
+                <div class="mb-6">
+                    <label class="block text-cyan-400 text-xs font-bold mb-2">Link Website / Facebook (Tùy
+                        chọn)</label>
+                    <input type="text" id="edit-website-link" class="cyber-input w-full px-4 py-2 rounded-lg text-sm"
+                        placeholder="VD: https://facebook.com/...">
+                </div>
 
-                        <p class="text-[10px] text-gray-500 mt-2">Để trống để dùng Skin Minecraft theo tên.</p>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-cyan-400 text-xs font-bold mb-2">Link Discord cá nhân (Tùy
-                            chọn)</label>
-                        <input type="text" id="edit-discord-link"
-                            class="cyber-input w-full px-4 py-2 rounded-lg text-sm"
-                            placeholder="VD: https://discordapp.com/users/...">
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-cyan-400 text-xs font-bold mb-2">Link Website / Facebook (Tùy
-                            chọn)</label>
-                        <input type="text" id="edit-website-link"
-                            class="cyber-input w-full px-4 py-2 rounded-lg text-sm"
-                            placeholder="VD: https://facebook.com/...">
-                    </div>
-
-                    <button type="submit" class="cyber-btn w-full py-3 rounded-lg font-bold title-font text-lg">
-                        LƯU THAY ĐỔI 💾
-                    </button>
-                </form>
-            </div>
+                <button type="submit" class="cyber-btn w-full py-3 rounded-lg font-bold title-font text-lg">
+                    LƯU THAY ĐỔI 💾
+                </button>
+            </form>
         </div>
     </div>
+
     <div id="tool-modal" class="modal">
         <div class="modal-content glass-intense rounded-2xl modal-full">
 

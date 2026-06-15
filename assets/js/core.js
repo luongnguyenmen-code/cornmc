@@ -181,7 +181,7 @@ export async function fetchAllUsers() {
 
 // Lấy danh sách thành viên Staff (Media, Helper, Dev, Admin)
 export async function fetchStaffMembers() {
-    const staffRoles = ['media', 'helper', 'dev', 'admin'];
+    const staffRoles = ['media', 'helper', 'staff','dev', 'admin'];
     const q = query(collection(db, "users"), where("role", "in", staffRoles), orderBy("role", "desc"), orderBy("joinedAt", "asc"));
     const snap = await getDocs(q);
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));

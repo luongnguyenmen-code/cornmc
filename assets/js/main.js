@@ -1389,7 +1389,7 @@ async function renderAdminTable() {
         tbody.innerHTML = users.map(u => {
             const isMe = currentUser && currentUser.uid === u.id;
             const avatar = u.photoURL || `https://mc-heads.net/avatar/${u.username}`;
-            const roles = ['member', 'vip', 'media', 'helper', 'dev', 'admin'];
+            const roles = ['member', 'vip', 'media', 'helper', 'staff','dev', 'admin'];
 
             return `
             <tr class="hover:bg-white/5 transition border-b border-purple-500/10 user-row">
@@ -1513,7 +1513,7 @@ function handleAuthUI(user, role) {
 
         // 2. SỬA LỖI MEMBER KHÔNG THẤY NÚT ĐĂNG BÀI
         // Thêm 'member' vào danh sách cho phép
-        if (['admin', 'dev', 'helper', 'member'].includes(role)) {
+        if (['admin', 'dev', 'staff' , 'helper', 'member'].includes(role)) {
             const btn = document.getElementById('create-post-trigger');
             if (btn) btn.classList.remove('hidden');
         }
@@ -1775,11 +1775,6 @@ window.addEventListener('load', async () => {
         e.preventDefault();
         const btn = e.target.querySelector('button');
         const statusText = document.getElementById('avatar-upload-status');
-        // Sửa lại đoạn này trong profile-form submit
-        const newName = document.getElementById('edit-name')?.value.trim() || '';
-        const discordLink = document.getElementById('edit-discord-link')?.value.trim() || '';
-        const websiteLink = document.getElementById('edit-website-link')?.value.trim() || '';
-        await updateUserProfile(newName, avatarUrl, discordLink, websiteLink);
 
         btn.innerHTML = "⏳ Đang xử lý...";
         btn.disabled = true;
