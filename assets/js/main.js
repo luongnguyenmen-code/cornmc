@@ -1274,7 +1274,7 @@ async function renderForum(filterMode = 'approved') {
         return;
     }
 
-    const isStaff = ['admin', 'dev'].includes(currentRole);
+    const isStaff = ['admin', 'dev','staff','helper','media'].includes(currentRole);
 
     if (posts.length === 0) {
         let emptyMsg = "Chưa có bài viết nào.";
@@ -1511,9 +1511,8 @@ function handleAuthUI(user, role) {
             };
         }
 
-        // 2. SỬA LỖI MEMBER KHÔNG THẤY NÚT ĐĂNG BÀI
         // Thêm 'member' vào danh sách cho phép
-        if (['admin', 'dev', 'staff' , 'helper', 'member'].includes(role)) {
+        if (['admin', 'dev', 'staff' , 'helper','media' ,'member'].includes(role)) {
             const btn = document.getElementById('create-post-trigger');
             if (btn) btn.classList.remove('hidden');
         }
