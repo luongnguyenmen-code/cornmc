@@ -1211,7 +1211,7 @@ async function renderForum(filterMode = 'approved') {
             </button>`;
 
         // Nếu là Admin/Dev -> Hiện tab Duyệt bài
-        if (['admin', 'dev', 'helper'].includes(currentRole)) {
+        if (['admin', 'dev','staff','media' , 'helper'].includes(currentRole)) {
             tabsHTML += `
             <button id="tab-pending" onclick="window.filterForum('pending')" 
                 class="px-5 py-2 rounded-lg font-bold text-sm transition border border-yellow-500/30 text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10">
