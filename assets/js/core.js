@@ -61,7 +61,6 @@ export function subscribeToAuth(callback) {
                 }
                 callback(user, role);
             } catch (e) {
-                console.error("Auth Sync Error:", e);
                 callback(user, 'member');
             }
         } else {
@@ -74,15 +73,14 @@ export async function loginUser(input, password) {
     let email = input.trim();
     // Nếu không có @, tự động coi là user ảo
     if (!email.includes('@')) {
-        email = `${email.toLowerCase()}@corn.local`;
+        email = `${email.toLowerCase()}@cornmc.vn`;
     }
     return await signInWithEmailAndPassword(auth, email, password);
 }
 
 // Đăng ký: CHỈ CẦN USERNAME + PASSWORD
 export async function registerUser(username, password) {
-    // Tạo email ảo đuôi @corn.local
-    const fakeEmail = `${username.trim().toLowerCase()}@corn.local`;
+    const fakeEmail = `${username.trim().toLowerCase()}@cornmc.vn`;
     
     const cred = await createUserWithEmailAndPassword(auth, fakeEmail, password);
     await updateProfile(cred.user, { displayName: username });
@@ -109,12 +107,11 @@ export async function loginGoogle() {
 }
 
 export async function loginEmail(email, password) {
-    // Thêm hậu tố domain ảo như code cũ của bạn
-    return await signInWithEmailAndPassword(auth, `${email}@corn.local`, password);
+    return await signInWithEmailAndPassword(auth, `${email}@cornmc.vn`, password);
 }
 
 export async function registerEmail(username, password) {
-    const cred = await createUserWithEmailAndPassword(auth, `${username}@corn.local`, password);
+    const cred = await createUserWithEmailAndPassword(auth, `${username}@cornmc.vn`, password);
     await updateProfile(cred.user, { displayName: username });
     // Tạo data user
     await setDoc(doc(db, "users", cred.user.uid), {
