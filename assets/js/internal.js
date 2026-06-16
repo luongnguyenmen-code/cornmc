@@ -534,7 +534,7 @@ async function loadPayrollAdmin() {
                 </div>
                 <div>
                     <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">💸 Số Tiền (Coin)</label>
-                    <input type="number" id="pay-amount" min="1000" class="w-full bg-black/40 border border-purple-500/30 rounded-lg p-3 text-white outline-none focus:border-cyan-500" placeholder="VD: 50000" required>
+                    <input type="number" id="pay-amount" min="0" class="w-full bg-black/40 border border-purple-500/30 rounded-lg p-3 text-white outline-none focus:border-cyan-500" placeholder="VD: 50000" required>
                 </div>
                 <div>
                     <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">📝 Lý do phát lương / thưởng</label>

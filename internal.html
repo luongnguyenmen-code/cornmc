@@ -6,235 +6,302 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Internal Dashboard - CornMC</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
     <style>
-        body {
-            font-family: 'Space Grotesk', sans-serif;
-            background: #09090b;
-        }
-
         .sidebar-link.active {
-            background: rgba(139, 92, 246, 0.2);
+            background: rgba(34, 211, 238, 0.15);
             border-left: 4px solid #22d3ee;
-            color: white;
+            color: #22d3ee;
+            text-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
         }
+        /* Tùy chỉnh thanh cuộn siêu đẹp */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.5); border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.8); }
     </style>
 </head>
 
-<body class="text-gray-300 flex h-full overflow-hidden">
-    <aside class="w-64 bg-[#0f0f1a] border-r border-white/10 flex flex-col z-20">
-        <div class="p-6 border-b border-white/10">
-            <h1 class="text-xl font-black text-cyan-400 tracking-tighter">CORN INTERNAL</h1>
-            <p class="text-[10px] text-gray-500 uppercase font-bold">Project Management</p>
-        </div>
-        <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
-            <button data-tab="wallet"
-                class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition active">
-                💳 Ví & Thu nhập
-            </button>
-            <button data-tab="report"
-                class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition">
-                📝 Báo cáo & Nhiệm vụ
-            </button>
+<body class="h-full w-full overflow-hidden flex flex-col md:flex-row bg-[#1c1c22]">
 
-            <div id="manager-tools" class="hidden pt-4 border-t border-white/5 mt-2">
-                <p class="px-4 text-[10px] font-bold text-gray-600 mb-2 uppercase">Quản lý & Điều hành</p>
-                <button data-tab="assign-task"
-                    class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition">
-                    🎯 Giao Nhiệm Vụ
-                </button>
-                <button data-tab="manage-work"
-                    class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition">
-                    📋 Duyệt Báo Cáo
-                </button>
-                <button data-tab="payroll"
-                    class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition hidden"
-                    id="admin-payroll-btn">
-                    💰 Phát Lương Thưởng
-                </button>
+    <canvas id="particle-network"></canvas>
+    <div class="cyber-grid"></div>
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+
+    <div class="md:hidden flex items-center justify-between bg-[#09090b]/90 backdrop-blur-md p-4 border-b border-cyan-500/30 z-30 relative shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+        <h1 class="text-2xl font-black title-font neon-text text-cyan-400">CORN INTERNAL</h1>
+        <button id="mobile-sidebar-btn" class="text-cyan-400 text-2xl font-bold drop-shadow-md">☰</button>
+    </div>
+
+    <div class="flex flex-1 overflow-hidden relative z-10 w-full">
+        <aside id="sidebar-menu"
+            class="absolute md:relative w-64 h-full glass-intense border-r border-cyan-500/20 flex flex-col z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 shadow-[5px_0_15px_rgba(0,0,0,0.5)] md:shadow-none">
+            <div class="p-6 border-b border-white/10 hidden md:block text-center">
+                <h1 class="text-3xl font-black title-font neon-text text-cyan-400">INTERNAL</h1>
+                <p class="text-[10px] text-purple-300 uppercase font-bold mt-1 tracking-widest">Project Management</p>
             </div>
-        </nav>
-        <div class="p-4 border-t border-white/10">
-            <a href="/" class="block text-center text-xs hover:text-white transition">← Quay lại trang chủ</a>
-        </div>
-    </aside>
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto custom-scrollbar">
+                <button data-tab="wallet"
+                    class="sidebar-link w-full text-left px-4 py-3 rounded-lg font-bold flex items-center gap-3 transition active">
+                    💳 Ví & Thu nhập
+                </button>
+                <button data-tab="report"
+                    class="sidebar-link w-full text-left px-4 py-3 rounded-lg font-bold flex items-center gap-3 transition">
+                    📝 Báo cáo Tiến độ
+                </button>
 
-    <main class="flex-1 overflow-y-auto p-4 sm:p-8 relative">
-
-        <div id="tab-wallet" class="tab-content space-y-6">
-            <h2 class="text-3xl font-bold text-white">Ví của tôi</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-panel p-6 rounded-2xl border-l-4 border-green-500">
-                    <p class="text-gray-400 text-sm">Tổng thu nhập nhận được</p>
-                    <p id="total-earned" class="text-4xl font-black text-white mt-2">0 Coin</p>
+                <div id="manager-tools" class="hidden pt-4 border-t border-white/10 mt-2">
+                    <p class="px-4 text-[10px] font-bold text-cyan-500 mb-2 uppercase tracking-widest drop-shadow-sm">Quản lý & Điều hành</p>
+                    <button data-tab="assign-task"
+                        class="sidebar-link w-full text-left px-4 py-3 rounded-lg font-bold flex items-center gap-3 transition">
+                        🎯 Giao Nhiệm Vụ
+                    </button>
+                    <button data-tab="manage-work"
+                        class="sidebar-link w-full text-left px-4 py-3 rounded-lg font-bold flex items-center gap-3 transition">
+                        📋 Duyệt Báo Cáo
+                    </button>
+                    <button data-tab="payroll"
+                        class="sidebar-link w-full text-left px-4 py-3 rounded-lg font-bold flex items-center gap-3 transition hidden"
+                        id="admin-payroll-btn">
+                        💰 Phát Lương Thưởng
+                    </button>
                 </div>
-                <div class="glass-panel p-6 rounded-2xl">
-                    <h3 class="font-bold mb-4 flex items-center gap-2">🔔 Thông báo mới nhất</h3>
-                    <div id="notification-list" class="space-y-3 max-h-40 overflow-y-auto custom-scrollbar pr-2">
-                        <p class="text-gray-600 text-xs italic">Không có thông báo mới.</p>
+            </nav>
+            <div class="p-4 border-t border-white/10 bg-black/40">
+                <a href="/" class="cyber-btn-secondary block text-center py-3 rounded-lg text-sm text-cyan-400 hover:text-white transition font-bold uppercase tracking-widest">← Về trang chủ</a>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-y-auto p-4 sm:p-8 relative custom-scrollbar">
+
+            <div id="tab-wallet" class="tab-content space-y-6">
+                <h2 class="text-4xl font-black title-font neon-text mb-8">VÍ CỦA TÔI</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.1)] hover:-translate-y-1 transition-transform">
+                        <p class="text-gray-400 text-sm uppercase font-bold tracking-wider mb-2">Tổng thu nhập nhận được</p>
+                        <p id="total-earned" class="text-5xl font-black text-green-400 mt-2 title-font drop-shadow-md">0 Coin</p>
+                    </div>
+                    <div class="glass-panel p-6 rounded-2xl border-l-4 border-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.1)]">
+                        <h3 class="font-bold mb-4 flex items-center gap-2 text-cyan-400 uppercase tracking-wider title-font text-xl drop-shadow-md">🔔 Thông báo mới nhất</h3>
+                        <div id="notification-list" class="space-y-3 max-h-32 overflow-y-auto custom-scrollbar pr-2">
+                            <p class="text-gray-500 text-xs italic">Không có thông báo mới.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="glass-panel rounded-2xl overflow-hidden border border-purple-500/30">
+                    <table class="w-full text-left text-sm">
+                        <thead class="bg-purple-900/40 text-purple-200 uppercase text-[10px] tracking-wider title-font">
+                            <tr>
+                                <th class="p-4">Ngày nhận</th>
+                                <th class="p-4">Lý do</th>
+                                <th class="p-4 text-right">Số lượng</th>
+                            </tr>
+                        </thead>
+                        <tbody id="payroll-history-body" class="divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="tab-report" class="tab-content hidden max-w-7xl">
+                <h2 class="text-4xl font-black title-font neon-text mb-8">BÁO CÁO & NHIỆM VỤ</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="flex flex-col h-full glass-panel p-6 rounded-2xl">
+                        <h3 class="text-2xl font-black title-font text-cyan-400 mb-6 flex items-center gap-2 border-b border-cyan-500/30 pb-4">📌 Việc cần làm</h3>
+                        <div id="my-tasks-list" class="space-y-4 flex-1 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                            <p class="text-gray-500 text-sm italic">Đang kiểm tra nhiệm vụ...</p>
+                        </div>
+                    </div>
+
+                    <div class="glass-intense p-6 rounded-2xl shadow-[0_0_30px_rgba(139,92,246,0.15)] border-t-4 border-t-purple-500 relative overflow-hidden group">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                        <h3 class="text-2xl font-black title-font text-purple-400 mb-6 flex items-center gap-2 border-b border-purple-500/30 pb-4 relative z-10">📝 Nộp báo cáo</h3>
+                        
+                        <form id="work-report-form" class="space-y-5 relative z-10">
+                            <div>
+                                <label class="block text-xs font-bold mb-2 uppercase text-purple-300 tracking-wider">Công việc đang thực hiện</label>
+                                <input type="text" id="report-task" class="cyber-input w-full p-3 rounded-lg font-bold" placeholder="VD: Xây xong khu vực Spawn mới" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-2 uppercase text-purple-300 tracking-wider">Tiến độ (%)</label>
+                                <input type="number" id="report-percent" min="0" max="100" class="cyber-input w-full p-3 rounded-lg font-bold text-cyan-400 text-xl" required>
+                            </div>
+                            <div class="bg-cyan-900/20 p-4 rounded-xl border border-cyan-500/30">
+                                <label class="block text-xs font-bold mb-2 uppercase text-cyan-400 tracking-wider flex items-center gap-2">📸 Ảnh minh chứng <span class="text-gray-500 text-[10px]">(Max: 10)</span></label>
+                                <input type="file" id="report-images" accept="image/*" multiple class="cyber-input w-full p-2 rounded-lg text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500 cursor-pointer outline-none transition">
+                                <div id="report-image-preview" class="flex flex-wrap gap-3 mt-3"></div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-2 uppercase text-purple-300 tracking-wider">Link bổ sung <span class="text-gray-500 text-[10px]">(Video/Drive)</span></label>
+                                <input type="url" id="report-link" class="cyber-input w-full p-3 rounded-lg" placeholder="https://...">
+                            </div>
+                            <button type="submit" class="cyber-btn w-full py-4 rounded-xl font-black title-font text-xl mt-4">GỬI BÁO CÁO 🚀</button>
+                        </form>
                     </div>
                 </div>
             </div>
-            <div class="glass-panel rounded-2xl overflow-hidden">
-                <table class="w-full text-left text-sm">
-                    <thead class="bg-white/5 text-gray-500 uppercase text-[10px]">
-                        <tr>
-                            <th class="p-4">Ngày nhận</th>
-                            <th class="p-4">Lý do</th>
-                            <th class="p-4 text-right">Số lượng</th>
-                        </tr>
-                    </thead>
-                    <tbody id="payroll-history-body"></tbody>
-                </table>
-            </div>
-        </div>
 
-        <div id="tab-report" class="tab-content hidden max-w-6xl">
-            <h2 class="text-3xl font-bold text-white mb-6">Báo cáo & Nhiệm vụ</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-                <div class="flex flex-col h-full">
-                    <h3 class="text-lg font-bold text-cyan-400 mb-4 flex items-center gap-2">📌 Việc cần làm của bộ phận
-                    </h3>
-                    <div id="my-tasks-list"
-                        class="space-y-3 flex-1 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
-                        <p class="text-gray-500 text-sm italic">Đang kiểm tra nhiệm vụ...</p>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="text-lg font-bold text-green-400 mb-4 flex items-center gap-2">📝 Nộp báo cáo tiến độ
-                    </h3>
-                    <form id="work-report-form" class="glass-panel p-6 rounded-2xl space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold mb-2 uppercase text-gray-300">Công việc đang thực
-                                hiện</label>
-                            <input type="text" id="report-task"
-                                class="w-full bg-black/40 border border-white/10 rounded-lg p-3 outline-none focus:border-cyan-500 text-white"
-                                placeholder="Bấm vào nhiệm vụ bên trái hoặc nhập tay..." required>
+            <div id="tab-assign-task" class="tab-content hidden max-w-7xl">
+                <h2 class="text-4xl font-black title-font neon-text mb-8">GIAO NHIỆM VỤ</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <form id="assign-task-form" class="glass-intense p-6 sm:p-8 rounded-2xl space-y-6 h-fit border-t-4 border-t-cyan-500 shadow-[0_0_30px_rgba(34,211,238,0.15)] relative overflow-hidden">
+                        <div class="absolute -left-10 -top-10 w-40 h-40 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                        <div class="relative z-10">
+                            <label class="block text-xs font-bold mb-2 uppercase text-cyan-400 tracking-wider">🏢 Giao cho Doanh Mục (Bộ phận)</label>
+                            <select id="task-role" class="cyber-input w-full p-3 rounded-lg font-bold">
+                                <option value="all" class="bg-gray-900">🌐 Tất cả bộ phận (Nhiệm vụ chung)</option>
+                                <option value="media" class="bg-gray-900">🎬 Bộ phận Media (Video, Content)</option>
+                                <option value="helper" class="bg-gray-900">🤝 Bộ phận Helper (Hỗ trợ, Wiki)</option>
+                                <option value="staff" class="bg-gray-900">🛡️ Bộ phận Staff (Quản lý)</option>
+                                <option value="dev" class="bg-gray-900">💻 Bộ phận Developer (Code, Build)</option>
+                            </select>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold mb-2 uppercase text-gray-300">Tiến độ (%)</label>
-                            <input type="number" id="report-percent" min="0" max="100"
-                                class="w-full bg-black/40 border border-white/10 rounded-lg p-3 outline-none focus:border-cyan-500 text-white"
-                                required>
+                        <div class="relative z-10">
+                            <label class="block text-xs font-bold mb-2 uppercase text-cyan-400 tracking-wider">📌 Tên nhiệm vụ</label>
+                            <input type="text" id="task-title" class="cyber-input w-full p-3 rounded-lg font-bold" placeholder="VD: Xây dựng Spawn mới..." required>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">📸 Ảnh minh chứng (Tối
-                                đa 10 ảnh)</label>
-                            <input type="file" id="report-images" accept="image/*" multiple
-                                class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500 cursor-pointer bg-black/40 border border-white/10 rounded-lg outline-none transition p-1.5">
-                            <div id="report-image-preview" class="flex flex-wrap gap-3 mt-3"></div>
+                        <div class="relative z-10">
+                            <label class="block text-xs font-bold mb-2 uppercase text-cyan-400 tracking-wider">📝 Mô tả chi tiết yêu cầu</label>
+                            <textarea id="task-desc" rows="4" class="cyber-input w-full p-3 rounded-lg text-gray-300" placeholder="Chi tiết các hạng mục cần làm..."></textarea>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold mb-2 uppercase text-gray-300">Link bổ sung
-                                (Video/Drive nếu có)</label>
-                            <input type="url" id="report-link"
-                                class="w-full bg-black/40 border border-white/10 rounded-lg p-3 outline-none focus:border-cyan-500 text-white"
-                                placeholder="Link Video, Google Drive...">
-                        </div>
-                        <button type="submit"
-                            class="bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-black w-full py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all">GỬI
-                            BÁO CÁO 🚀</button>
+                        <button type="submit" class="cyber-btn w-full py-4 rounded-xl font-black title-font text-xl relative z-10">PHÁT LỆNH GIAO VIỆC 🎯</button>
                     </form>
-                </div>
 
-            </div>
-        </div>
-
-        <div id="tab-assign-task" class="tab-content hidden max-w-6xl">
-            <h2 class="text-3xl font-bold text-white mb-6">Phân Bổ Nhiệm Vụ</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-                <form id="assign-task-form" class="glass-panel p-6 rounded-2xl space-y-5 h-fit">
-                    <div>
-                        <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">🏢 Giao cho Doanh Mục (Bộ
-                            phận)</label>
-                        <select id="task-role"
-                            class="w-full bg-black/40 border border-purple-500/30 rounded-lg p-3 text-white outline-none focus:border-cyan-500">
-                            <option value="all" class="bg-gray-900">🌐 Tất cả bộ phận (Nhiệm vụ chung)</option>
-                            <option value="media" class="bg-gray-900">🎬 Bộ phận Media (Video, Content)</option>
-                            <option value="helper" class="bg-gray-900">🤝 Bộ phận Helper (Hỗ trợ, Wiki)</option>
-                            <option value="staff" class="bg-gray-900">🛡️ Bộ phận Staff (Quản lý)</option>
-                            <option value="dev" class="bg-gray-900">💻 Bộ phận Developer (Code, Build)</option>
-                        </select>
+                    <div class="glass-panel p-6 rounded-2xl flex flex-col h-full">
+                        <h3 class="text-2xl font-black title-font text-cyan-400 mb-6 border-b border-cyan-500/30 pb-4">Lịch sử giao việc</h3>
+                        <div id="admin-tasks-list" class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar"></div>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">📌 Tên nhiệm vụ</label>
-                        <input type="text" id="task-title"
-                            class="w-full bg-black/40 border border-purple-500/30 rounded-lg p-3 text-white outline-none focus:border-cyan-500"
-                            placeholder="VD: Xây dựng Spawn mới..." required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">📝 Mô tả chi tiết yêu
-                            cầu</label>
-                        <textarea id="task-desc" rows="4"
-                            class="w-full bg-black/40 border border-purple-500/30 rounded-lg p-3 text-white outline-none focus:border-cyan-500"
-                            placeholder="Chi tiết các hạng mục cần làm..."></textarea>
-                    </div>
-                    <button type="submit"
-                        class="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-black w-full py-4 rounded-xl shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all">PHÁT
-                        LỆNH GIAO VIỆC 🎯</button>
-                </form>
-
-                <div>
-                    <h3 class="text-xl font-bold text-white mb-4">Lịch sử giao việc gần đây</h3>
-                    <div id="admin-tasks-list" class="space-y-3 max-h-[550px] overflow-y-auto pr-2 custom-scrollbar">
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div id="tab-manage-work" class="tab-content hidden">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
-                <h2 class="text-3xl font-bold text-white">Duyệt Báo Cáo</h2>
-
-                <div
-                    class="flex bg-black/40 p-1 rounded-lg border border-white/10 overflow-x-auto w-full sm:w-auto custom-scrollbar">
-                    <button onclick="window.filterReports('all')" id="filter-all"
-                        class="report-filter-btn px-4 py-2 rounded-md text-sm font-bold bg-cyan-600 text-white shadow-md transition whitespace-nowrap">🌐
-                        Tất cả</button>
-                    <button onclick="window.filterReports('media')" id="filter-media"
-                        class="report-filter-btn px-4 py-2 rounded-md text-sm font-bold text-gray-400 hover:text-white transition whitespace-nowrap">🎬
-                        Media</button>
-                    <button onclick="window.filterReports('helper')" id="filter-helper"
-                        class="report-filter-btn px-4 py-2 rounded-md text-sm font-bold text-gray-400 hover:text-white transition whitespace-nowrap">🤝
-                        Helper</button>
-                    <button onclick="window.filterReports('staff')" id="filter-staff"
-                        class="report-filter-btn px-4 py-2 rounded-md text-sm font-bold text-gray-400 hover:text-white transition whitespace-nowrap">🛡️
-                        Staff</button>
-                    <button onclick="window.filterReports('dev')" id="filter-dev"
-                        class="report-filter-btn px-4 py-2 rounded-md text-sm font-bold text-gray-400 hover:text-white transition whitespace-nowrap">💻
-                        Dev</button>
                 </div>
             </div>
 
-            <div id="all-reports-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6"></div>
-        </div>
-
-        <div id="tab-payroll" class="tab-content hidden max-w-2xl">
-            <h2 class="text-3xl font-bold text-white mb-6">Phát lương & Thưởng</h2>
-            <div id="payroll-admin-panel" class="glass-panel p-8 rounded-2xl"></div>
-        </div>
-        <div id="report-detail-modal"
-            class="fixed inset-0 z-[100] hidden flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 transition-all">
-            <div
-                class="glass-intense rounded-2xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-cyan-500/50 shadow-[0_0_30px_rgba(34,211,238,0.2)]">
-                <div class="flex justify-between items-center p-6 border-b border-white/10 bg-black/40 rounded-t-2xl">
-                    <h3 class="text-2xl font-black text-cyan-400 title-font uppercase tracking-wider">CHI TIẾT BÁO CÁO
-                    </h3>
-                    <button onclick="document.getElementById('report-detail-modal').classList.add('hidden')"
-                        class="text-gray-400 hover:text-white hover:bg-white/10 w-8 h-8 rounded-full flex items-center justify-center text-xl font-bold transition">✕</button>
+            <div id="tab-manage-work" class="tab-content hidden">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-white/10 pb-6">
+                    <h2 class="text-4xl font-black title-font neon-text">DUYỆT BÁO CÁO</h2>
+                    
+                    <div class="flex bg-black/50 p-1.5 rounded-xl border border-purple-500/30 overflow-x-auto w-full sm:w-auto custom-scrollbar shadow-inner">
+                        <button onclick="window.filterReports('all')" id="filter-all" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold bg-cyan-600 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)] border border-cyan-400 transition whitespace-nowrap">🌐 Tất cả</button>
+                        <button onclick="window.filterReports('media')" id="filter-media" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🎬 Media</button>
+                        <button onclick="window.filterReports('helper')" id="filter-helper" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🤝 Helper</button>
+                        <button onclick="window.filterReports('staff')" id="filter-staff" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🛡️ Staff</button>
+                        <button onclick="window.filterReports('dev')" id="filter-dev" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">💻 Dev</button>
+                    </div>
                 </div>
-                <div class="p-6 overflow-y-auto custom-scrollbar flex-1" id="report-detail-content">
+                
+                <div id="all-reports-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <div id="tab-payroll" class="tab-content hidden max-w-2xl mx-auto">
+                <h2 class="text-4xl font-black title-font neon-text mb-8 text-center">PHÁT LƯƠNG & THƯỞNG</h2>
+                <div id="payroll-admin-panel" class="glass-intense p-8 rounded-2xl shadow-[0_0_40px_rgba(234,179,8,0.15)] border border-yellow-500/30 relative overflow-hidden">
+                    <div class="absolute -top-20 -right-20 w-60 h-60 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    </div>
+            </div>
+
+            <div id="report-detail-modal" class="modal">
+                <div class="modal-content glass-intense rounded-2xl modal-lg border border-cyan-500/50 flex flex-col h-[90vh]">
+                    <div class="modal-header border-b border-cyan-500/30 bg-black/40 rounded-t-2xl">
+                        <h2 class="text-3xl font-black title-font neon-text text-cyan-400">CHI TIẾT BÁO CÁO</h2>
+                        <button class="close-modal text-gray-400 hover:text-red-400 transition text-2xl font-bold">✕</button>
+                    </div>
+                    <div class="modal-body overflow-y-auto custom-scrollbar p-6 sm:p-8 flex-1" id="report-detail-content">
+                        </div>
                 </div>
             </div>
-        </div>
+            
+        </main>
+    </div>
+
+    <script>
+        const initParticles = () => {
+            const canvas = document.getElementById('particle-network');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let particlesArray = [];
+
+            function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+            window.addEventListener('resize', resize); resize();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 2 + 1;
+                    this.speedX = Math.random() * 0.5 - 0.25;
+                    this.speedY = Math.random() * 0.5 - 0.25;
+                    this.color = Math.random() > 0.5 ? '#8b5cf6' : '#22d3ee';
+                }
+                update() {
+                    this.x += this.speedX; this.y += this.speedY;
+                    if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                    if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+                }
+                draw() {
+                    ctx.fillStyle = this.color; ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+                }
+            }
+
+            for (let i = 0; i < Math.floor((canvas.width * canvas.height) / 20000); i++) particlesArray.push(new Particle());
+
+            function animate() {
+                if (!document.body.classList.contains('lite-mode')) {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    for (let i = 0; i < particlesArray.length; i++) {
+                        particlesArray[i].update(); particlesArray[i].draw();
+                        for (let j = i; j < particlesArray.length; j++) {
+                            const dx = particlesArray[i].x - particlesArray[j].x;
+                            const dy = particlesArray[i].y - particlesArray[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy);
+                            if (dist < 100) {
+                                ctx.beginPath(); ctx.strokeStyle = `rgba(139, 92, 246, ${0.1 - dist / 1000})`;
+                                ctx.moveTo(particlesArray[i].x, particlesArray[i].y);
+                                ctx.lineTo(particlesArray[j].x, particlesArray[j].y);
+                                ctx.stroke();
+                            }
+                        }
+                    }
+                }
+                requestAnimationFrame(animate);
+            }
+            animate();
+        };
+
+        // Kích hoạt Particles và kiểm tra Lite Mode
+        if (localStorage.getItem('liteMode') === 'on') {
+            document.body.classList.add('lite-mode');
+        }
+        initParticles();
+
+        // Script Tắt mở Menu Mobile
+        document.getElementById('mobile-sidebar-btn')?.addEventListener('click', () => {
+            const sidebar = document.getElementById('sidebar-menu');
+            if (sidebar.classList.contains('-translate-x-full')) {
+                sidebar.classList.remove('-translate-x-full');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+            }
+        });
         
-    </main>
+        // Đóng menu khi bấm vào link chuyển tab (trên điện thoại)
+        document.querySelectorAll('.sidebar-link').forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    document.getElementById('sidebar-menu').classList.add('-translate-x-full');
+                }
+            });
+        });
+        
+        // Setup Modal Close Button (Vì code JS cũ không bắt được sự kiện modal mới tạo)
+        document.querySelectorAll('.modal').forEach(m => {
+            m.addEventListener('click', e => { if (e.target === m) m.classList.remove('active', 'hidden'); });
+            m.querySelectorAll('.close-modal').forEach(b => b.onclick = () => m.classList.remove('active', 'hidden'));
+        });
+    </script>
+
     <script type="module" src="assets/js/internal.js"></script>
 </body>
-
 </html>
