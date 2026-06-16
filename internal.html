@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internal Dashboard - CornMC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; background: #09090b; }
+        .sidebar-link.active { background: rgba(139, 92, 246, 0.2); border-left: 4px solid #22d3ee; color: white; }
+    </style>
+</head>
+<body class="text-gray-300 flex h-full overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0f0f1a] border-r border-white/10 flex flex-col">
+        <div class="p-6 border-b border-white/10">
+            <h1 class="text-xl font-black text-cyan-400 tracking-tighter">CORN INTERNAL</h1>
+            <p class="text-[10px] text-gray-500 uppercase font-bold">Project Management</p>
+        </div>
+        <nav class="flex-1 p-4 space-y-2">
+            <button data-tab="wallet" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition active">
+                💳 Ví & Thu nhập
+            </button>
+            <button data-tab="report" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition">
+                📝 Gửi báo cáo
+            </button>
+            <div id="manager-tools" class="hidden pt-4 border-t border-white/5">
+                <p class="px-4 text-[10px] font-bold text-gray-600 mb-2 uppercase">Quản lý</p>
+                <button data-tab="manage-work" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition">
+                    📋 Duyệt tiến độ
+                </button>
+                <button data-tab="payroll" class="sidebar-link w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition hidden" id="admin-payroll-btn">
+                    💰 Quản lý Lương
+                </button>
+            </div>
+        </nav>
+        <div class="p-4 border-t border-white/10">
+            <a href="/" class="block text-center text-xs hover:text-white transition">← Quay lại trang chủ</a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        <div id="tab-wallet" class="tab-content space-y-6">
+            <h2 class="text-3xl font-bold text-white">Ví của tôi</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-panel p-6 rounded-2xl border-l-4 border-green-500">
+                    <p class="text-gray-400 text-sm">Tổng thu nhập nhận được</p>
+                    <p id="total-earned" class="text-4xl font-black text-white mt-2">0 Coin</p>
+                </div>
+                <div class="glass-panel p-6 rounded-2xl">
+                    <h3 class="font-bold mb-4">🔔 Thông báo mới nhất</h3>
+                    <div id="notification-list" class="space-y-3">
+                        <p class="text-gray-600 text-xs italic">Không có thông báo mới.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="glass-panel rounded-2xl overflow-hidden">
+                <table class="w-full text-left text-sm">
+                    <thead class="bg-white/5 text-gray-500 uppercase text-[10px]">
+                        <tr>
+                            <th class="p-4">Ngày nhận</th>
+                            <th class="p-4">Lý do</th>
+                            <th class="p-4 text-right">Số tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody id="payroll-history-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-report" class="tab-content hidden max-w-2xl">
+            <h2 class="text-3xl font-bold text-white mb-6">Báo cáo tiến độ</h2>
+            <form id="work-report-form" class="glass-panel p-8 rounded-2xl space-y-4">
+                <div>
+                    <label class="block text-xs font-bold mb-2 uppercase">Công việc đang thực hiện</label>
+                    <input type="text" id="report-task" class="w-full bg-black/40 border border-white/10 rounded-lg p-3 outline-none focus:border-cyan-500" placeholder="VD: Xây xong khu vực Spawn mới" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-2 uppercase">Tiến độ (%)</label>
+                    <input type="number" id="report-percent" min="0" max="100" class="w-full bg-black/40 border border-white/10 rounded-lg p-3 outline-none focus:border-cyan-500" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">📸 Ảnh minh chứng (Tối đa 10 ảnh)</label>
+                    <input type="file" id="report-images" accept="image/*" multiple class="w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-500 cursor-pointer bg-black/40 border border-white/10 rounded-lg outline-none transition p-1.5">
+                    <p class="text-[10px] text-gray-500 mt-1 italic">Hỗ trợ JPG, PNG. Có thể chọn nhiều ảnh cùng lúc.</p>
+                    
+                    <div id="report-image-preview" class="flex flex-wrap gap-3 mt-3"></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold mb-2 uppercase">Link kết quả bổ sung (Nếu có video/Drive)</label>
+                    <input type="url" id="report-link" class="w-full bg-black/40 border border-white/10 rounded-lg p-3 outline-none focus:border-cyan-500" placeholder="Link Video, Google Drive...">
+                </div>
+                <button type="submit" class="cyber-btn w-full py-3 rounded-lg font-bold">GỬI BÁO CÁO 🚀</button>
+            </form>
+        </div>
+
+        <!-- Các tab dành cho Manager/Admin sẽ được render động hoặc ẩn/hiện -->
+        <div id="tab-manage-work" class="tab-content hidden">
+             <h2 class="text-3xl font-bold text-white mb-6">Duyệt báo cáo công việc</h2>
+             <div id="all-reports-list" class="space-y-4"></div>
+        </div>
+
+        <div id="tab-payroll" class="tab-content hidden">
+             <h2 class="text-3xl font-bold text-white mb-6">Phát lương & Thưởng</h2>
+             <div id="payroll-admin-panel" class="glass-panel p-6 rounded-2xl"></div>
+        </div>
+    </main>
+    <script type="module" src="assets/js/internal.js"></script>
+</body>
+</html>
