@@ -6,6 +6,7 @@ import {
     fetchNews, fetchGuides, fetchForumPosts, createPost,
     fetchAllUsers, fetchMyPosts, fetchStaffMembers, defaultConfig, loginUser, deleteUserAndData,
     updateUserProfile, editDocument, registerUser, resetPassword,
+    createGiveaway, fetchActiveGiveaways, joinGiveaway, endGiveaway, sendDiscordWebhook,
     deleteDocument, fetchComments, addComment, deleteComment
 } from './core.js';
 import { uploadImage } from './core.js';
@@ -693,8 +694,15 @@ async function renderStaff() {
             // Xử lý link mạng xã hội (Discord & Website) đã được thêm ở tính năng Profile
             let socialsHtml = '';
             if (staff.discordLink || staff.websiteLink) {
-                if (staff.discordLink) socialsHtml += `<a href="${staff.discordLink}" target="_blank" class="px-3 py-1.5 rounded bg-[#5865F2]/20 hover:bg-[#5865F2]/40 text-[#5865F2] hover:text-white border border-[#5865F2]/30 transition text-xs font-bold flex items-center gap-1">💬 Discord</a>`;
-                if (staff.websiteLink) socialsHtml += `<a href="${staff.websiteLink}" target="_blank" class="px-3 py-1.5 rounded bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-400 hover:text-white border border-cyan-500/30 transition text-xs font-bold flex items-center gap-1">🌐 Web</a>`;
+                if (staff.discordLink) {
+                    // Kiểm tra nếu là một dãy số (ID) thì tự động tạo link mở Profile Discord
+                    const isId = /^\d+$/.test(staff.discordLink);
+                    const link = isId ? `https://discordapp.com/users/${staff.discordLink}` : staff.discordLink;
+                    socialsHtml += `<a href="${link}" target="_blank" class="px-3 py-1.5 rounded bg-[#5865F2]/20 hover:bg-[#5865F2]/40 text-[#5865F2] hover:text-white border border-[#5865F2]/30 transition text-xs font-bold flex items-center gap-1">💬 Discord</a>`;
+                }
+                if (staff.websiteLink) {
+                    socialsHtml += `<a href="${staff.websiteLink}" target="_blank" class="px-3 py-1.5 rounded bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-400 hover:text-white border border-cyan-500/30 transition text-xs font-bold flex items-center gap-1">🌐 Web</a>`;
+                }
             } else {
                 socialsHtml = `<span class="text-gray-600 text-[10px] italic">Chưa liên kết MXH</span>`;
             }
@@ -1415,6 +1423,162 @@ async function renderAdminTable() {
 }
 
 // ==========================================
+// RENDER SỰ KIỆN GIVEAWAY
+// ==========================================
+async function renderGiveaways() {
+    const container = document.getElementById('giveaways-list');
+    if (!container) return;
+
+    // Hiện nút Tạo Sự kiện nếu là Ban Quản Trị
+    if (['admin', 'dev', 'staff', 'media'].includes(currentRole)) {
+        document.getElementById('admin-giveaway-controls')?.classList.remove('hidden');
+    } else {
+        document.getElementById('admin-giveaway-controls')?.classList.add('hidden');
+    }
+
+    try {
+        const giveaways = await fetchActiveGiveaways();
+        
+        if (giveaways.length === 0) {
+            container.innerHTML = '<div class="glass-panel p-8 text-center text-gray-500 italic rounded-xl border border-dashed border-gray-700">Hiện tại chưa có sự kiện Giveaway nào diễn ra. Quý khách vui lòng quay lại sau!</div>';
+            return;
+        }
+
+        container.innerHTML = giveaways.map(gw => {
+            const hasJoined = currentUser && gw.participants && gw.participants.includes(currentUser.uid);
+            const isClosed = gw.status === 'closed'; // Kiểm tra xem sự kiện đã chốt giải chưa
+            
+            // Xử lý format ngày tháng hiển thị đẹp
+            const endDate = new Date(gw.endTime);
+            const endTimeStr = isNaN(endDate.getTime()) ? gw.endTime : endDate.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
+            
+            // 1. GIAO DIỆN NÚT BẤM HOẶC BẢNG KẾT QUẢ
+            let actionBtn = '';
+            if (isClosed) {
+                // Nếu đã chốt -> Hiện bảng thông báo người thắng
+                actionBtn = `
+                    <div class="text-center bg-yellow-500/10 border border-yellow-500/30 px-6 py-3 rounded-xl shadow-[0_0_15px_rgba(234,179,8,0.2)]">
+                        <p class="text-[10px] text-yellow-200 uppercase font-bold mb-1 tracking-widest">👑 NGƯỜI TRÚNG GIẢI 👑</p>
+                        <p class="text-xl font-black text-yellow-400">${gw.winnerName || 'Không có ai'}</p>
+                    </div>
+                `;
+            } else if (!currentUser) {
+                actionBtn = `<button onclick="document.getElementById('auth-modal').classList.add('active')" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2.5 rounded-lg font-bold transition w-full md:w-auto">ĐĂNG NHẬP ĐỂ THAM GIA</button>`;
+            } else if (hasJoined) {
+                actionBtn = `<button disabled class="bg-green-600/50 text-green-300 border border-green-500/50 px-6 py-2.5 rounded-lg font-bold cursor-not-allowed w-full md:w-auto">✅ ĐÃ BÁO DANH</button>`;
+            } else {
+                actionBtn = `<button onclick="window.joinGiveawayAction('${gw.id}')" class="bg-gradient-to-r from-pink-600 to-purple-500 hover:from-pink-500 hover:to-purple-400 text-white px-8 py-2.5 rounded-lg font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] transition transform hover:scale-105 w-full md:w-auto">🎉 THAM GIA NGAY</button>`;
+            }
+
+            // 2. GIAO DIỆN NÚT QUẢN LÝ CỦA ADMIN
+            let adminBtn = '';
+            if (currentRole === 'admin') {
+                if (!isClosed) {
+                    // Nếu chưa chốt -> Hiện nút Chốt
+                    adminBtn = `<button onclick="window.endGiveawayAction('${gw.id}')" class="mt-4 bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition w-full shadow-lg shadow-yellow-900/30">🏆 CHỐT SỰ KIỆN & QUAY SỐ</button>`;
+                } else {
+                    // Nếu chốt rồi -> Hiện nút Xóa để dọn dẹp
+                    adminBtn = `<button onclick="window.deleteDocument('giveaways', '${gw.id}'); setTimeout(()=>renderGiveaways(), 500);" class="mt-4 bg-red-600/50 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition w-full">🗑️ XÓA SỰ KIỆN NÀY</button>`;
+                }
+            }
+
+            // 3. TAG TRẠNG THÁI GÓC TRÊN CÙNG
+            const statusBadge = isClosed 
+                ? `<span class="bg-gray-900/80 text-gray-400 border border-gray-500/50 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 inline-block">🔒 ĐÃ KẾT THÚC</span>`
+                : `<span class="bg-pink-900/50 text-pink-400 border border-pink-500/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 inline-block animate-pulse">🔥 ĐANG DIỄN RA</span>`;
+
+            return `
+            <div class="glass-panel p-6 sm:p-8 rounded-2xl border ${isClosed ? 'border-gray-600/30 opacity-80' : 'border-pink-500/30 shadow-[0_0_20px_rgba(236,72,153,0.1)]'} relative overflow-hidden group">
+                ${!isClosed ? '<div class="absolute -right-10 -top-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl group-hover:bg-cyan-500/20 transition duration-700 pointer-events-none"></div>' : ''}
+                
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6 relative z-10">
+                    <div class="text-center md:text-left w-full md:w-auto flex-1">
+                        ${statusBadge}
+                        <h3 class="text-2xl sm:text-3xl font-black ${isClosed ? 'text-gray-300' : 'text-white'} mb-2 title-font">${gw.title}</h3>
+                        <p class="text-lg text-yellow-400 font-bold mb-3 flex items-center justify-center md:justify-start gap-2">
+                            <span class="text-2xl">🎁</span> ${gw.prize}
+                        </p>
+                        <div class="text-sm text-gray-400 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 font-mono">
+                            <span class="bg-black/40 px-2 py-1 rounded border border-white/5">⏳ Hạn chót: ${endTimeStr}</span>
+                            <span class="bg-black/40 px-2 py-1 rounded border border-white/5">👥 Đã đăng ký: <span class="text-cyan-400 font-bold">${gw.participants ? gw.participants.length : 0}</span> người</span>
+                        </div>
+                    </div>
+                    <div class="flex-shrink-0 w-full md:w-auto mt-4 md:mt-0 flex flex-col items-end">
+                        <div class="w-full">${actionBtn}</div>
+                        <div class="w-full">${adminBtn}</div>
+                    </div>
+                </div>
+            </div>`;
+        }).join('');
+    } catch (error) {
+        console.error("LỖI TẢI GIVEAWAY:", error); 
+        container.innerHTML = '<div class="text-red-500 p-4 text-center glass-panel border border-red-500/30 rounded-xl">Lỗi kết nối máy chủ dữ liệu. Vui lòng ấn F12 xem Console!</div>';
+    }
+}
+
+// ==========================================
+// CÁC HÀNH ĐỘNG CỦA GIVEAWAY
+// ==========================================
+window.joinGiveawayAction = async (id) => {
+    try {
+        showCustomModal("ĐANG XỬ LÝ", "⏳ Hệ thống đang kiểm tra điều kiện tài khoản...", "info");
+        await joinGiveaway(id);
+        showCustomModal("🎉 ĐĂNG KÝ THÀNH CÔNG", "Bạn đã ghi danh thành công vào sự kiện!\nKết quả sẽ được công bố khi Admin chốt giải. Chúc bạn may mắn!", "info");
+        renderGiveaways(); 
+    } catch (err) {
+        if (err.message === "NOT_VERIFIED") {
+            showCustomModal("⛔ TỪ CHỐI THAM GIA", "Tài khoản của bạn chưa được liên kết với ID Discord!\n\n**Cách khắc phục:**\n1. Mở Hồ Sơ Cá Nhân (Avatar góc phải).\n2. Nhập ID Discord của bạn.\n3. Bấm [NHẬN MÃ] và kiểm tra tin nhắn Discord để xác minh.", "danger");
+        } else if (err.message === "ALREADY_JOINED") {
+            showCustomModal("THÔNG BÁO", "Bạn đã có tên trong danh sách tham gia sự kiện này rồi!", "info");
+        } else {
+            showCustomModal("LỖI KẾT NỐI", err.message, "danger");
+        }
+    }
+};
+
+window.endGiveawayAction = (id) => {
+    showCustomModal(
+        "XÁC NHẬN CHỐT GIẢI", 
+        "Hệ thống sẽ tổng hợp danh sách và chọn **NGẪU NHIÊN 1 NGƯỜI** trúng thưởng.\nBạn có chắc chắn muốn kết thúc sự kiện này ngay bây giờ?", 
+        "confirm", 
+        async () => {
+            try {
+                showCustomModal("ĐANG QUAY SỐ", "⏳ Đang tổng hợp danh sách và chọn người may mắn...", "info");
+                
+                // Lấy kết quả quay số (Bây giờ nó trả về nguyên 1 cục data)
+                const result = await endGiveaway(id);
+                
+                showCustomModal("🎉 ĐÃ TÌM THẤY NGƯỜI TRÚNG GIẢI", `Sự kiện đã kết thúc!\nNgười may mắn nhất là: **${result.winnerName}** 🏆`, "info");
+                renderGiveaways(); // Tải lại danh sách
+                
+                // ==========================================
+                // BẮN THÔNG BÁO DISCORD KẾT QUẢ TRÚNG THƯỞNG
+                // ==========================================
+                
+                // Kiểm tra xem ID Discord có hợp lệ không để ping (<@ID>), nếu không thì chỉ in chữ in đậm
+                const isIdValid = result.winnerDiscordId && /^\d+$/.test(result.winnerDiscordId);
+                const tagWinner = isIdValid ? `<@${result.winnerDiscordId}>` : `**${result.winnerName}**`;
+
+                const discordMessage = result.winnerName === "Không có ai tham gia" 
+                    ? `😔 Rất tiếc, sự kiện **${result.title}** đã kết thúc nhưng không có ai tham gia!` 
+                    : `🎉 **KẾT QUẢ SỰ KIỆN: ${result.title.toUpperCase()}** 🎉\nXin chúc mừng ${tagWinner} đã là người may mắn nhất! Vui lòng liên hệ Admin để nhận thưởng nhé!`;
+
+                await sendDiscordWebhook(discordMessage, [{
+                    title: "🏆 CHI TIẾT GIẢI THƯỞNG",
+                    description: `🎁 **Phần thưởng:** ${result.prize}\n👤 **Người trúng:** ${result.winnerName}`,
+                    color: 15469315, // Mã màu vàng Gold
+                    footer: { text: "CornMC Event System" },
+                    timestamp: new Date().toISOString()
+                }]);
+
+            } catch (e) {
+                showCustomModal("LỖI", e.message, "danger");
+            }
+        }
+    );
+};
+
+// ==========================================
 // 4. AUTH & INIT (Khởi động)
 // ==========================================
 
@@ -1509,6 +1673,99 @@ function handleAuthUI(user, role) {
             if (document.getElementById('edit-website-link')) document.getElementById('edit-website-link').value = user.websiteLink || '';
 
             document.getElementById('profile-modal').classList.add('active');
+            
+            // Reset lại giao diện nhập mã
+            document.getElementById('discord-verify-zone').classList.add('hidden');
+            document.getElementById('edit-discord-link').disabled = false;
+        };
+
+        // --- XỬ LÝ NÚT [NHẬN MÃ] ---
+        document.getElementById('btn-request-verify').onclick = async () => {
+            const discordId = document.getElementById('edit-discord-link').value.trim();
+            // Kiểm tra ID Discord chỉ được chứa số
+            if (!/^\d{17,19}$/.test(discordId)) {
+                return showCustomModal("LỖI", "ID Discord không hợp lệ! Vui lòng nhập đúng dãy số ID (khoảng 18 chữ số).", "danger");
+            }
+
+            const btn = document.getElementById('btn-request-verify');
+            btn.innerText = "⏳ ĐANG XỬ LÝ...";
+            btn.disabled = true;
+
+            try {
+                // 1. KIỂM TRA TRÙNG ID DISCORD TRƯỚC KHI GỬI MÃ
+                const { checkDiscordIdExists } = await import('./core.js');
+                const isExist = await checkDiscordIdExists(discordId);
+                
+                if (isExist) {
+                    showCustomModal("LỖI LIÊN KẾT", "ID Discord này đã được sử dụng bởi một tài khoản khác trên hệ thống!", "danger");
+                    btn.innerText = "NHẬN MÃ";
+                    btn.disabled = false;
+                    return; // Dừng lại, không gửi mã nữa
+                }
+
+                // 2. Tiếp tục tạo mã ngẫu nhiên 6 chữ số
+                const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
+                
+                const { doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js');
+                const { db } = await import('./core.js');
+
+                // Lưu mã vào bảng tạm thời trên Firebase
+                await setDoc(doc(db, "discord_verify", currentUser.uid), {
+                    discordId: discordId,
+                    code: verifyCode,
+                    createdAt: serverTimestamp()
+                });
+
+                // Hiển thị ô nhập mã
+                document.getElementById('discord-verify-zone').classList.remove('hidden');
+                document.getElementById('edit-discord-link').disabled = true;
+                
+                showCustomModal("THÀNH CÔNG", "Mã xác minh đã được tạo trên hệ thống.\n\n⚠️ LƯU Ý: Website đã lưu yêu cầu gửi mã cho Bot. Vui lòng check tin nhắn Discord!", "info");
+            } catch (err) {
+                showCustomModal("LỖI", "Lỗi tạo mã: " + err.message, "danger");
+            } finally {
+                btn.innerText = "NHẬN MÃ";
+                btn.disabled = false;
+            }
+        };
+
+        // --- XỬ LÝ NÚT [XÁC NHẬN] ---
+        document.getElementById('btn-confirm-verify').onclick = async () => {
+            const inputCode = document.getElementById('discord-verify-code').value.trim();
+            if (inputCode.length !== 6) return;
+
+            const btn = document.getElementById('btn-confirm-verify');
+            btn.innerText = "⏳...";
+            btn.disabled = true;
+
+            try {
+                const { doc, getDoc, deleteDoc } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js');
+                const { db } = await import('./core.js');
+
+                // Lấy mã từ Firebase ra đối chiếu
+                const docRef = doc(db, "discord_verify", currentUser.uid);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists() && docSnap.data().code === inputCode) {
+                    // MÃ ĐÚNG! Lấy ID Discord lưu vào profile luôn
+                    const verifiedDiscordId = docSnap.data().discordId;
+                    
+                    // Xóa mã đi để tránh dùng lại
+                    await deleteDoc(docRef);
+
+                    showCustomModal("LIÊN KẾT THÀNH CÔNG", `Đã xác minh thành công ID Discord: ${verifiedDiscordId}!\n\nHãy ấn LƯU THAY ĐỔI để hoàn tất.`, "info");
+                    
+                    document.getElementById('discord-verify-zone').classList.add('hidden');
+                    document.getElementById('edit-discord-link').value = verifiedDiscordId; // Trả lại ID vào ô
+                } else {
+                    showCustomModal("SAI MÃ", "Mã xác minh không chính xác hoặc đã hết hạn!", "danger");
+                }
+            } catch (err) {
+                showCustomModal("LỖI", err.message, "danger");
+            } finally {
+                btn.innerText = "XÁC NHẬN";
+                btn.disabled = false;
+            }
         };
         if (document.getElementById('btn-admin')) {
             document.getElementById('btn-admin').onclick = () => {
@@ -1526,9 +1783,12 @@ function handleAuthUI(user, role) {
         const oldTabs = document.getElementById('forum-tabs');
         if (oldTabs) oldTabs.remove();
 
-        // 2. Nếu đang đứng ở trang Diễn đàn, VẼ LẠI CÁI MỚI NGAY
+        // 2. Nếu đang đứng ở trang Diễn đàn hoặc Giveaway, VẼ LẠI CÁI MỚI NGAY
         if (document.getElementById('section-forum').classList.contains('active')) {
             renderForum('approved');
+        }
+        if (document.getElementById('section-giveaway').classList.contains('active')) {
+            renderGiveaways(); // <-- CẬP NHẬT NÚT BẤM KHI ĐĂNG NHẬP
         }
 
     } else {
@@ -1538,10 +1798,11 @@ function handleAuthUI(user, role) {
         const btn = document.getElementById('create-post-trigger');
         if (btn) btn.classList.add('hidden');
 
-        // Nếu logout, cũng cần reset lại forum để mất nút Duyệt
+        // Nếu logout, cũng cần reset lại forum và giveaway
         const oldTabs = document.getElementById('forum-tabs');
         if (oldTabs) oldTabs.remove();
         if (document.getElementById('section-forum').classList.contains('active')) renderForum('approved');
+        if (document.getElementById('section-giveaway').classList.contains('active')) renderGiveaways(); // <-- CẬP NHẬT KHI ĐĂNG XUẤT
     }
 }
 
@@ -1759,6 +2020,7 @@ window.addEventListener('load', async () => {
             if (target === 'forum') renderForum('approved');
             if (target === 'admin') renderAdminTable();
             if (target === 'ranking') renderRanking();
+            if (target === 'giveaway') renderGiveaways();
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
@@ -1850,7 +2112,32 @@ window.addEventListener('load', async () => {
         } catch (e) { showCustomModal("LỖI ĐĂNG BÀI", e.message, "danger"); }
     });
 
-    // 7. Setup Search Admin
+    // 7. Setup Create Giveaway (Admin)
+    document.getElementById('create-giveaway-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const title = document.getElementById('gw-title').value;
+        const prize = document.getElementById('gw-prize').value;
+        const endtime = document.getElementById('gw-endtime').value;
+        
+        const btn = e.target.querySelector('button');
+        btn.innerText = "⏳ ĐANG TẠO...";
+        btn.disabled = true;
+
+        try {
+            await createGiveaway(title, prize, endtime);
+            showCustomModal("THÀNH CÔNG", "Đã khởi tạo sự kiện Giveaway mới!", "info");
+            document.getElementById('create-giveaway-modal').classList.remove('active');
+            renderGiveaways();
+            e.target.reset();
+        } catch (err) {
+            showCustomModal("LỖI", err.message, "danger");
+        } finally {
+            btn.innerText = "TẠO NGAY 🚀";
+            btn.disabled = false;
+        }
+    });
+
+    // 8. Setup Search Admin
     document.getElementById('user-search')?.addEventListener('keyup', (e) => {
         const term = e.target.value.toLowerCase();
         document.querySelectorAll('.user-row').forEach(row => {

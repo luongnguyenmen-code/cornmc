@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, where, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getFirestore, doc, arrayUnion, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, where, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 // 2. CONFIGURATION
 export const defaultConfig = {
@@ -25,7 +25,7 @@ const firebaseConfig = {
 // 3. INIT FIREBASE
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
+export const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 // ==========================================
@@ -147,7 +147,6 @@ export async function updateUserProfile(displayName, photoURL, discordLink, webs
 // ==========================================
 // B. DATA FETCHING (POSTS, USERS, ETC)
 // ==========================================
-
 // Lấy danh sách tin tức
 export async function fetchNews() {
     const q = query(collection(db, "news"), orderBy("createdAt", "desc"));
@@ -281,10 +280,13 @@ export async function deleteUserAndData(uid) {
 // Gửi báo cáo công việc
 export async function submitWorkReport(data) {
     const user = auth.currentUser;
+    const role = localStorage.getItem('cached_user_role') || 'member';
+    
     return await addDoc(collection(db, "work_reports"), {
         ...data,
         uid: user.uid,
         author: user.displayName,
+        authorRole: role, 
         status: 'pending',
         createdAt: serverTimestamp()
     });
@@ -320,4 +322,166 @@ export async function createPayrollEntry(targetUid, amount, reason) {
         isRead: false,
         createdAt: serverTimestamp()
     });
+}
+
+// ==========================================
+// E. HỆ THỐNG GIAO VIỆC (TASKS)
+// ==========================================
+
+// Tạo nhiệm vụ mới (Admin/Quản lý)
+export async function assignTask(title, description, targetRole) {
+    const user = auth.currentUser;
+    return await addDoc(collection(db, "tasks"), {
+        title: title,
+        description: description,
+        targetRole: targetRole, // 'media', 'helper', 'staff', 'dev', 'all'
+        assigner: user.displayName,
+        status: 'open',
+        createdAt: serverTimestamp()
+    });
+}
+
+// Lấy danh sách nhiệm vụ (Lọc trực tiếp bằng Code để tránh lỗi Index Firebase)
+export async function fetchTasksForRole(role) {
+    const q = query(collection(db, "tasks"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    const allTasks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    
+    // Nếu là Admin/Manager xem hết, nếu là nhân viên thì chỉ xem việc của bộ phận mình hoặc việc chung
+    if (['admin', 'dev', 'staff'].includes(role)) return allTasks;
+    return allTasks.filter(t => t.targetRole === role || t.targetRole === 'all');
+}
+
+// Kiểm tra xem ID Discord đã có ai liên kết chưa
+export async function checkDiscordIdExists(discordId) {
+    const q = query(collection(db, "users"), where("discordLink", "==", discordId));
+    const snap = await getDocs(q);
+    return !snap.empty; // Trả về true nếu ID này đã tồn tại trong database
+}
+
+// ==========================================
+// G. HỆ THỐNG GIVEAWAY & SỰ KIỆN
+// ==========================================
+
+// 1. Tạo Giveaway mới (Chỉ Admin)
+export async function createGiveaway(title, prize, endTimeStr) {
+    return await addDoc(collection(db, "giveaways"), {
+        title: title,
+        prize: prize,
+        endTime: endTimeStr,
+        participants: [], // Mảng chứa ID những người tham gia
+        status: 'active',
+        createdAt: serverTimestamp()
+    });
+}
+
+// Thay thế hàm fetchActiveGiveaways cũ bằng hàm này
+export async function fetchActiveGiveaways() {
+    // Đã gỡ bỏ bộ lọc "status" để hiển thị cả sự kiện đã kết thúc
+    const q = query(collection(db, "giveaways"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+// 3. Nút Báo Danh (Kiểm tra Discord trước khi cho tham gia)
+export async function joinGiveaway(giveawayId) {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Vui lòng đăng nhập!");
+
+    // BƯỚC KIỂM TRA QUAN TRỌNG: Check xem đã liên kết Discord chưa
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+    
+    const discordId = userSnap.data()?.discordLink;
+    // Kiểm tra xem ID có tồn tại và đúng định dạng số ID Discord không
+    if (!discordId || !/^\d{17,19}$/.test(discordId)) {
+        throw new Error("NOT_VERIFIED"); // Ném ra mã lỗi riêng để UI xử lý
+    }
+
+    const giveawayRef = doc(db, "giveaways", giveawayId);
+    const gwSnap = await getDoc(giveawayRef);
+    const participants = gwSnap.data()?.participants || [];
+
+    if (participants.includes(user.uid)) {
+        throw new Error("ALREADY_JOINED");
+    }
+
+    // Nhét UID của người chơi vào mảng danh sách
+    await updateDoc(giveawayRef, {
+        participants: arrayUnion(user.uid)
+    });
+}
+
+// 4. Chốt Giveaway (Quay random người trúng thưởng)
+export async function endGiveaway(giveawayId) {
+    const giveawayRef = doc(db, "giveaways", giveawayId);
+    const gwSnap = await getDoc(giveawayRef);
+    if (!gwSnap.exists()) throw new Error("Không tìm thấy sự kiện!");
+
+    const data = gwSnap.data();
+    const participants = data.participants || [];
+    let winnerName = "Không có ai tham gia";
+    let winnerUid = null;
+    let winnerDiscordId = null; // Thêm biến lưu ID Discord
+
+    if (participants.length > 0) {
+        // Quay random 1 người trong danh sách
+        winnerUid = participants[Math.floor(Math.random() * participants.length)];
+        
+        // Lấy Tên và ID Discord của người đó
+        const userSnap = await getDoc(doc(db, "users", winnerUid));
+        if (userSnap.exists()) {
+            winnerName = userSnap.data().username || "Ẩn danh";
+            winnerDiscordId = userSnap.data().discordLink; // Lấy ID để lát nữa Bot Tag tên
+        }
+    }
+
+    // Cập nhật trạng thái sự kiện
+    await updateDoc(giveawayRef, {
+        status: 'closed',
+        winnerUid: winnerUid,
+        winnerName: winnerName,
+        endedAt: serverTimestamp()
+    });
+
+    if (winnerDiscordId) {
+        await addDoc(collection(db, "discord_dms"), {
+            discordId: winnerDiscordId,
+            type: 'giveaway_winner',
+            title: data.title,
+            prize: data.prize,
+            winnerName: winnerName,
+            createdAt: serverTimestamp()
+        });
+    }
+
+    // Trả về một Gói dữ liệu (Gồm Tên người thắng, Giải thưởng, Tên sự kiện, ID Discord)
+    return { winnerName, title: data.title, prize: data.prize, winnerDiscordId };
+}
+
+// ==========================================
+// H. HỆ THỐNG DISCORD WEBHOOK
+// ==========================================
+export async function sendDiscordWebhook(message, embeds = []) {
+    // 🔴 BẮT BUỘC: THAY LINK WEBHOOK CỦA BẠN VÀO ĐÂY
+    // (Lấy trong Cài đặt Kênh Discord -> Tích hợp -> Webhook)
+    const webhookUrl = "https://discord.com/api/webhooks/xxxx/yyyy"; 
+    
+    if (!webhookUrl || webhookUrl.includes("xxxx")) {
+        console.warn("Chưa cấu hình Link Webhook Discord!");
+        return;
+    }
+
+    try {
+        await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: message,
+                embeds: embeds
+            })
+        });
+    } catch (error) {
+        console.error("Lỗi gửi Webhook Discord:", error);
+    }
 }
