@@ -316,7 +316,7 @@ export async function createPayrollEntry(targetUid, amount, reason) {
     // Tự động tạo một thông báo cho người nhận
     return await addDoc(collection(db, "notifications"), {
         uid: targetUid,
-        message: `💰 Bạn vừa nhận được ${Number(amount).toLocaleString()} VNĐ cho: ${reason}`,
+        message: `💰 Bạn vừa nhận được ${Number(amount).toLocaleString()} coin cho: ${reason}`,
         isRead: false,
         createdAt: serverTimestamp()
     });

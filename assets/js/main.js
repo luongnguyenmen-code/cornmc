@@ -1483,11 +1483,17 @@ function handleAuthUI(user, role) {
                         <div class="text-[10px] text-purple-300 font-bold uppercase">${role}</div>
                     </div>
                 </button>
-                <div class="absolute right-0 mt-2 w-48 bg-[#0f0f1a] border border-purple-500/30 rounded-xl shadow-2xl invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 overflow-hidden">
-                    <button id="btn-profile" class="block w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-purple-500/20 hover:text-white">👤 Hồ sơ</button>
-                    ${['admin'].includes(role) ? `<button id="btn-admin" class="block w-full text-left px-4 py-3 text-sm hover:bg-yellow-500/20 font-bold">👤 Quản Lý User</button>` : ''}
-                    ${['admin', 'dev'].includes(role) ? `<a href="admin.html" class="block w-full text-left px-4 py-3 text-sm text-yellow-400 hover:bg-yellow-500/20 font-bold no-underline">🛡️ Admin Panel</a>` : ''}
-                    <button id="btn-logout" class="block w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/20 border-t border-gray-700">⏏ Đăng xuất</button>
+                <div class="absolute right-0 mt-2 w-56 bg-[#0f0f1a] border border-purple-500/30 rounded-xl shadow-2xl invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 overflow-hidden z-50">
+                    
+                    <button id="btn-profile" class="block w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-purple-500/20 hover:text-white border-b border-white/5 transition">👤 Hồ sơ</button>
+                    
+                    ${['admin', 'dev', 'staff', 'media', 'helper'].includes(role) ? `<a href="internal.html" class="block w-full text-left px-4 py-3 text-sm text-cyan-400 hover:bg-cyan-500/20 font-bold border-b border-white/5 no-underline transition">🏢 Khu Vực Nội Bộ</a>` : ''}
+                    
+                    ${['admin'].includes(role) ? `<button id="btn-admin" class="block w-full text-left px-4 py-3 text-sm text-orange-400 hover:bg-orange-500/20 font-bold border-b border-white/5 transition">👥 Quản Lý User</button>` : ''}
+                    
+                    ${['admin', 'dev'].includes(role) ? `<a href="admin.html" class="block w-full text-left px-4 py-3 text-sm text-yellow-400 hover:bg-yellow-500/20 font-bold border-b border-white/5 no-underline transition">🛡️ Admin Panel</a>` : ''}
+                    
+                    <button id="btn-logout" class="block w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-red-500/20 transition">⏏ Đăng xuất</button>
                 </div>
             </div>`;
 
