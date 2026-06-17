@@ -312,7 +312,16 @@ body {
     position: relative;
     color: rgba(248, 250, 252, 0.7);
     transition: color 0.3s ease;
-    padding: 0.5rem 1rem;
+    padding: 0.4rem 0.5rem; /* Giảm mạnh khoảng cách 2 bên của chữ */
+    font-size: 0.85rem; /* Thu nhỏ font chữ xuống một chút */
+}
+
+/* Khi lên màn hình PC to thì mới cho chữ và khoảng cách to ra */
+@media (min-width: 1280px) {
+    .nav-link {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.95rem; 
+    }
 }
 
 .nav-link::before {
