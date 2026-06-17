@@ -1652,9 +1652,10 @@ function handleAuthUI(user, role) {
         const avatar = user.photoURL || `https://mc-heads.net/avatar/${user.displayName}`;
         authDisplay.innerHTML = `
             <div class="relative group z-50">
-                <button class="flex items-center gap-2.5 glass-panel pl-1.5 pr-4 py-1.5 rounded-full hover:bg-white/10 transition border border-cyan-400/50 w-max">
+                <button class="flex items-center gap-2.5 glass-panel p-1 lg:pl-1.5 lg:pr-4 lg:py-1.5 rounded-full hover:bg-white/10 transition border border-cyan-400/50 w-max">
                     <img src="${avatar}" class="w-8 h-8 rounded-full border border-cyan-400 object-cover shrink-0">
-                    <div class="text-left hidden sm:block whitespace-nowrap">
+                    
+                    <div class="text-left hidden xl:block whitespace-nowrap">
                         <div class="text-sm font-bold text-white leading-none mb-1">${user.displayName}</div>
                         <div class="text-[10px] text-purple-300 font-bold uppercase leading-none">${role}</div>
                     </div>
