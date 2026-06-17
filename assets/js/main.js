@@ -2064,7 +2064,7 @@ window.addEventListener('load', async () => {
         }
     });
 
-    // 4. Setup Profile Save (Đã nâng cấp Upload ảnh)
+    // 4. Setup Profile Save (Đã nâng cấp Upload ảnh & Auto Reload UI)
     document.getElementById('profile-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = e.target.querySelector('button');
@@ -2086,7 +2086,6 @@ window.addEventListener('load', async () => {
                 statusText.innerText = '⏳ Đang tải ảnh lên...';
                 statusText.className = "text-xs mt-2 text-yellow-400 font-bold block animate-pulse";
 
-                // SỬA DÒNG NÀY: Dùng hàm uploadImage mới (ImgBB không cần truyền folderName nữa)
                 avatarUrl = await uploadImage(file);
 
                 statusText.innerText = '✅ Tải ảnh xong!';
@@ -2099,14 +2098,24 @@ window.addEventListener('load', async () => {
             const websiteLink = document.getElementById('edit-website-link').value.trim();
             await updateUserProfile(newName, avatarUrl, discordLink, websiteLink);
 
+            // ========================================================
+            // BẢN VÁ LỖI: CẬP NHẬT BIẾN VÀ GIAO DIỆN NGAY LẬP TỨC
+            // ========================================================
+            if (currentUser) {
+                // Nhét dữ liệu mới vào biến tạm để mở Modal lần sau không bị trống
+                currentUser.discordLink = discordLink;
+                currentUser.websiteLink = websiteLink;
+                
+                // Gọi lại hàm này để load lại Avatar và Tên ở góc phải màn hình luôn
+                handleAuthUI(currentUser, currentRole); 
+            }
+
             showCustomModal("THÀNH CÔNG", "Hồ sơ đã được cập nhật!", "info");
             document.getElementById('profile-modal').classList.remove('active');
 
             // Reset form ảnh sau khi update thành công
             fileInput.value = '';
             statusText.classList.add('hidden');
-
-            // Nhớ load lại giao diện để hiển thị ảnh mới (gọi hàm load thông tin user của bạn ở đây nếu cần)
 
         } catch (err) {
             showCustomModal("LỖI", err.message, "danger");
