@@ -39,35 +39,38 @@ export function subscribeToAuth(callback) {
     onAuthStateChanged(auth, async (user) => {
         if (user) {
             try {
-                // Lấy Role từ Firestore
                 const userRef = doc(db, "users", user.uid);
                 const snap = await getDoc(userRef);
                 let role = 'member';
+                let dbData = {}; 
 
                 if (snap.exists()) {
-                    role = snap.data().role || 'member';
-                    // Cache lại để dùng cho lần sau
+                    dbData = snap.data();
+                    role = dbData.role || 'member';
                     localStorage.setItem('cached_user_role', role);
                     localStorage.setItem('cached_user_name', user.displayName);
                 } else {
-                    // Tạo user mới nếu chưa có trong DB
-                    await setDoc(userRef, {
+                   
+                    dbData = {
                         username: user.displayName || "User",
                         email: user.email,
                         photoURL: user.photoURL,
                         role: 'member',
                         joinedAt: serverTimestamp()
-                    });
+                    };
+                    await setDoc(userRef, dbData);
                 }
-                callback(user, role);
+                
+                callback(user, role, dbData);
             } catch (e) {
-                callback(user, 'member');
+                callback(user, 'member', {});
             }
         } else {
-            callback(null, 'guest');
+            callback(null, 'guest', null);
         }
     });
 }
+
 // Đăng nhập: Chấp nhận cả Tên nhân vật HOẶC Email thật
 export async function loginUser(input, password) {
     let email = input.trim();

@@ -14,6 +14,7 @@ import { uploadImage } from './core.js';
 // Biến toàn cục lưu trạng thái
 let currentUser = null;
 let currentRole = 'guest';
+let currentUserData = null;
 
 function showCustomModal(title, message, type = 'info', onConfirm = null) {
     const modal = document.getElementById('global-modal');
@@ -30,13 +31,13 @@ function showCustomModal(title, message, type = 'info', onConfirm = null) {
 
     // 2. Set Icon & Màu tiêu đề tùy loại
     if (type === 'danger') {
-        iconEl.innerText = '⚠️';
+        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
         titleEl.className = "text-2xl font-black title-font text-red-500 mb-2";
     } else if (type === 'confirm') {
-        iconEl.innerText = '❓';
+        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
         titleEl.className = "text-2xl font-black title-font text-yellow-400 mb-2";
     } else {
-        iconEl.innerText = '🔔';
+        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
         titleEl.className = "text-2xl font-black title-font text-cyan-400 mb-2";
     }
 
@@ -114,7 +115,7 @@ window.handleRoleChange = async (uid, newRole) => {
 window.handleDeleteUser = async (uid, name) => {
     showCustomModal(
         "CẢNH BÁO XÓA USER",
-        `⛔ Bạn đang xóa toàn bộ dữ liệu của [${name}]?\nHành động này KHÔNG THỂ khôi phục!`,
+        ` Bạn đang xóa toàn bộ dữ liệu của [${name}]?\nHành động này KHÔNG THỂ khôi phục!`,
         "danger",
         async () => {
             try {
@@ -676,11 +677,41 @@ async function renderStaff() {
 
         // Định nghĩa màu sắc & nhãn hiển thị cho từng Role
         const roleConfig = {
-            'admin': { name: 'Admin', icon: '👑', color: 'text-red-400', border: 'border-red-500/50', bg: 'bg-red-500/10 shadow-[0_0_15px_rgba(248,113,113,0.2)]' },
-            'dev': { name: 'Developer', icon: '💻', color: 'text-yellow-400', border: 'border-yellow-500/50', bg: 'bg-yellow-500/10 shadow-[0_0_15px_rgba(250,204,21,0.2)]' },
-            'staff': { name: 'Staff', icon: '🛡️', color: 'text-purple-400', border: 'border-purple-500/50', bg: 'bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.2)]' },
-            'media': { name: 'Media', icon: '🎬', color: 'text-pink-400', border: 'border-pink-500/50', bg: 'bg-pink-500/10 shadow-[0_0_15px_rgba(236,72,153,0.2)]' },
-            'helper': { name: 'Helper', icon: '🤝', color: 'text-green-400', border: 'border-green-500/50', bg: 'bg-green-500/10 shadow-[0_0_15px_rgba(74,222,128,0.2)]' }
+            'admin': {
+                name: 'Admin',
+                icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>`,
+                color: 'text-red-400',
+                border: 'border-red-500/50',
+                bg: 'bg-red-500/10 shadow-[0_0_15px_rgba(248,113,113,0.2)]'
+            },
+            'dev': {
+                name: 'Developer',
+                icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>`,
+                color: 'text-yellow-400',
+                border: 'border-yellow-500/50',
+                bg: 'bg-yellow-500/10 shadow-[0_0_15px_rgba(250,204,21,0.2)]'
+            },
+            'staff': {
+                name: 'Staff',
+                icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01"></path></svg>`,
+                color: 'text-purple-400',
+                border: 'border-purple-500/50',
+                bg: 'bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
+            },
+            'media': {
+                name: 'Media',
+                icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`,
+                color: 'text-pink-400',
+                border: 'border-pink-500/50',
+                bg: 'bg-pink-500/10 shadow-[0_0_15px_rgba(236,72,153,0.2)]'
+            },
+            'helper': {
+                name: 'Helper',
+                icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`,
+                color: 'text-green-400',
+                border: 'border-green-500/50',
+                bg: 'bg-green-500/10 shadow-[0_0_15px_rgba(74,222,128,0.2)]'
+            }
         };
 
         // Ưu tiên sắp xếp (Admin hiện trước -> Dev -> Staff -> Media -> Helper)
@@ -691,20 +722,48 @@ async function renderStaff() {
             const avatar = staff.photoURL || `https://mc-heads.net/avatar/${staff.username || 'Steve'}`;
             const conf = roleConfig[staff.role] || { name: staff.role.toUpperCase(), icon: '👤', color: 'text-gray-400', border: 'border-gray-500/50', bg: 'bg-gray-500/10' };
 
-            // Xử lý link mạng xã hội (Discord & Website) đã được thêm ở tính năng Profile
+            // Xử lý link mạng xã hội (Discord & Tự động nhận diện Website/FB/YT/TikTok)
             let socialsHtml = '';
             if (staff.discordLink || staff.websiteLink) {
+                
+                // 1. Nút Discord (Đã thay bằng Icon Logo thật)
                 if (staff.discordLink) {
-                    // Kiểm tra nếu là một dãy số (ID) thì tự động tạo link mở Profile Discord
                     const isId = /^\d+$/.test(staff.discordLink);
                     const link = isId ? `https://discordapp.com/users/${staff.discordLink}` : staff.discordLink;
-                    socialsHtml += `<a href="${link}" target="_blank" class="px-3 py-1.5 rounded bg-[#5865F2]/20 hover:bg-[#5865F2]/40 text-[#5865F2] hover:text-white border border-[#5865F2]/30 transition text-xs font-bold flex items-center gap-1">💬 Discord</a>`;
+                    socialsHtml += `
+                    <a href="${link}" target="_blank" class="px-3 py-1.5 rounded bg-[#5865F2]/20 hover:bg-[#5865F2]/40 text-[#5865F2] hover:text-white border border-[#5865F2]/30 transition text-[11px] font-bold flex items-center gap-1.5 shadow-sm">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 00-4.885-1.515.074.074 0 00-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 00-5.487 0 12.64 12.64 0 00-.617-1.25.077.077 0 00-.079-.037A19.736 19.736 0 003.677 4.37a.07.07 0 00-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 00.031.057 19.9 19.9 0 005.993 3.03.078.078 0 00.084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 00-.041-.106 13.107 13.107 0 01-1.872-.892.077.077 0 01-.008-.128 10.2 10.2 0 00.372-.292.074.074 0 01.077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 01.078.01c.12.098.246.198.373.292a.077.077 0 01-.006.127 12.299 12.299 0 01-1.873.892.077.077 0 00-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 00.084.028 19.839 19.839 0 006.002-3.03.077.077 0 00.032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 00-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" /></svg>Discord
+                    </a>`;
                 }
+                
+                // 2. Nút MXH tự động nhận diện (Web / Facebook / YouTube / TikTok)
                 if (staff.websiteLink) {
-                    socialsHtml += `<a href="${staff.websiteLink}" target="_blank" class="px-3 py-1.5 rounded bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-400 hover:text-white border border-cyan-500/30 transition text-xs font-bold flex items-center gap-1">🌐 Web</a>`;
+                    let link = staff.websiteLink.toLowerCase();
+                    let pName = "Website";
+                    let pColor = "text-cyan-400 border-cyan-500/30 bg-cyan-500/20 hover:bg-cyan-500/40";
+                    let pIcon = `<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>`;
+                    
+                    if (link.includes("facebook.com") || link.includes("fb.com") || link.includes("fb.watch")) {
+                        pName = "Facebook";
+                        pColor = "text-blue-400 border-blue-500/30 bg-blue-600/20 hover:bg-blue-600/40";
+                        pIcon = `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" /></svg>`;
+                    } else if (link.includes("youtube.com") || link.includes("youtu.be")) {
+                        pName = "YouTube";
+                        pColor = "text-red-400 border-red-500/30 bg-red-600/20 hover:bg-red-600/40";
+                        pIcon = `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" /></svg>`;
+                    } else if (link.includes("tiktok.com")) {
+                        pName = "TikTok";
+                        pColor = "text-gray-300 border-gray-500/30 bg-gray-600/20 hover:bg-gray-600/40 hover:border-pink-500/50 hover:text-white";
+                        pIcon = `<svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.12-3.44-3.17-3.64-5.46-.22-2.15.53-4.32 2.05-5.83 1.57-1.54 3.86-2.16 6.01-1.67V13.8c-1.05-.2-2.14-.07-3.08.43-.88.45-1.52 1.3-1.66 2.29-.14 1.05.21 2.13.92 2.87.72.76 1.79 1.15 2.85 1.04 1.25-.13 2.37-1.02 2.66-2.24.12-.47.16-.96.16-1.44V.02z"/></svg>`;
+                    }
+
+                    socialsHtml += `
+                    <a href="${staff.websiteLink}" target="_blank" class="px-3 py-1.5 rounded ${pColor} hover:text-white transition text-[11px] font-bold flex items-center gap-1.5 shadow-sm">
+                        ${pIcon}${pName}
+                    </a>`;
                 }
             } else {
-                socialsHtml = `<span class="text-gray-600 text-[10px] italic">Chưa liên kết MXH</span>`;
+                socialsHtml = `<span class="text-gray-600 text-[10px] italic mt-1">Chưa liên kết MXH</span>`;
             }
 
             return `
@@ -732,7 +791,7 @@ async function renderStaff() {
 
     } catch (error) {
         console.error("Lỗi khi renderStaff:", error);
-        container.innerHTML = `<div class="text-red-500 text-center glass-panel p-6 border border-red-500/30 rounded-xl shadow-[0_0_15px_rgba(248,113,113,0.1)]">❌ Có lỗi xảy ra khi tải danh sách BQT. Hãy thử lại sau!</div>`;
+        container.innerHTML = `<div class="text-red-500 text-center glass-panel p-6 border border-red-500/30 rounded-xl shadow-[0_0_15px_rgba(248,113,113,0.1)]"> Có lỗi xảy ra khi tải danh sách BQT. Hãy thử lại sau!</div>`;
     }
 }
 
@@ -833,13 +892,13 @@ async function renderRanking() {
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "tetinhxuan", value: 500000 },
             { namecache: "nhan", value: 350000 },
-            { namecache: "Linhyumy24", value: 200000 + 50000 + 100000},
+            { namecache: "Linhyumy24", value: 200000 + 50000 + 100000 },
             { namecache: "bill199204", value: 100000 + 50000 },
             { namecache: "toan909", value: 100000 },
             { namecache: "imnotlgb", value: 70000 },
             { namecache: "swipey166", value: 50000 },
             { namecache: "Hiro2003", value: 20000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000},
+            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 },
             { namecache: "WolfMC", value: 40000 },
             { namecache: "Chooty_427", value: 450000 },
             { namecache: "LSArt203", value: 170000 + 20000 + 20000 },
@@ -850,7 +909,7 @@ async function renderRanking() {
             { namecache: "RUKY_MC", value: 20000 },
             { namecache: "huynhtri", value: 10000 },
             { namecache: "Sanganhzaki", value: 10000 + 10000 },
-            { namecache: "Demon0ra", value: 60000+ 10000 },
+            { namecache: "Demon0ra", value: 60000 + 10000 },
             { namecache: "jonnyzip", value: 20000 },
             { namecache: "LuciCuc", value: 50000 },
             { namecache: "Minhvuongz", value: 20000 },
@@ -869,7 +928,7 @@ async function renderRanking() {
         // ==========================================
         const donateJuneData = [
             { namecache: "KING_NTV", value: 4000000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000+ 50000},
+            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 },
             { namecache: "linhcute2006", value: 1000000 },
             { namecache: "DraWind000", value: 900000 },
             { namecache: "Sunnn06", value: 725000 + 50000 },
@@ -877,7 +936,7 @@ async function renderRanking() {
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "Chooty_427", value: 450000 },
             { namecache: "nhan", value: 350000 },
-            { namecache: "Linhyumy24", value: 200000 + 100000},
+            { namecache: "Linhyumy24", value: 200000 + 100000 },
             { namecache: "PE_Hhnoo1", value: 200000 },
             { namecache: "LSArt203", value: 170000 },
             { namecache: "bill199204", value: 100000 },
@@ -886,13 +945,13 @@ async function renderRanking() {
             { namecache: "swipey166", value: 50000 },
             { namecache: "WolfMC", value: 40000 },
             { namecache: "Sanganhzaki", value: 10000 },
-            { namecache: "Demon0ra", value: 60000+10000 },
+            { namecache: "Demon0ra", value: 60000 + 10000 },
             { namecache: "Hiro2003", value: 20000 },
             { namecache: "LuciCuc", value: 50000 },
             { namecache: "Minhvuongz", value: 20000 },
             { namecache: "NiruMi_XL", value: 25000 },
             { namecache: "samsungdang", value: 100000 },
-            { namecache: "MinzKhee", value: 200000+ 70000 },
+            { namecache: "MinzKhee", value: 200000 + 70000 },
             { namecache: "PE_Linh_chan3931", value: 240000 },
             { namecache: "VanhDuck08 ", value: 55000 },
         ];
@@ -923,7 +982,7 @@ async function renderRanking() {
             <button onclick="window.switchRankTab('june')" id="tab-btn-june" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">🔥 TOP THÁNG 6</button>
             <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💖 TOP TỔNG</button>
             <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💰 ĐẠI GIA</button>
-            <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">⏳ CHĂM CHỈ</button>
+            <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10"> CHĂM CHỈ</button>
             <button onclick="window.switchRankTab('point')" id="tab-btn-point" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💎 TOP XU</button>
             <button onclick="window.switchRankTab('kill')" id="tab-btn-kill" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">⚔️ SÁT THỦ</button>
         </div>
@@ -1012,16 +1071,16 @@ async function renderRanking() {
 
         // 4. VẼ CÁC BẢNG VÀO HTML
         // Bảng Tháng 6 (Hiện đầu tiên - false)
-        html += renderBoard("june", "🔥 TOP DONATE THÁNG 6", donateJuneBoard, "", " VNĐ", "text-orange-400", "border-orange-500/20", false, 20, 'short');
+        html += renderBoard("june", "TOP DONATE THÁNG 6", donateJuneBoard, "", " VNĐ", "text-orange-400", "border-orange-500/20", false, 20, 'short');
 
         // Bảng Donate Tổng (Chuyển sang Ẩn - true)
-        html += renderBoard("donate", "💖 BẢNG VÀNG DONATE TỔNG", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", true, 20, 'short');
+        html += renderBoard("donate", "BẢNG VÀNG DONATE TỔNG", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", true, 20, 'short');
 
         // Các bảng còn lại giữ nguyên...
-        html += renderBoard("money", "💰 TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", true, 10, 'short');
-        html += renderBoard("online", "⏳ TOP CHĂM CHỈ", onlineBoard, "", "", "text-cyan-400", "border-cyan-500/20", true, 20, 'time');
-        html += renderBoard("point", "💎 TOP ĐẠI GIA XU", pointBoard, "", " Xu", "text-yellow-400", "border-yellow-500/20", true, 10, 'short');
-        html += renderBoard("kill", "⚔️ TOP SÁT THỦ", killBoard, "", " Kill", "text-red-400", "border-red-500/20", true, 10, 'short');
+        html += renderBoard("money", "TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", true, 10, 'short');
+        html += renderBoard("online", "TOP CHĂM CHỈ", onlineBoard, "", "", "text-cyan-400", "border-cyan-500/20", true, 20, 'time');
+        html += renderBoard("point", "TOP ĐẠI GIA XU", pointBoard, "", " Xu", "text-yellow-400", "border-yellow-500/20", true, 10, 'short');
+        html += renderBoard("kill", "TOP SÁT THỦ", killBoard, "", " Kill", "text-red-400", "border-red-500/20", true, 10, 'short');
 
         // const renderBoard = (tabId, title, boardData, prefix, suffix, colorClass, borderGlow, isHidden, limit = 10, useShortFormat = false) => {
         //     let boardHtml = `<div id="board-${tabId}" class="rank-board ${isHidden ? 'hidden' : ''} glass-intense p-4 sm:p-6 rounded-2xl border ${borderGlow} shadow-[0_0_30px_rgba(0,0,0,0.2)] relative overflow-hidden group transition-all duration-300">`;
@@ -1087,7 +1146,7 @@ async function renderRanking() {
 
     } catch (error) {
         console.error("Lỗi tải Ranking:", error);
-        container.innerHTML = '<div class="text-red-500 text-center glass-panel p-6 border border-red-500/30 rounded-xl">❌ Lỗi kết nối đến dữ liệu máy chủ. Vui lòng thử lại sau!</div>';
+        container.innerHTML = '<div class="text-red-500 text-center glass-panel p-6 border border-red-500/30 rounded-xl"> Lỗi kết nối đến dữ liệu máy chủ. Vui lòng thử lại sau!</div>';
     }
 }
 
@@ -1294,7 +1353,7 @@ async function renderForum(filterMode = 'approved') {
         return;
     }
 
-    const isStaff = ['admin', 'dev','staff','helper','media'].includes(currentRole);
+    const isStaff = ['admin', 'dev', 'staff', 'helper', 'media'].includes(currentRole);
 
     if (posts.length === 0) {
         let emptyMsg = "Chưa có bài viết nào.";
@@ -1314,7 +1373,7 @@ async function renderForum(filterMode = 'approved') {
         let statusBadge = '';
         if (filterMode === 'mine') {
             if (post.status === 'approved') statusBadge = `<span class="bg-green-500/20 text-green-400 border border-green-500/50 text-[10px] px-2 py-0.5 rounded uppercase font-bold inline-flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path></svg>Đã duyệt</span>`;
-            else statusBadge = `<span class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 text-[10px] px-2 py-0.5 rounded uppercase font-bold">⏳ Đang chờ</span>`;
+            else statusBadge = `<span class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 text-[10px] px-2 py-0.5 rounded uppercase font-bold"> Đang chờ</span>`;
         }
 
         return `
@@ -1400,7 +1459,7 @@ async function renderAdminTable() {
     const tbody = document.getElementById('admin-user-table-body');
     if (!tbody) return;
 
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-purple-300">⏳ Đang tải dữ liệu...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-purple-300"> Đang tải dữ liệu...</td></tr>';
 
     try {
         const users = await fetchAllUsers();
@@ -1409,7 +1468,7 @@ async function renderAdminTable() {
         tbody.innerHTML = users.map(u => {
             const isMe = currentUser && currentUser.uid === u.id;
             const avatar = u.photoURL || `https://mc-heads.net/avatar/${u.username}`;
-            const roles = ['member', 'vip', 'media', 'helper', 'staff','dev', 'admin'];
+            const roles = ['member', 'vip', 'media', 'helper', 'staff', 'dev', 'admin'];
 
             return `
             <tr class="hover:bg-white/5 transition border-b border-purple-500/10 user-row">
@@ -1450,7 +1509,7 @@ async function renderGiveaways() {
 
     try {
         const giveaways = await fetchActiveGiveaways();
-        
+
         if (giveaways.length === 0) {
             container.innerHTML = '<div class="glass-panel p-8 text-center text-gray-500 italic rounded-xl border border-dashed border-gray-700">Hiện tại chưa có sự kiện Giveaway nào diễn ra. Quý khách vui lòng quay lại sau!</div>';
             return;
@@ -1459,11 +1518,11 @@ async function renderGiveaways() {
         container.innerHTML = giveaways.map(gw => {
             const hasJoined = currentUser && gw.participants && gw.participants.includes(currentUser.uid);
             const isClosed = gw.status === 'closed'; // Kiểm tra xem sự kiện đã chốt giải chưa
-            
+
             // Xử lý format ngày tháng hiển thị đẹp
             const endDate = new Date(gw.endTime);
             const endTimeStr = isNaN(endDate.getTime()) ? gw.endTime : endDate.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
-            
+
             // 1. GIAO DIỆN NÚT BẤM HOẶC BẢNG KẾT QUẢ
             let actionBtn = '';
             if (isClosed) {
@@ -1495,7 +1554,7 @@ async function renderGiveaways() {
             }
 
             // 3. TAG TRẠNG THÁI GÓC TRÊN CÙNG
-            const statusBadge = isClosed 
+            const statusBadge = isClosed
                 ? `<span class="bg-gray-900/80 text-gray-400 border border-gray-500/50 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 inline-block">🔒 ĐÃ KẾT THÚC</span>`
                 : `<span class="bg-pink-900/50 text-pink-400 border border-pink-500/30 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-4 inline-block animate-pulse">🔥 ĐANG DIỄN RA</span>`;
 
@@ -1511,7 +1570,7 @@ async function renderGiveaways() {
                             <span class="text-2xl">🎁</span> ${gw.prize}
                         </p>
                         <div class="text-sm text-gray-400 flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2 font-mono">
-                            <span class="bg-black/40 px-2 py-1 rounded border border-white/5">⏳ Hạn chót: ${endTimeStr}</span>
+                            <span class="bg-black/40 px-2 py-1 rounded border border-white/5"> Hạn chót: ${endTimeStr}</span>
                             <span class="bg-black/40 px-2 py-1 rounded border border-white/5">👥 Đã đăng ký: <span class="text-cyan-400 font-bold">${gw.participants ? gw.participants.length : 0}</span> người</span>
                         </div>
                     </div>
@@ -1523,7 +1582,7 @@ async function renderGiveaways() {
             </div>`;
         }).join('');
     } catch (error) {
-        console.error("LỖI TẢI GIVEAWAY:", error); 
+        console.error("LỖI TẢI GIVEAWAY:", error);
         container.innerHTML = '<div class="text-red-500 p-4 text-center glass-panel border border-red-500/30 rounded-xl">Lỗi kết nối máy chủ dữ liệu. Vui lòng ấn F12 xem Console!</div>';
     }
 }
@@ -1533,13 +1592,13 @@ async function renderGiveaways() {
 // ==========================================
 window.joinGiveawayAction = async (id) => {
     try {
-        showCustomModal("ĐANG XỬ LÝ", "⏳ Hệ thống đang kiểm tra điều kiện tài khoản...", "info");
+        showCustomModal("ĐANG XỬ LÝ", " Hệ thống đang kiểm tra điều kiện tài khoản...", "info");
         await joinGiveaway(id);
         showCustomModal("🎉 ĐĂNG KÝ THÀNH CÔNG", "Bạn đã ghi danh thành công vào sự kiện!\nKết quả sẽ được công bố khi Admin chốt giải. Chúc bạn may mắn!", "info");
-        renderGiveaways(); 
+        renderGiveaways();
     } catch (err) {
         if (err.message === "NOT_VERIFIED") {
-            showCustomModal("⛔ TỪ CHỐI THAM GIA", "Tài khoản của bạn chưa được liên kết với ID Discord!\n\n**Cách khắc phục:**\n1. Mở Hồ Sơ Cá Nhân (Avatar góc phải).\n2. Nhập ID Discord của bạn.\n3. Bấm [NHẬN MÃ] và kiểm tra tin nhắn Discord để xác minh.", "danger");
+            showCustomModal(" TỪ CHỐI THAM GIA", "Tài khoản của bạn chưa được liên kết với ID Discord!\n\n**Cách khắc phục:**\n1. Mở Hồ Sơ Cá Nhân (Avatar góc phải).\n2. Nhập ID Discord của bạn.\n3. Bấm [NHẬN MÃ] và kiểm tra tin nhắn Discord để xác minh.", "danger");
         } else if (err.message === "ALREADY_JOINED") {
             showCustomModal("THÔNG BÁO", "Bạn đã có tên trong danh sách tham gia sự kiện này rồi!", "info");
         } else {
@@ -1550,29 +1609,29 @@ window.joinGiveawayAction = async (id) => {
 
 window.endGiveawayAction = (id) => {
     showCustomModal(
-        "XÁC NHẬN CHỐT GIẢI", 
-        "Hệ thống sẽ tổng hợp danh sách và chọn **NGẪU NHIÊN 1 NGƯỜI** trúng thưởng.\nBạn có chắc chắn muốn kết thúc sự kiện này ngay bây giờ?", 
-        "confirm", 
+        "XÁC NHẬN CHỐT GIẢI",
+        "Hệ thống sẽ tổng hợp danh sách và chọn **NGẪU NHIÊN 1 NGƯỜI** trúng thưởng.\nBạn có chắc chắn muốn kết thúc sự kiện này ngay bây giờ?",
+        "confirm",
         async () => {
             try {
-                showCustomModal("ĐANG QUAY SỐ", "⏳ Đang tổng hợp danh sách và chọn người may mắn...", "info");
-                
+                showCustomModal("ĐANG QUAY SỐ", " Đang tổng hợp danh sách và chọn người may mắn...", "info");
+
                 // Lấy kết quả quay số (Bây giờ nó trả về nguyên 1 cục data)
                 const result = await endGiveaway(id);
-                
+
                 showCustomModal("🎉 ĐÃ TÌM THẤY NGƯỜI TRÚNG GIẢI", `Sự kiện đã kết thúc!\nNgười may mắn nhất là: **${result.winnerName}** 🏆`, "info");
                 renderGiveaways(); // Tải lại danh sách
-                
+
                 // ==========================================
                 // BẮN THÔNG BÁO DISCORD KẾT QUẢ TRÚNG THƯỞNG
                 // ==========================================
-                
+
                 // Kiểm tra xem ID Discord có hợp lệ không để ping (<@ID>), nếu không thì chỉ in chữ in đậm
                 const isIdValid = result.winnerDiscordId && /^\d+$/.test(result.winnerDiscordId);
                 const tagWinner = isIdValid ? `<@${result.winnerDiscordId}>` : `**${result.winnerName}**`;
 
-                const discordMessage = result.winnerName === "Không có ai tham gia" 
-                    ? `😔 Rất tiếc, sự kiện **${result.title}** đã kết thúc nhưng không có ai tham gia!` 
+                const discordMessage = result.winnerName === "Không có ai tham gia"
+                    ? `😔 Rất tiếc, sự kiện **${result.title}** đã kết thúc nhưng không có ai tham gia!`
                     : `🎉 **KẾT QUẢ SỰ KIỆN: ${result.title.toUpperCase()}** 🎉\nXin chúc mừng ${tagWinner} đã là người may mắn nhất! Vui lòng liên hệ Admin để nhận thưởng nhé!`;
 
                 await sendDiscordWebhook(discordMessage, [{
@@ -1642,9 +1701,10 @@ function setupAuthForms() {
     };
 }
 
-function handleAuthUI(user, role) {
+function handleAuthUI(user, role, dbData) {
     currentUser = user;
     currentRole = role;
+    currentUserData = dbData || {};
     const authDisplay = document.getElementById('auth-display');
 
     if (user) {
@@ -1681,12 +1741,11 @@ function handleAuthUI(user, role) {
             if (document.getElementById('edit-avatar')) document.getElementById('edit-avatar').value = user.photoURL || '';
             if (document.getElementById('profile-preview')) document.getElementById('profile-preview').src = avatar;
 
-            // Check an toàn: Nếu HTML có ô nhập Discord/Web thì mới gán giá trị
-            if (document.getElementById('edit-discord-link')) document.getElementById('edit-discord-link').value = user.discordLink || '';
-            if (document.getElementById('edit-website-link')) document.getElementById('edit-website-link').value = user.websiteLink || '';
+            if (document.getElementById('edit-discord-link')) document.getElementById('edit-discord-link').value = currentUserData.discordLink || '';
+            if (document.getElementById('edit-website-link')) document.getElementById('edit-website-link').value = currentUserData.websiteLink || '';
 
             document.getElementById('profile-modal').classList.add('active');
-            
+
             // Reset lại giao diện nhập mã
             document.getElementById('discord-verify-zone').classList.add('hidden');
             document.getElementById('edit-discord-link').disabled = false;
@@ -1701,14 +1760,14 @@ function handleAuthUI(user, role) {
             }
 
             const btn = document.getElementById('btn-request-verify');
-            btn.innerText = "⏳ ĐANG XỬ LÝ...";
+            btn.innerText = " ĐANG XỬ LÝ...";
             btn.disabled = true;
 
             try {
                 // 1. KIỂM TRA TRÙNG ID DISCORD TRƯỚC KHI GỬI MÃ
                 const { checkDiscordIdExists } = await import('./core.js');
                 const isExist = await checkDiscordIdExists(discordId);
-                
+
                 if (isExist) {
                     showCustomModal("LỖI LIÊN KẾT", "ID Discord này đã được sử dụng bởi một tài khoản khác trên hệ thống!", "danger");
                     btn.innerText = "NHẬN MÃ";
@@ -1718,7 +1777,7 @@ function handleAuthUI(user, role) {
 
                 // 2. Tiếp tục tạo mã ngẫu nhiên 6 chữ số
                 const verifyCode = Math.floor(100000 + Math.random() * 900000).toString();
-                
+
                 const { doc, setDoc, serverTimestamp } = await import('https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js');
                 const { db } = await import('./core.js');
 
@@ -1732,7 +1791,7 @@ function handleAuthUI(user, role) {
                 // Hiển thị ô nhập mã
                 document.getElementById('discord-verify-zone').classList.remove('hidden');
                 document.getElementById('edit-discord-link').disabled = true;
-                
+
                 showCustomModal("THÀNH CÔNG", "Mã xác minh đã được tạo trên hệ thống.\n\n⚠️ LƯU Ý: Website đã lưu yêu cầu gửi mã cho Bot. Vui lòng check tin nhắn Discord!", "info");
             } catch (err) {
                 showCustomModal("LỖI", "Lỗi tạo mã: " + err.message, "danger");
@@ -1748,7 +1807,7 @@ function handleAuthUI(user, role) {
             if (inputCode.length !== 6) return;
 
             const btn = document.getElementById('btn-confirm-verify');
-            btn.innerText = "⏳...";
+            btn.innerText = "...";
             btn.disabled = true;
 
             try {
@@ -1762,12 +1821,12 @@ function handleAuthUI(user, role) {
                 if (docSnap.exists() && docSnap.data().code === inputCode) {
                     // MÃ ĐÚNG! Lấy ID Discord lưu vào profile luôn
                     const verifiedDiscordId = docSnap.data().discordId;
-                    
+
                     // Xóa mã đi để tránh dùng lại
                     await deleteDoc(docRef);
 
                     showCustomModal("LIÊN KẾT THÀNH CÔNG", `Đã xác minh thành công ID Discord: ${verifiedDiscordId}!\n\nHãy ấn LƯU THAY ĐỔI để hoàn tất.`, "info");
-                    
+
                     document.getElementById('discord-verify-zone').classList.add('hidden');
                     document.getElementById('edit-discord-link').value = verifiedDiscordId; // Trả lại ID vào ô
                 } else {
@@ -1788,7 +1847,7 @@ function handleAuthUI(user, role) {
         }
 
         // Thêm 'member' vào danh sách cho phép
-        if (['admin', 'dev', 'staff' , 'helper','media' ,'member'].includes(role)) {
+        if (['admin', 'dev', 'staff', 'helper', 'media', 'member'].includes(role)) {
             const btn = document.getElementById('create-post-trigger');
             if (btn) btn.classList.remove('hidden');
         }
@@ -2029,11 +2088,11 @@ window.addEventListener('load', async () => {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             const target = link.getAttribute('data-nav');
-            
-            if (!target) return; 
+
+            if (!target) return;
 
             e.preventDefault();
-            
+
             // Active Link
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
@@ -2070,7 +2129,7 @@ window.addEventListener('load', async () => {
         const btn = e.target.querySelector('button');
         const statusText = document.getElementById('avatar-upload-status');
 
-        btn.innerHTML = "⏳ Đang xử lý...";
+        btn.innerHTML = " Đang xử lý...";
         btn.disabled = true;
 
         try {
@@ -2083,7 +2142,7 @@ window.addEventListener('load', async () => {
             // Nếu người dùng CÓ chọn file ảnh mới -> Bắt đầu Upload
             if (file) {
                 statusText.classList.remove('hidden');
-                statusText.innerText = '⏳ Đang tải ảnh lên...';
+                statusText.innerText = ' Đang tải ảnh lên...';
                 statusText.className = "text-xs mt-2 text-yellow-400 font-bold block animate-pulse";
 
                 avatarUrl = await uploadImage(file);
@@ -2098,16 +2157,14 @@ window.addEventListener('load', async () => {
             const websiteLink = document.getElementById('edit-website-link').value.trim();
             await updateUserProfile(newName, avatarUrl, discordLink, websiteLink);
 
-            // ========================================================
-            // BẢN VÁ LỖI: CẬP NHẬT BIẾN VÀ GIAO DIỆN NGAY LẬP TỨC
-            // ========================================================
+            if (currentUserData) {
+                currentUserData.discordLink = discordLink;
+                currentUserData.websiteLink = websiteLink;
+            }
+
             if (currentUser) {
-                // Nhét dữ liệu mới vào biến tạm để mở Modal lần sau không bị trống
-                currentUser.discordLink = discordLink;
-                currentUser.websiteLink = websiteLink;
-                
-                // Gọi lại hàm này để load lại Avatar và Tên ở góc phải màn hình luôn
-                handleAuthUI(currentUser, currentRole); 
+                // Gọi lại hàm để reload UI
+                handleAuthUI(currentUser, currentRole, currentUserData);
             }
 
             showCustomModal("THÀNH CÔNG", "Hồ sơ đã được cập nhật!", "info");
@@ -2120,12 +2177,12 @@ window.addEventListener('load', async () => {
         } catch (err) {
             showCustomModal("LỖI", err.message, "danger");
             if (statusText) {
-                statusText.innerText = '❌ Lỗi tải ảnh!';
+                statusText.innerText = ' Lỗi tải ảnh!';
                 statusText.className = "text-xs mt-2 text-red-500 font-bold block";
             }
         }
         finally {
-            btn.innerHTML = "LƯU THAY ĐỔI 💾";
+            btn.innerHTML = "LƯU THAY ĐỔI ";
             btn.disabled = false;
         }
     });
@@ -2154,9 +2211,9 @@ window.addEventListener('load', async () => {
         const title = document.getElementById('gw-title').value;
         const prize = document.getElementById('gw-prize').value;
         const endtime = document.getElementById('gw-endtime').value;
-        
+
         const btn = e.target.querySelector('button');
-        btn.innerText = "⏳ ĐANG TẠO...";
+        btn.innerText = " ĐANG TẠO...";
         btn.disabled = true;
 
         try {
@@ -2168,7 +2225,7 @@ window.addEventListener('load', async () => {
         } catch (err) {
             showCustomModal("LỖI", err.message, "danger");
         } finally {
-            btn.innerText = "TẠO NGAY 🚀";
+            btn.innerText = "TẠO NGAY ";
             btn.disabled = false;
         }
     });
