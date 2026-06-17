@@ -979,12 +979,12 @@ async function renderRanking() {
         // 3. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
         let html = `
         <div class="flex overflow-x-auto custom-scrollbar justify-start md:justify-center gap-3 mb-8 pb-2 w-full [&>button]:shrink-0 [&>button]:whitespace-nowrap">
-            <button onclick="window.switchRankTab('june')" id="tab-btn-june" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">🔥 TOP THÁNG 6</button>
-            <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💖 TOP TỔNG</button>
-            <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💰 ĐẠI GIA</button>
-            <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10"> CHĂM CHỈ</button>
-            <button onclick="window.switchRankTab('point')" id="tab-btn-point" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💎 TOP XU</button>
-            <button onclick="window.switchRankTab('kill')" id="tab-btn-kill" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">⚔️ SÁT THỦ</button>
+            <button onclick="window.switchRankTab('june')" id="tab-btn-june" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">TOP THÁNG 6</button>
+            <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">TOP TỔNG</button>
+            <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">ĐẠI GIA</button>
+            <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">CHĂM CHỈ</button>
+            <button onclick="window.switchRankTab('point')" id="tab-btn-point" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">TOP XU</button>
+            <button onclick="window.switchRankTab('kill')" id="tab-btn-kill" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">SÁT THỦ</button>
         </div>
         <div class="relative w-full max-w-2xl mx-auto">
         `;
