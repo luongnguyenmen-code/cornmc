@@ -743,7 +743,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "i7E2VpkoiVLVXYSE";
-    const BASE_ID = "mNk1tslLjIqdoxYg";
+    const BASE_ID = "HwQbtGRcwJdKvOmD";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -833,13 +833,13 @@ async function renderRanking() {
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "tetinhxuan", value: 500000 },
             { namecache: "nhan", value: 350000 },
-            { namecache: "Linhyumy24", value: 200000 + 50000 },
+            { namecache: "Linhyumy24", value: 200000 + 50000 + 100000},
             { namecache: "bill199204", value: 100000 + 50000 },
             { namecache: "toan909", value: 100000 },
             { namecache: "imnotlgb", value: 70000 },
             { namecache: "swipey166", value: 50000 },
             { namecache: "Hiro2003", value: 20000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000 },
+            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000},
             { namecache: "WolfMC", value: 40000 },
             { namecache: "Chooty_427", value: 450000 },
             { namecache: "LSArt203", value: 170000 + 20000 + 20000 },
@@ -850,9 +850,15 @@ async function renderRanking() {
             { namecache: "RUKY_MC", value: 20000 },
             { namecache: "huynhtri", value: 10000 },
             { namecache: "Sanganhzaki", value: 10000 + 10000 },
-            { namecache: "Demon0ra", value: 60000 },
-            { namecache: "jonnyzip", value: 20000 }
-
+            { namecache: "Demon0ra", value: 60000+ 10000 },
+            { namecache: "jonnyzip", value: 20000 },
+            { namecache: "LuciCuc", value: 50000 },
+            { namecache: "Minhvuongz", value: 20000 },
+            { namecache: "NiruMi_XL", value: 25000 },
+            { namecache: "samsungdang", value: 100000 },
+            { namecache: "MinzKhee", value: 200000 + 70000 },
+            { namecache: "PE_Linh_chan3931", value: 240000 },
+            { namecache: "VanhDuck08 ", value: 55000 },
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
@@ -863,7 +869,7 @@ async function renderRanking() {
         // ==========================================
         const donateJuneData = [
             { namecache: "KING_NTV", value: 4000000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000 },
+            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000+ 50000},
             { namecache: "linhcute2006", value: 1000000 },
             { namecache: "DraWind000", value: 900000 },
             { namecache: "Sunnn06", value: 725000 + 50000 },
@@ -871,7 +877,7 @@ async function renderRanking() {
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "Chooty_427", value: 450000 },
             { namecache: "nhan", value: 350000 },
-            { namecache: "Linhyumy24", value: 200000 },
+            { namecache: "Linhyumy24", value: 200000 + 100000},
             { namecache: "PE_Hhnoo1", value: 200000 },
             { namecache: "LSArt203", value: 170000 },
             { namecache: "bill199204", value: 100000 },
@@ -880,9 +886,15 @@ async function renderRanking() {
             { namecache: "swipey166", value: 50000 },
             { namecache: "WolfMC", value: 40000 },
             { namecache: "Sanganhzaki", value: 10000 },
-            { namecache: "Demon0ra", value: 60000 },
-            { namecache: "Hiro2003", value: 20000 }
-
+            { namecache: "Demon0ra", value: 60000+10000 },
+            { namecache: "Hiro2003", value: 20000 },
+            { namecache: "LuciCuc", value: 50000 },
+            { namecache: "Minhvuongz", value: 20000 },
+            { namecache: "NiruMi_XL", value: 25000 },
+            { namecache: "samsungdang", value: 100000 },
+            { namecache: "MinzKhee", value: 200000+ 70000 },
+            { namecache: "PE_Linh_chan3931", value: 240000 },
+            { namecache: "VanhDuck08 ", value: 55000 },
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
@@ -907,7 +919,7 @@ async function renderRanking() {
 
         // 3. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
         let html = `
-        <div class="flex flex-wrap justify-center gap-3 mb-8">
+        <div class="flex overflow-x-auto custom-scrollbar justify-start md:justify-center gap-3 mb-8 pb-2 w-full [&>button]:shrink-0 [&>button]:whitespace-nowrap">
             <button onclick="window.switchRankTab('june')" id="tab-btn-june" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">🔥 TOP THÁNG 6</button>
             <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💖 TOP TỔNG</button>
             <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">💰 ĐẠI GIA</button>
@@ -1070,7 +1082,7 @@ async function renderRanking() {
         html += '</div>'; // Đóng div max-w-2xl
 
         container.classList.remove('max-w-7xl');
-        container.classList.add('max-w-3xl');
+        container.classList.add('max-w-4xl');
         container.innerHTML = html;
 
     } catch (error) {
@@ -1640,11 +1652,11 @@ function handleAuthUI(user, role) {
         const avatar = user.photoURL || `https://mc-heads.net/avatar/${user.displayName}`;
         authDisplay.innerHTML = `
             <div class="relative group z-50">
-                <button class="flex items-center gap-2 glass-panel px-3 py-1.5 rounded-full hover:bg-white/10 transition border border-cyan-400/30">
-                    <img src="${avatar}" class="w-8 h-8 rounded-full border border-cyan-400 object-cover">
-                    <div class="text-left hidden sm:block">
-                        <div class="text-sm font-bold text-white leading-none">${user.displayName}</div>
-                        <div class="text-[10px] text-purple-300 font-bold uppercase">${role}</div>
+                <button class="flex items-center gap-2.5 glass-panel pl-1.5 pr-4 py-1.5 rounded-full hover:bg-white/10 transition border border-cyan-400/50 w-max">
+                    <img src="${avatar}" class="w-8 h-8 rounded-full border border-cyan-400 object-cover shrink-0">
+                    <div class="text-left hidden sm:block whitespace-nowrap">
+                        <div class="text-sm font-bold text-white leading-none mb-1">${user.displayName}</div>
+                        <div class="text-[10px] text-purple-300 font-bold uppercase leading-none">${role}</div>
                     </div>
                 </button>
                 <div class="absolute right-0 mt-2 w-56 bg-[#0f0f1a] border border-purple-500/30 rounded-xl shadow-2xl invisible group-hover:visible opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0 overflow-hidden z-50">
@@ -1979,12 +1991,23 @@ window.addEventListener('load', async () => {
         links.forEach(link => {
             const target = link.getAttribute('data-nav');
             const text = link.innerText;
-            // Tạo thẻ a mới với style phù hợp cho mobile
-            mobileHtml += `<a href="#${target}" 
-                class="nav-link block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-bold title-font transition mb-1" 
-                data-nav="${target}">
-                ${text}
-            </a>`;
+            const href = link.getAttribute('href'); // Lấy link gốc (VD: https://bans...)
+            const targetAttr = link.getAttribute('target') === '_blank' ? 'target="_blank"' : '';
+
+            if (target) {
+                // Nếu là link chuyển Tab nội bộ (Có data-nav)
+                mobileHtml += `<a href="#${target}" 
+                    class="nav-link block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-bold title-font transition mb-1" 
+                    data-nav="${target}">
+                    ${text}
+                </a>`;
+            } else {
+                // NẾU LÀ LINK NGOÀI (Nút Xử Phạt không có data-nav)
+                mobileHtml += `<a href="${href}" ${targetAttr} 
+                    class="nav-link block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg font-bold title-font transition mb-1">
+                    ${text}
+                </a>`;
+            }
         });
         mobileMenu.innerHTML = mobileHtml;
 
@@ -2004,13 +2027,17 @@ window.addEventListener('load', async () => {
     // 3. Setup Navigation
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
+            const target = link.getAttribute('data-nav');
+            
+            if (!target) return; 
+
             e.preventDefault();
+            
             // Active Link
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
 
             // Show Section
-            const target = link.getAttribute('data-nav');
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
             document.getElementById(`section-${target}`).classList.add('active');
 
@@ -2025,7 +2052,6 @@ window.addEventListener('load', async () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     });
-
 
     // Tính năng: Hiển thị trước ảnh đại diện khi vừa chọn file
     document.getElementById('edit-avatar-file')?.addEventListener('change', (e) => {

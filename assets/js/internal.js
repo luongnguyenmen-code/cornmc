@@ -336,52 +336,62 @@ window.filterReports = (roleFilter) => {
 
 async function loadWorkReports() {
     const listContainer = document.getElementById('all-reports-list');
-    listContainer.innerHTML = '<div class="text-center text-gray-500 py-8 col-span-2">⏳ Đang tải dữ liệu báo cáo...</div>';
+    listContainer.innerHTML = '<div class="text-center text-gray-500 py-8 col-span-2 title-font text-xl animate-pulse">⏳ Đang tải dữ liệu báo cáo...</div>';
 
     try {
         let reports = await fetchAllWorkReports();
         
-        // Lọc theo Doanh mục (Role)
         if (window.currentReportFilter !== 'all') {
             reports = reports.filter(r => (r.authorRole || 'member') === window.currentReportFilter);
         }
         
-        window.allLoadedReports = reports; // Lưu vào biến toàn cục để Modal đọc
+        window.allLoadedReports = reports; 
         
         if (reports.length === 0) {
-            listContainer.innerHTML = `<div class="glass-panel p-6 text-center text-gray-500 rounded-xl col-span-2 border border-dashed border-white/10">Không có báo cáo nào thuộc bộ phận này.</div>`;
+            listContainer.innerHTML = `<div class="glass-panel p-8 text-center text-gray-500 italic rounded-2xl col-span-2 md:col-span-3 border border-dashed border-gray-700">Không có báo cáo nào thuộc bộ phận này.</div>`;
             return;
         }
 
-        // Render ra các "Thẻ Rút Gọn" (Chỉ hiện Tên, Tiến độ, Trạng thái)
-        listContainer.innerHTML = reports.map(r => {
+        // Tạo cục hiển thị Tổng số báo cáo và map danh sách
+        listContainer.innerHTML = `
+            <div class="col-span-1 md:col-span-2 lg:col-span-3 mb-2">
+                <span class="text-cyan-400 font-bold text-sm bg-cyan-900/20 px-4 py-2 rounded-lg border border-cyan-500/30 inline-block shadow-sm">
+                    📊 Tổng số: <span class="text-white">${reports.length}</span> báo cáo
+                </span>
+            </div>
+        ` + reports.map(r => {
             const isApproved = r.status === 'approved';
             const statusColor = isApproved ? 'text-green-400 border-green-500/50 bg-green-500/10' : 'text-yellow-400 border-yellow-500/50 bg-yellow-500/10';
             const statusText = isApproved ? '✅ Đã Duyệt' : '⏳ Chờ Duyệt';
-            const dateStr = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+            
+            // Format ngày nộp đẹp và chuẩn hơn
+            const dateStr = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A';
+            
             const roleBadge = r.authorRole ? `<span class="px-2 py-0.5 rounded bg-purple-900/50 border border-purple-500/50 text-purple-300 text-[10px] uppercase font-bold ml-2">${r.authorRole}</span>` : '';
             
             return `
-                <div onclick="window.viewReportDetail('${r.id}')" class="glass-panel p-5 rounded-2xl border-l-4 ${isApproved ? 'border-green-500' : 'border-yellow-500'} cursor-pointer hover:bg-white/10 hover:shadow-[0_0_15px_rgba(34,211,238,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
-                    <div class="flex justify-between items-start mb-3">
+                <div onclick="window.viewReportDetail('${r.id}')" class="glass-panel p-6 rounded-2xl border-l-4 ${isApproved ? 'border-green-500' : 'border-yellow-500'} cursor-pointer hover:bg-white/10 hover:shadow-[0_0_20px_rgba(34,211,238,0.2)] hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
+                    <div class="absolute -right-5 -top-5 w-24 h-24 ${isApproved ? 'bg-green-500/10' : 'bg-yellow-500/10'} rounded-full blur-2xl pointer-events-none"></div>
+                    
+                    <div class="relative z-10 flex justify-between items-start mb-4">
                         <div>
-                            <h4 class="font-black text-white text-base flex items-center">${r.author} ${roleBadge}</h4>
-                            <span class="text-[10px] text-gray-500 font-mono">${dateStr}</span>
+                            <h4 class="font-black text-white text-lg title-font tracking-wide flex items-center">${r.author} ${roleBadge}</h4>
+                            <span class="text-[11px] text-cyan-300 font-mono drop-shadow-md mt-1 inline-block">📅 Ngày nộp: ${dateStr}</span>
                         </div>
-                        <span class="px-2 py-1 rounded-full text-[9px] font-bold uppercase border ${statusColor} whitespace-nowrap ml-2">${statusText}</span>
+                        <span class="px-2 py-1 rounded text-[9px] font-bold uppercase border ${statusColor} whitespace-nowrap ml-2 drop-shadow-md">${statusText}</span>
                     </div>
                     
-                    <div class="mb-4 text-white text-sm line-clamp-2">${r.task}</div>
+                    <div class="relative z-10 mb-5 text-gray-300 text-sm line-clamp-2 leading-relaxed">${r.task}</div>
                     
-                    <div class="flex items-center gap-3">
-                        <div class="flex-1 bg-black/50 rounded-full h-2 border border-white/10 overflow-hidden">
+                    <div class="relative z-10 flex items-center gap-3">
+                        <div class="flex-1 bg-black/60 rounded-full h-2.5 border border-white/10 overflow-hidden shadow-inner">
                             <div class="bg-gradient-to-r from-cyan-500 to-purple-500 h-full rounded-full" style="width: ${r.percent}%"></div>
                         </div>
-                        <span class="text-xs font-bold text-cyan-400 w-10 text-right">${r.percent}%</span>
+                        <span class="text-xs font-bold text-cyan-400 w-10 text-right drop-shadow-md">${r.percent}%</span>
                     </div>
                     
-                    <div class="mt-4 pt-3 border-t border-white/5 text-right">
-                        <span class="text-xs text-cyan-400 font-bold group-hover:text-cyan-300 group-hover:underline transition flex items-center justify-end gap-1">Bấm xem chi tiết ➔</span>
+                    <div class="relative z-10 mt-5 pt-3 border-t border-white/5 text-right">
+                        <span class="text-xs text-cyan-400 font-bold group-hover:text-cyan-300 group-hover:underline transition flex items-center justify-end gap-1 uppercase tracking-wider">Xem chi tiết ➔</span>
                     </div>
                 </div>
             `;
@@ -392,11 +402,7 @@ async function loadWorkReports() {
     }
 }
 
-// ----------------------------------------------------
-// Hàm mở Modal và Đổ dữ liệu chi tiết của 1 Báo cáo
-// ----------------------------------------------------
 window.viewReportDetail = (id) => {
-    // Tìm báo cáo từ biến toàn cục
     const r = window.allLoadedReports.find(x => x.id === id);
     if (!r) return;
 
@@ -404,65 +410,66 @@ window.viewReportDetail = (id) => {
     const content = document.getElementById('report-detail-content');
 
     const isApproved = r.status === 'approved';
-    const dateStr = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
     
-    // BẢO MẬT: Chặn không cho Staff thấy nút duyệt (Chỉ Admin và Dev)
-    const canApprove = !isApproved && ['admin', 'dev'].includes(currentRole);
+    // Đồng bộ format ngày nộp đẹp như bên ngoài danh sách
+    const dateStr = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A';
+    
+    // 🔴 SỬA LẠI QUYỀN DUYỆT BÁO CÁO TẠI ĐÂY: 
+    // - Chỉ hiện nút duyệt khi báo cáo chưa được duyệt (!isApproved)
+    // - VÀ người đang xem bắt buộc phải có Role là 'admin' (currentRole === 'admin')
+    const canApprove = !isApproved && currentRole === 'admin';
 
-    // Xử lý Gallery Ảnh
     let imagesHtml = '';
     if (r.images && r.images.length > 0) {
         imagesHtml = `
-            <div class="mb-6 pt-5 border-t border-white/10">
-                <p class="text-sm text-cyan-400 mb-4 uppercase font-bold tracking-wider flex items-center gap-2">📸 Ảnh minh chứng (${r.images.length})</p>
+            <div class="mb-6 pt-5 border-t border-cyan-500/20">
+                <p class="text-sm text-cyan-400 mb-4 uppercase font-bold tracking-wider title-font flex items-center gap-2">📸 Ảnh minh chứng (${r.images.length})</p>
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    ${r.images.map(img => `<a href="${img}" target="_blank" class="block overflow-hidden rounded-xl border border-white/10 hover:border-cyan-400 transition shadow-md"><img src="${img}" class="w-full h-32 object-cover hover:scale-110 transition duration-500"></a>`).join('')}
+                    ${r.images.map(img => `<a href="${img}" target="_blank" class="block overflow-hidden rounded-xl border border-white/10 hover:border-cyan-400 hover:shadow-[0_0_15px_rgba(34,211,238,0.3)] transition-all"><img src="${img}" class="w-full h-32 object-cover hover:scale-110 transition duration-500"></a>`).join('')}
                 </div>
             </div>
         `;
     }
 
-    // Xử lý Link đính kèm
     let linkHtml = '';
     if (r.link) {
         linkHtml = `
-            <div class="mb-6 pt-5 border-t border-white/10">
-                <p class="text-sm text-cyan-400 mb-3 uppercase font-bold tracking-wider flex items-center gap-2">🔗 Tệp đính kèm / Kết quả</p>
-                <a href="${r.link}" target="_blank" class="inline-flex items-center gap-2 text-sm text-blue-300 hover:text-white transition bg-blue-600/20 hover:bg-blue-600/40 px-5 py-3 rounded-xl border border-blue-500/30 w-full break-all shadow-inner">
-                    <span class="text-lg">🌐</span> ${r.link}
+            <div class="mb-6 pt-5 border-t border-cyan-500/20">
+                <p class="text-sm text-cyan-400 mb-3 uppercase font-bold tracking-wider title-font flex items-center gap-2">🔗 Tệp đính kèm / Kết quả</p>
+                <a href="${r.link}" target="_blank" class="inline-flex items-center gap-3 text-sm text-purple-300 hover:text-white transition bg-purple-900/20 hover:bg-purple-900/40 px-5 py-3 rounded-xl border border-purple-500/30 w-full break-all shadow-inner group">
+                    <span class="text-xl group-hover:scale-110 transition">🌐</span> ${r.link}
                 </a>
             </div>
         `;
     }
 
-    // Đổ toàn bộ HTML vào Modal
     content.innerHTML = `
         <div class="flex justify-between items-start mb-6">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-full bg-gradient-to-tr from-cyan-600 to-purple-600 p-[2px]">
-                    <div class="w-full h-full bg-gray-900 rounded-full flex items-center justify-center text-2xl">👤</div>
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-tr from-cyan-600 to-purple-600 p-[2px] shadow-[0_0_15px_rgba(139,92,246,0.4)]">
+                    <div class="w-full h-full bg-gray-900 rounded-lg flex items-center justify-center text-2xl">👤</div>
                 </div>
                 <div>
-                    <h4 class="font-black text-white text-xl uppercase tracking-wide">${r.author} 
-                        <span class="text-[10px] bg-purple-900/60 text-purple-300 border border-purple-500/50 px-2 py-0.5 rounded align-middle ml-2">${r.authorRole || 'MEMBER'}</span>
+                    <h4 class="font-black text-white text-2xl title-font uppercase tracking-wide drop-shadow-md">${r.author} 
+                        <span class="text-[10px] bg-purple-900/60 text-purple-300 border border-purple-500/50 px-2 py-0.5 rounded align-middle ml-2 font-sans">${r.authorRole || 'MEMBER'}</span>
                     </h4>
                     <span class="text-xs text-gray-400 font-mono inline-block mt-1">Đã nộp lúc: ${dateStr}</span>
                 </div>
             </div>
-            <span class="px-3 py-1.5 rounded-full text-xs font-bold uppercase border shadow-sm ${isApproved ? 'text-green-400 border-green-500/50 bg-green-500/10' : 'text-yellow-400 border-yellow-500/50 bg-yellow-500/10'}">${isApproved ? '✅ Đã Duyệt' : '⏳ Chờ Duyệt'}</span>
+            <span class="px-3 py-1.5 rounded text-xs font-bold uppercase border shadow-md ${isApproved ? 'text-green-400 border-green-500/50 bg-green-500/10' : 'text-yellow-400 border-yellow-500/50 bg-yellow-500/10'}">${isApproved ? '✅ Đã Duyệt' : '⏳ Chờ Duyệt'}</span>
         </div>
         
-        <div class="mb-6 bg-black/40 p-5 rounded-2xl border border-white/5 shadow-inner">
-            <p class="text-cyan-400 font-bold mb-2 text-xs uppercase tracking-widest flex items-center gap-2">📝 Chi tiết Nhiệm vụ</p>
-            <p class="text-white text-lg leading-relaxed">${r.task}</p>
+        <div class="mb-6 bg-black/50 p-6 rounded-2xl border border-cyan-500/20 shadow-inner">
+            <p class="text-cyan-400 font-bold mb-3 text-sm uppercase tracking-widest title-font flex items-center gap-2">📝 Chi tiết Nhiệm vụ</p>
+            <p class="text-gray-200 text-lg leading-relaxed">${r.task}</p>
         </div>
         
-        <div class="mb-6 bg-black/40 p-5 rounded-2xl border border-white/5 shadow-inner">
-            <div class="flex justify-between items-end mb-2">
-                <p class="text-cyan-400 font-bold text-xs uppercase tracking-widest flex items-center gap-2">📊 Tiến độ hoàn thành</p>
-                <span class="text-white font-black text-xl">${r.percent}%</span>
+        <div class="mb-6 bg-black/50 p-6 rounded-2xl border border-cyan-500/20 shadow-inner">
+            <div class="flex justify-between items-end mb-3">
+                <p class="text-cyan-400 font-bold text-sm uppercase tracking-widest title-font flex items-center gap-2">📊 Tiến độ hoàn thành</p>
+                <span class="text-cyan-400 font-black text-2xl drop-shadow-md">${r.percent}%</span>
             </div>
-            <div class="w-full bg-gray-900 rounded-full h-4 border border-white/10 overflow-hidden shadow-inner">
+            <div class="w-full bg-gray-900 rounded-full h-5 border border-white/10 overflow-hidden shadow-inner">
                 <div class="bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 h-full rounded-full transition-all duration-1000 relative" style="width: ${r.percent}%">
                     <div class="absolute inset-0 bg-white/20 animate-pulse"></div>
                 </div>
@@ -473,16 +480,15 @@ window.viewReportDetail = (id) => {
         ${linkHtml}
 
         ${canApprove ? `
-            <div class="mt-8 pt-6 border-t border-white/10 flex justify-end">
-                <button onclick="window.approveReportAction('${r.id}')" class="bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white px-8 py-3 rounded-xl text-sm font-black shadow-[0_0_20px_rgba(16,185,129,0.4)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)] transition-all transform hover:-translate-y-1 w-full sm:w-auto flex items-center justify-center gap-2">
-                    <span class="text-lg">✅</span> CHẤP NHẬN & DUYỆT BÁO CÁO
+            <div class="mt-8 pt-6 border-t border-cyan-500/30 flex justify-end">
+                <button onclick="window.approveReportAction('${r.id}')" class="cyber-btn text-white px-8 py-4 rounded-xl text-lg title-font font-black w-full sm:w-auto flex items-center justify-center gap-2 transition-transform hover:-translate-y-1 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                    <span class="text-2xl drop-shadow-md">✅</span> CHẤP NHẬN BÁO CÁO
                 </button>
             </div>
         ` : ''}
     `;
 
-    // Hiển thị Modal
-    modal.classList.remove('hidden');
+    modal.classList.add('active'); 
 };
 
 // Hàm xử lý khi Admin bấm Duyệt

@@ -124,7 +124,7 @@ async function loadUsers() {
         } else {
             // Nếu không phải Admin -> Hiện Dropdown bình thường
             // LƯU Ý: Đã xóa 'admin' ra khỏi danh sách này để không ai cấp quyền admin được
-            const roles = ['member', 'vip', 'media', 'helper', 'dev'];
+            const roles = ['member', 'vip', 'media', 'helper', 'staff', 'dev'];
             roleDisplay = `
                 <select onchange="window.updateUserRole('${u.id}', this.value)" class="bg-black border border-gray-700 text-xs rounded px-2 py-1 text-white hover:border-cyan-500 transition outline-none">
                     ${roles.map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`).join('')}
