@@ -91,7 +91,7 @@ document.getElementById('edit-image-file')?.addEventListener('change', async (e)
         // Gắn link Firebase trả về vào thẻ input ẩn để hàm Submit mang đi lưu
         urlInput.value = imageUrl;
         
-        statusText.innerText = '✅ Đã tải ảnh xong! Sẵn sàng lưu.';
+        statusText.innerText = 'Đã tải ảnh xong! Sẵn sàng lưu.';
         statusText.className = "text-xs mt-2 text-green-400 font-bold block";
     } catch (error) {
         console.error(error);
@@ -307,7 +307,7 @@ async function loadPendingForum() {
     const posts = await fetchForumPosts('pending');
     
     if(posts.length === 0) {
-        list.innerHTML = '<div class="p-8 text-center bg-white/5 rounded-xl">✅ Không có bài viết nào chờ duyệt!</div>';
+        list.innerHTML = '<div class="p-8 text-center bg-white/5 rounded-xl flex items-center justify-center gap-2"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path></svg> Không có bài viết nào chờ duyệt!</div>';
         return;
     }
 
@@ -318,8 +318,8 @@ async function loadPendingForum() {
             <div class="flex justify-between items-center">
                 <span class="text-xs text-gray-500">Tác giả: ${p.author} • ${new Date(p.createdAt?.seconds*1000).toLocaleString()}</span>
                 <div class="flex gap-3">
-                    <button onclick="window.approveForumPost('${p.id}')" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-bold text-sm">✅ DUYỆT</button>
-                    <button onclick="window.deleteItem('forum_posts', '${p.id}')" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded font-bold text-sm">🗑️ XÓA</button>
+                    <button onclick="window.approveForumPost('${p.id}')" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded font-bold text-sm inline-flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path></svg> DUYỆT</button>
+                    <button onclick="window.deleteItem('forum_posts', '${p.id}')" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded font-bold text-sm inline-flex items-center gap-1.5"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> XÓA</button>
                 </div>
             </div>
         </div>
@@ -375,7 +375,7 @@ window.loadPunishments = async (type) => {
 function renderPunishments(data, type) {
     const list = document.getElementById('punishments-list');
     if (!data || data.length === 0) {
-        list.innerHTML = `<tr><td colspan="6" class="p-8 text-center">✅ Không có dữ liệu.</td></tr>`;
+        list.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-gray-500">Không có dữ liệu.</td></tr>`;
         return;
     }
     

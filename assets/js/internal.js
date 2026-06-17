@@ -229,7 +229,7 @@ function setupReportForm() {
                 images: imageUrls 
             });
             
-            alert("✅ Đã gửi báo cáo thành công! Chờ quản lý duyệt.");
+            alert("Đã gửi báo cáo thành công! Chờ quản lý duyệt.");
             e.target.reset();
             previewContainer.innerHTML = '';
         } catch (err) {
@@ -259,7 +259,7 @@ function setupAssignTaskForm() {
         btn.disabled = true;
         try {
             await assignTask(title, desc, targetRole);
-            alert("✅ Đã phát lệnh giao việc thành công!");
+            alert("Đã phát lệnh giao việc thành công!");
             e.target.reset();
             loadAdminTasks(); // Load lại danh sách vừa tạo
         } catch (err) {
@@ -341,32 +341,40 @@ async function loadWorkReports() {
     try {
         let reports = await fetchAllWorkReports();
         
+        // 🟢 TẢI DANH SÁCH USER ĐỂ LẤY AVATAR MỚI NHẤT TỪ WEB
+        const users = await fetchAllUsers();
+        const userMap = {};
+        users.forEach(u => {
+            userMap[u.id] = u.photoURL || `https://mc-heads.net/avatar/${u.username}`;
+        });
+
         if (window.currentReportFilter !== 'all') {
             reports = reports.filter(r => (r.authorRole || 'member') === window.currentReportFilter);
         }
         
-        window.allLoadedReports = reports; 
+        // 🟢 GÁN AVATAR ĐỘNG VÀO BIẾN TOÀN CỤC ĐỂ MODAL ĐỌC ĐƯỢC
+        window.allLoadedReports = reports.map(r => ({
+            ...r,
+            avatar: userMap[r.uid] || r.avatar || `https://mc-heads.net/avatar/${r.author}`
+        })); 
         
-        if (reports.length === 0) {
+        if (window.allLoadedReports.length === 0) {
             listContainer.innerHTML = `<div class="glass-panel p-8 text-center text-gray-500 italic rounded-2xl col-span-2 md:col-span-3 border border-dashed border-gray-700">Không có báo cáo nào thuộc bộ phận này.</div>`;
             return;
         }
 
-        // Tạo cục hiển thị Tổng số báo cáo và map danh sách
         listContainer.innerHTML = `
             <div class="col-span-1 md:col-span-2 lg:col-span-3 mb-2">
                 <span class="text-cyan-400 font-bold text-sm bg-cyan-900/20 px-4 py-2 rounded-lg border border-cyan-500/30 inline-block shadow-sm">
-                    📊 Tổng số: <span class="text-white">${reports.length}</span> báo cáo
+                    📊 Tổng số: <span class="text-white">${window.allLoadedReports.length}</span> báo cáo
                 </span>
             </div>
-        ` + reports.map(r => {
+        ` + window.allLoadedReports.map(r => {
             const isApproved = r.status === 'approved';
             const statusColor = isApproved ? 'text-green-400 border-green-500/50 bg-green-500/10' : 'text-yellow-400 border-yellow-500/50 bg-yellow-500/10';
             const statusText = isApproved ? '✅ Đã Duyệt' : '⏳ Chờ Duyệt';
             
-            // Format ngày nộp đẹp và chuẩn hơn
             const dateStr = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A';
-            
             const roleBadge = r.authorRole ? `<span class="px-2 py-0.5 rounded bg-purple-900/50 border border-purple-500/50 text-purple-300 text-[10px] uppercase font-bold ml-2">${r.authorRole}</span>` : '';
             
             return `
@@ -374,9 +382,12 @@ async function loadWorkReports() {
                     <div class="absolute -right-5 -top-5 w-24 h-24 ${isApproved ? 'bg-green-500/10' : 'bg-yellow-500/10'} rounded-full blur-2xl pointer-events-none"></div>
                     
                     <div class="relative z-10 flex justify-between items-start mb-4">
-                        <div>
-                            <h4 class="font-black text-white text-lg title-font tracking-wide flex items-center">${r.author} ${roleBadge}</h4>
-                            <span class="text-[11px] text-cyan-300 font-mono drop-shadow-md mt-1 inline-block">📅 Ngày nộp: ${dateStr}</span>
+                        <div class="flex items-center gap-3">
+                            <img src="${r.avatar}" class="w-10 h-10 rounded-lg border border-cyan-500/30 object-cover bg-gray-900 shrink-0 shadow-sm">
+                            <div>
+                                <h4 class="font-black text-white text-lg title-font tracking-wide flex items-center">${r.author} ${roleBadge}</h4>
+                                <span class="text-[11px] text-cyan-300 font-mono drop-shadow-md mt-0.5 inline-block">📅 Ngày nộp: ${dateStr}</span>
+                            </div>
                         </div>
                         <span class="px-2 py-1 rounded text-[9px] font-bold uppercase border ${statusColor} whitespace-nowrap ml-2 drop-shadow-md">${statusText}</span>
                     </div>
@@ -410,14 +421,11 @@ window.viewReportDetail = (id) => {
     const content = document.getElementById('report-detail-content');
 
     const isApproved = r.status === 'approved';
-    
-    // Đồng bộ format ngày nộp đẹp như bên ngoài danh sách
     const dateStr = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) : 'N/A';
-    
-    // 🔴 SỬA LẠI QUYỀN DUYỆT BÁO CÁO TẠI ĐÂY: 
-    // - Chỉ hiện nút duyệt khi báo cáo chưa được duyệt (!isApproved)
-    // - VÀ người đang xem bắt buộc phải có Role là 'admin' (currentRole === 'admin')
     const canApprove = !isApproved && currentRole === 'admin';
+
+    // 🟢 TẠO LINK LẤY AVATAR TỪ TÊN NHÂN VẬT (r.author)
+    const avatarUrl = r.avatar || `https://mc-heads.net/avatar/${r.author}`;
 
     let imagesHtml = '';
     if (r.images && r.images.length > 0) {
@@ -446,8 +454,8 @@ window.viewReportDetail = (id) => {
     content.innerHTML = `
         <div class="flex justify-between items-start mb-6">
             <div class="flex items-center gap-4">
-                <div class="w-14 h-14 rounded-xl bg-gradient-to-tr from-cyan-600 to-purple-600 p-[2px] shadow-[0_0_15px_rgba(139,92,246,0.4)]">
-                    <div class="w-full h-full bg-gray-900 rounded-lg flex items-center justify-center text-2xl">👤</div>
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-tr from-cyan-600 to-purple-600 p-[2px] shadow-[0_0_15px_rgba(139,92,246,0.4)] shrink-0">
+                    <img src="${avatarUrl}" alt="${r.author}" class="w-full h-full bg-gray-900 rounded-lg object-cover">
                 </div>
                 <div>
                     <h4 class="font-black text-white text-2xl title-font uppercase tracking-wide drop-shadow-md">${r.author} 
@@ -567,7 +575,7 @@ async function loadPayrollAdmin() {
 
             try {
                 await createPayrollEntry(targetUid, amount, reason);
-                alert("✅ Giao dịch thành công! Dữ liệu đã được cập nhật vào ví của nhân sự.");
+                alert("Giao dịch thành công! Dữ liệu đã được cập nhật vào ví của nhân sự.");
                 e.target.reset();
             } catch (err) { alert("❌ Lỗi giao dịch: " + err.message); } 
             finally {

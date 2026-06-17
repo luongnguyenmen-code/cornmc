@@ -2,9 +2,9 @@
     <div class="tool-selector">
         <!-- <button id="tab-pixel" class="tab-btn" onclick="openTool('pixel')">👾 AI Pixel Scanner</button>
         <button id="tab-ai" class="tab-btn" onclick="openTool('ai')">✨ AI Photo to Skin</button> -->
-        <button id="tab-merge" class="tab-btn active" onclick="openTool('merge')">✂️ Tool Ghép Skin Toàn Diện</button>
-        <button id="tab-convert" class="tab-btn" onclick="openTool('convert')">🎨 Tool Chuyển Skin -> 3D Schematic</button>
-        <button id="tab-upload" class="tab-btn" onclick="openTool('upload')">📤 Skin Uploader (Mojang)</button>
+        <button id="tab-merge" class="tab-btn active" onclick="openTool('merge')"> Tool Ghép Skin Toàn Diện</button>
+        <button id="tab-convert" class="tab-btn" onclick="openTool('convert')">Tool Chuyển Skin -> 3D Schematic</button>
+        <button id="tab-upload" class="tab-btn" onclick="openTool('upload')"> Skin Uploader (Mojang)</button>
     </div>
 
     <div id="tool-pixel" class="tool-container" style="display: none;">
@@ -23,23 +23,23 @@
             </select>
         </div>
         <button id="pixelBtn" class="action-btn" style="background-color: #f9e2af;" onclick="scanPixelArt()">Scan Pixel
-            Art 🚨</button>
+            Art </button>
         <p id="pixelStatus" class="status-message"></p>
     </div>
 
     <div id="tool-ai" class="tool-container" style="display: none;">
-        <h2>✨ AI Photo to Skin</h2>
+        <h2>AI Photo to Skin</h2>
         <p class="text-sm">Tải ảnh đời thực/phong cảnh để AI tự động chuyển hóa thành skin theo cấu trúc 4px.</p>
         <div class="upload-area">
             <input type="file" id="aiInput" accept="image/*" />
         </div>
         <button id="aiBtn" class="action-btn" style="background-color: #cba6f7;" onclick="processAISkin()">Bắt Đầu
-            Chuyển Hóa ⚡</button>
+            Chuyển Hóa </button>
         <p id="aiStatus" class="status-message"></p>
     </div>
 
     <div id="tool-merge" class="tool-container">
-        <h2>✂️ Ghép Skin Tùy Chỉnh</h2>
+        <h2> Ghép Skin Tùy Chỉnh</h2>
         <div class="merge-tabs" style="display: flex; gap: 5px; margin-bottom: 15px;">
             <button onclick="setMergeMode('full')" class="sub-tab active">Full (3 Mảnh)</button>
             <button onclick="setMergeMode('head')" class="sub-tab">Ghép Đầu vào Thân</button>
@@ -47,35 +47,35 @@
         </div>
 
         <div id="area-head">
-            <label>🎯 Skin lấy ĐẦU:</label>
+            <label> Skin lấy ĐẦU:</label>
             <input type="file" id="skinHead">
         </div>
 
         <div id="area-body">
-            <label>👕 Skin GỐC (Thân/Chân):</label>
+            <label> Skin GỐC (Thân/Chân):</label>
             <input type="file" id="skinBody">
         </div>
 
         <div id="area-legs">
-            <label>👖 Skin lấy CHÂN:</label>
+            <label> Skin lấy CHÂN:</label>
             <input type="file" id="skinLegs">
         </div>
-        <button id="btnMerge" class="action-btn" onclick="mergeSkin()">Ghép Lại Ngay 🚀</button>
+        <button id="btnMerge" class="action-btn" onclick="mergeSkin()">Ghép Lại Ngay </button>
         <p id="mergeStatus" class="status-message"></p>
     </div>
 
     <div id="tool-convert" class="tool-container" style="display: none;">
-        <h2>🎨 Tool Chuyển Skin -> 3D Schematic</h2>
+        <h2> Tool Chuyển Skin -> 3D Schematic</h2>
         <p>Chọn file Skin Minecraft của bạn (định dạng .png) để chuyển đổi thành file .schem dùng cho WorldEdit.</p>
 
         <div class="upload-area">
             <input type="file" id="skinInput" accept="image/png" />
         </div>
 
-        <button id="convertBtn" class="action-btn" onclick="convertSkin()">Chuyển Đổi Ngay 🚀</button>
+        <button id="convertBtn" class="action-btn" onclick="convertSkin()">Chuyển Đổi Ngay </button>
         <p id="statusMessage" class="status-message"></p>
     </div>
-    
+
     <div id="tool-upload" class="tool-container" style="display: none; max-width: 450px;">
         <div class="flex items-center justify-center gap-3 mb-4">
             <i class="fa-solid fa-shirt text-green-400 text-2xl"></i>
@@ -90,7 +90,7 @@
             <input type="file" id="skinInputUpload" accept="image/png" style="font-size: 12px;">
         </div>
 
-        <button id="uploadBtn" onclick="uploadToMineSkin()" class="action-btn" 
+        <button id="uploadBtn" onclick="uploadToMineSkin()" class="action-btn"
             style="background-color: #6366f1; color: white;">
             <i class="fa-solid fa-cloud-arrow-up"></i> TẢI LÊN MINESKIN
         </button>
@@ -240,12 +240,12 @@
         const btn = document.getElementById('uploadBtn');
         const status = document.getElementById('statusMsgUpload');
         const result = document.getElementById('resultUrl');
-        
+
         // Key của bạn
-        const apiKey = "msk_HW9Ijlzo_Al820AIANVL8YnNh7j5_uxxaaQzyi4W3DiN2Gg1HUVG68xctA6Zq-VB_VLJOuCcT"; 
+        const apiKey = "msk_HW9Ijlzo_Al820AIANVL8YnNh7j5_uxxaaQzyi4W3DiN2Gg1HUVG68xctA6Zq-VB_VLJOuCcT";
 
         if (!fileInput.files[0]) {
-            status.textContent = "⚠️ Bạn chưa chọn file skin!";
+            status.textContent = " Bạn chưa chọn file skin!";
             status.style.color = "#f38ba8";
             return;
         }
@@ -273,14 +273,14 @@
             }
 
             const data = await response.json();
-            const mojangUrl = data.data.texture.url; 
+            const mojangUrl = data.data.texture.url;
 
             result.value = mojangUrl;
-            status.textContent = "✅ Thành công! Link đã sẵn sàng.";
+            status.textContent = "Thành công! Link đã sẵn sàng.";
             status.style.color = "#a6e3a1";
 
         } catch (err) {
-            status.textContent = "❌ Lỗi: " + err.message;
+            status.textContent = " Lỗi: " + err.message;
             status.style.color = "#f38ba8";
         } finally {
             btn.disabled = false;
@@ -309,13 +309,13 @@
 
         // CHỈ BẮT BUỘC có Skin Gốc
         if (bodyInput.files.length === 0) {
-            statusMsg.textContent = '⚠️ Vui lòng chọn Skin GỐC để làm nền!';
+            statusMsg.textContent = 'Vui lòng chọn Skin GỐC để làm nền!';
             statusMsg.style.color = '#f38ba8';
             return;
         }
 
         btn.disabled = true;
-        btn.textContent = '⏳ Đang xử lý...';
+        btn.textContent = ' Đang xử lý...';
 
         const formData = new FormData();
         formData.append('body', bodyInput.files[0]);
@@ -344,15 +344,15 @@
             a.remove();
             window.URL.revokeObjectURL(downloadUrl);
 
-            statusMsg.textContent = '✅ Đã ghép hoàn chỉnh và tải về máy!';
+            statusMsg.textContent = 'Đã ghép hoàn chỉnh và tải về máy!';
             statusMsg.style.color = '#a6e3a1';
 
         } catch (error) {
-            statusMsg.textContent = '❌ Thất bại: ' + error.message;
+            statusMsg.textContent = ' Thất bại: ' + error.message;
             statusMsg.style.color = '#f38ba8';
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Ghép Lại Ngay 🚀';
+            btn.textContent = 'Ghép Lại Ngay ';
         }
     }
 
@@ -363,9 +363,9 @@
 
         // Đổi chữ nhãn cho dễ hiểu
         const bodyLabel = document.querySelector('#area-body label');
-        if (mode === 'head') bodyLabel.innerText = '👕 Skin lấy THÂN & CHÂN:';
-        else if (mode === 'legs') bodyLabel.innerText = '👕 Skin lấy ĐẦU & THÂN:';
-        else bodyLabel.innerText = '👕 Skin lấy THÂN:';
+        if (mode === 'head') bodyLabel.innerText = ' Skin lấy THÂN & CHÂN:';
+        else if (mode === 'legs') bodyLabel.innerText = ' Skin lấy ĐẦU & THÂN:';
+        else bodyLabel.innerText = ' Skin lấy THÂN:';
     }
 
     // 2. CONVERT SCHEMATIC
@@ -375,13 +375,13 @@
         const convertBtn = document.getElementById('convertBtn');
 
         if (fileInput.files.length === 0) {
-            statusMsg.textContent = '⚠️ Vui lòng chọn một file ảnh skin (.png) trước!';
+            statusMsg.textContent = ' Vui lòng chọn một file ảnh skin (.png) trước!';
             statusMsg.style.color = '#f38ba8';
             return;
         }
 
         convertBtn.disabled = true;
-        convertBtn.textContent = '⏳ Đang xử lý...';
+        convertBtn.textContent = ' Đang xử lý...';
         statusMsg.textContent = 'Đang tải ảnh lên và phân tích màu sắc...';
         statusMsg.style.color = '#f9e2af';
 
@@ -411,15 +411,15 @@
             a.remove();
             window.URL.revokeObjectURL(downloadUrl);
 
-            statusMsg.textContent = '✅ Thành công! File .schem đã tải về.';
+            statusMsg.textContent = 'Thành công! File .schem đã tải về.';
             statusMsg.style.color = '#a6e3a1';
 
         } catch (error) {
-            statusMsg.textContent = '❌ Thất bại: ' + error.message;
+            statusMsg.textContent = ' Thất bại: ' + error.message;
             statusMsg.style.color = '#f38ba8';
         } finally {
             convertBtn.disabled = false;
-            convertBtn.textContent = 'Chuyển Đổi Ngay 🚀';
+            convertBtn.textContent = 'Chuyển Đổi Ngay ';
         }
     }
 
@@ -429,12 +429,12 @@
         const btn = document.getElementById('aiBtn');
 
         if (fileInput.files.length === 0) {
-            statusMsg.textContent = '⚠️ Hãy chọn một tấm ảnh trước!';
+            statusMsg.textContent = ' Hãy chọn một tấm ảnh trước!';
             return;
         }
 
         btn.disabled = true;
-        btn.textContent = '⏳ AI Đang quét ảnh...';
+        btn.textContent = ' AI Đang quét ảnh...';
 
         const formData = new FormData();
         formData.append('image', fileInput.files[0]);
@@ -454,13 +454,13 @@
             a.download = 'CornNetwork_AI_Skin.png';
             a.click();
 
-            statusMsg.textContent = '✅ Chuyển hóa thành công!';
+            statusMsg.textContent = 'Chuyển hóa thành công!';
             statusMsg.style.color = '#a6e3a1';
         } catch (error) {
-            statusMsg.textContent = '❌ Thất bại: ' + error.message;
+            statusMsg.textContent = ' Thất bại: ' + error.message;
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Bắt Đầu Chuyển Hóa ⚡';
+            btn.textContent = 'Bắt Đầu Chuyển Hóa ';
         }
     }
 
@@ -471,13 +471,13 @@
         const btn = document.getElementById('pixelBtn');
 
         if (fileInput.files.length === 0) {
-            statusMsg.textContent = '⚠️ Chọn ảnh cái đã ae ơi!';
+            statusMsg.textContent = ' Chọn ảnh cái đã ae ơi!';
             statusMsg.style.color = '#f38ba8';
             return;
         }
 
         btn.disabled = true;
-        btn.textContent = '🚨 Đang quét Pixel...';
+        btn.textContent = ' Đang quét Pixel...';
         statusMsg.textContent = 'AI đang xử lý bảng màu...';
         statusMsg.style.color = '#f9e2af';
 
@@ -503,14 +503,14 @@
             a.click();
             a.remove();
 
-            statusMsg.textContent = '✅ Đã hoàn thành bản vẽ Pixel!';
+            statusMsg.textContent = 'Đã hoàn thành bản vẽ Pixel!';
             statusMsg.style.color = '#a6e3a1';
         } catch (error) {
-            statusMsg.textContent = '❌ Lỗi: ' + error.message;
+            statusMsg.textContent = ' Lỗi: ' + error.message;
             statusMsg.style.color = '#f38ba8';
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Scan Pixel Art 🚨';
+            btn.textContent = 'Scan Pixel Art ';
         }
     }
 

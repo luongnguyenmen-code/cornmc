@@ -88,7 +88,7 @@ function showCustomModal(title, message, type = 'info', onConfirm = null) {
 // --- Tiện ích ---
 window.copyServerIP = () => {
     navigator.clipboard.writeText("cornmc.vn").then(() => {
-        showCustomModal("SERVER IP", "✅ Đã copy IP thành công:\n cornmc.vn \n PC: play.cornmc.vn \n PE: pe.cornmc.vn port 26700", "info");
+        showCustomModal("SERVER IP", "Đã copy IP thành công:\n cornmc.vn \n PC: play.cornmc.vn \n PE: pe.cornmc.vn port 26700", "info");
     });
 };
 
@@ -105,7 +105,7 @@ window.handleRoleChange = async (uid, newRole) => {
         async () => {
             try {
                 await editDocument('users', uid, { role: newRole });
-                showCustomModal("THÀNH CÔNG", "✅ Đã cập nhật quyền thành công!", "info");
+                showCustomModal("THÀNH CÔNG", "Đã cập nhật quyền thành công!", "info");
             } catch (e) { showCustomModal("LỖI", e.message, "danger"); }
         }
     );
@@ -129,7 +129,7 @@ window.handleDeleteUser = async (uid, name) => {
 window.deletePost = (collectionName, docId) => {
     showCustomModal(
         "XÓA BÀI VIẾT",
-        "🗑️ Bạn chắc chắn muốn xóa bài viết này vĩnh viễn?",
+        "Bạn chắc chắn muốn xóa bài viết này vĩnh viễn?",
         "danger",
         async () => {
             try {
@@ -150,7 +150,7 @@ window.deletePost = (collectionName, docId) => {
 window.approvePost = (docId) => {
     showCustomModal(
         "DUYỆT BÀI",
-        "✅ Bạn muốn duyệt bài viết này hiển thị công khai?",
+        "Bạn muốn duyệt bài viết này hiển thị công khai?",
         "confirm",
         async () => {
             try {
@@ -295,7 +295,7 @@ async function renderNews() {
                 <span class="text-xs text-gray-400 hidden sm:block">Bởi: <b class="text-cyan-300">${item.author}</b></span>
                 <span class="text-cyan-400 text-sm font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">ĐỌC CHI TIẾT ➔</span>
                 
-                ${isStaff ? `<button onclick="event.stopPropagation(); window.deletePost('news', '${item.id}')" class="text-red-400 text-xs hover:text-white font-bold bg-red-900/30 hover:bg-red-600 px-3 py-1.5 rounded border border-red-500/30 mt-1 transition shadow-md">🗑️ XÓA</button>` : ''}
+                ${isStaff ? `<button onclick="event.stopPropagation(); window.deletePost('news', '${item.id}')" class="text-red-400 text-xs hover:text-white font-bold bg-red-900/30 hover:bg-red-600 px-3 py-1.5 rounded border border-red-500/30 mt-1 transition shadow-md inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>XÓA</button>` : ''}
             </div>
         </div>
     </div>
@@ -482,7 +482,7 @@ async function renderGuides() {
             ]
         },
         {
-            title: "👮 4. Hành Xử Với BQT (Staff/Admin)",
+            title: "🛡️ 4. Hành Xử Với BQT (Staff/Admin)",
             rules: [
                 "Tôn trọng người chơi và BQT. Không xúc phạm, cãi vã hay gây rối.",
                 "Không năn nỉ xin quyền OP, Fly, Creative, xin items hoặc hối lộ BQT.",
@@ -1313,7 +1313,7 @@ async function renderForum(filterMode = 'approved') {
         // Logic hiển thị Badge trạng thái (Cho tab Bài của tôi)
         let statusBadge = '';
         if (filterMode === 'mine') {
-            if (post.status === 'approved') statusBadge = `<span class="bg-green-500/20 text-green-400 border border-green-500/50 text-[10px] px-2 py-0.5 rounded uppercase font-bold">✅ Đã duyệt</span>`;
+            if (post.status === 'approved') statusBadge = `<span class="bg-green-500/20 text-green-400 border border-green-500/50 text-[10px] px-2 py-0.5 rounded uppercase font-bold inline-flex items-center gap-1"><svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path></svg>Đã duyệt</span>`;
             else statusBadge = `<span class="bg-yellow-500/20 text-yellow-400 border border-yellow-500/50 text-[10px] px-2 py-0.5 rounded uppercase font-bold">⏳ Đang chờ</span>`;
         }
 
@@ -1342,8 +1342,8 @@ async function renderForum(filterMode = 'approved') {
                         </button>
                         
                         <div class="flex gap-2">
-                            ${filterMode === 'pending' && isStaff ? `<button onclick="window.approvePost('${post.id}')" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded text-xs font-bold shadow-lg shadow-green-900/20">✅ DUYỆT NGAY</button>` : ''}
-                            ${canDelete ? `<button onclick="window.deletePost('forum_posts', '${post.id}')" class="text-red-500 hover:text-red-300 text-xs font-bold border border-red-500/30 hover:bg-red-500/10 px-3 py-1.5 rounded transition">🗑️ Xóa</button>` : ''}
+                            ${filterMode === 'pending' && isStaff ? `<button onclick="window.approvePost('${post.id}')" class="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded text-xs font-bold shadow-lg shadow-green-900/20 inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path></svg>DUYỆT NGAY</button>` : ''}
+                            ${canDelete ? `<button onclick="window.deletePost('forum_posts', '${post.id}')" class="text-red-500 hover:text-red-300 text-xs font-bold border border-red-500/30 hover:bg-red-500/10 px-3 py-1.5 rounded transition inline-flex items-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>Xóa</button>` : ''}
                         </div>
                     </div>
 
@@ -1427,7 +1427,7 @@ async function renderAdminTable() {
                     </select>
                 </td>
                 <td class="p-4 text-center">
-                    ${!isMe ? `<button onclick="window.handleDeleteUser('${u.id}', '${u.username}')" class="text-red-500 hover:text-white bg-red-500/10 p-1.5 rounded">🗑️</button>` : ''}
+                    ${!isMe ? `<button onclick="window.handleDeleteUser('${u.id}', '${u.username}')" class="text-red-500 hover:text-white bg-red-500/10 p-1.5 rounded inline-flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>` : ''}
                 </td>
             </tr>`;
         }).join('');
@@ -1477,7 +1477,7 @@ async function renderGiveaways() {
             } else if (!currentUser) {
                 actionBtn = `<button onclick="document.getElementById('auth-modal').classList.add('active')" class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-2.5 rounded-lg font-bold transition w-full md:w-auto">ĐĂNG NHẬP ĐỂ THAM GIA</button>`;
             } else if (hasJoined) {
-                actionBtn = `<button disabled class="bg-green-600/50 text-green-300 border border-green-500/50 px-6 py-2.5 rounded-lg font-bold cursor-not-allowed w-full md:w-auto">✅ ĐÃ BÁO DANH</button>`;
+                actionBtn = `<button disabled class="bg-green-600/50 text-green-300 border border-green-500/50 px-6 py-2.5 rounded-lg font-bold cursor-not-allowed w-full md:w-auto inline-flex items-center justify-center gap-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path></svg>ĐÃ BÁO DANH</button>`;
             } else {
                 actionBtn = `<button onclick="window.joinGiveawayAction('${gw.id}')" class="bg-gradient-to-r from-pink-600 to-purple-500 hover:from-pink-500 hover:to-purple-400 text-white px-8 py-2.5 rounded-lg font-bold shadow-[0_0_20px_rgba(236,72,153,0.4)] transition transform hover:scale-105 w-full md:w-auto">🎉 THAM GIA NGAY</button>`;
             }
@@ -1490,7 +1490,7 @@ async function renderGiveaways() {
                     adminBtn = `<button onclick="window.endGiveawayAction('${gw.id}')" class="mt-4 bg-yellow-600 hover:bg-yellow-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition w-full shadow-lg shadow-yellow-900/30">🏆 CHỐT SỰ KIỆN & QUAY SỐ</button>`;
                 } else {
                     // Nếu chốt rồi -> Hiện nút Xóa để dọn dẹp
-                    adminBtn = `<button onclick="window.deleteDocument('giveaways', '${gw.id}'); setTimeout(()=>renderGiveaways(), 500);" class="mt-4 bg-red-600/50 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition w-full">🗑️ XÓA SỰ KIỆN NÀY</button>`;
+                    adminBtn = `<button onclick="window.deleteDocument('giveaways', '${gw.id}'); setTimeout(()=>renderGiveaways(), 500);" class="mt-4 bg-red-600/50 hover:bg-red-500 text-white px-4 py-2 rounded-lg text-xs font-bold transition w-full inline-flex items-center justify-center gap-1"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>XÓA SỰ KIỆN NÀY</button>`;
                 }
             }
 
@@ -2088,7 +2088,7 @@ window.addEventListener('load', async () => {
 
                 avatarUrl = await uploadImage(file);
 
-                statusText.innerText = '✅ Tải ảnh xong!';
+                statusText.innerText = 'Tải ảnh xong!';
                 statusText.className = "text-xs mt-2 text-green-400 font-bold block";
             }
 
