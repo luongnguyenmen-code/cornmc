@@ -918,6 +918,8 @@ async function renderRanking() {
             { namecache: "MinzKhee", value: 200000 + 70000 },
             { namecache: "PE_Linh_chan3931", value: 240000 },
             { namecache: "VanhDuck08 ", value: 55000 },
+            { namecache: "K_PurpleReaper ", value: 100000 },
+            { namecache: "SeanGeekPlayz ", value: 200000 },
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
@@ -954,6 +956,8 @@ async function renderRanking() {
             { namecache: "MinzKhee", value: 200000 + 70000 },
             { namecache: "PE_Linh_chan3931", value: 240000 },
             { namecache: "VanhDuck08 ", value: 55000 },
+            { namecache: "K_PurpleReaper ", value: 100000 },
+            { namecache: "SeanGeekPlayz ", value: 200000 },
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
