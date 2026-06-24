@@ -802,7 +802,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "i7E2VpkoiVLVXYSE";
-    const BASE_ID = "HwQbtGRcwJdKvOmD";
+    const BASE_ID = "sqmvh6RVOlyyDNYC";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -860,7 +860,7 @@ async function renderRanking() {
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 + 50000 }, // Cũ + Mới 725k
+            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 + 50000 + 100000+ 230000}, 
             { namecache: "111s", value: 100000 },
             { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
@@ -877,7 +877,7 @@ async function renderRanking() {
             { namecache: "DraWind000", value: 250000 + 300000 + 900000 }, // Cũ + Mới 900k
             { namecache: "huy_holow", value: 230000 + 50000 },
             { namecache: "ConCuToBu", value: 500000 },
-            { namecache: "imtrhie", value: 115000 },
+            { namecache: "imtrhie", value: 115000 + 36000},
             { namecache: "SenPai_Cuong", value: 420000 },
             { namecache: "saoky", value: 20000 },
             { namecache: "BkunZ", value: 10000 },
@@ -892,15 +892,15 @@ async function renderRanking() {
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "tetinhxuan", value: 500000 },
             { namecache: "nhan", value: 350000 },
-            { namecache: "Linhyumy24", value: 200000 + 50000 + 100000 },
+            { namecache: "Linhyumy24", value: 200000 + 50000 + 100000  + 60000},
             { namecache: "bill199204", value: 100000 + 50000 },
             { namecache: "toan909", value: 100000 },
             { namecache: "imnotlgb", value: 70000 },
             { namecache: "swipey166", value: 50000 },
             { namecache: "Hiro2003", value: 20000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 },
+            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 + 625000},
             { namecache: "WolfMC", value: 40000 },
-            { namecache: "Chooty_427", value: 450000 },
+            { namecache: "Chooty_427", value: 450000 + 150000},
             { namecache: "LSArt203", value: 170000 + 20000 + 20000 },
             { namecache: "BomYeuEm", value: 20000 + 20000 },
             { namecache: "PE_Hhnoo1", value: 200000 },
@@ -914,12 +914,19 @@ async function renderRanking() {
             { namecache: "LuciCuc", value: 50000 },
             { namecache: "Minhvuongz", value: 20000 },
             { namecache: "NiruMi_XL", value: 25000 },
-            { namecache: "samsungdang", value: 100000 },
+            { namecache: "samsungdang", value: 100000 + 480000 + 500000},
             { namecache: "MinzKhee", value: 200000 + 70000 },
             { namecache: "PE_Linh_chan3931", value: 240000 },
-            { namecache: "VanhDuck08 ", value: 55000 },
+            { namecache: "VanhDuck08 ", value: 55000 + 95000 + 10000 + 500000 + 50000 + 200000 + 100000},
             { namecache: "K_PurpleReaper ", value: 100000 },
-            { namecache: "SeanGeekPlayz ", value: 200000 },
+            { namecache: "SeanGeekPlayz ", value: 200000 + 350000 },
+            { namecache: "Lynhnek ", value: 300000 },
+            { namecache: "KarotTW ", value: 20000 },
+            { namecache: "ZyraGen145 ", value: 200000 },
+            { namecache: "PETERMANE ", value: 20000 },
+            { namecache: "Duckman66", value: 60000 + 90000 + 100000 + 30000},
+            { namecache: "Derlackvn", value: 20000},
+            { namecache: "BachVjpPro1202", value: 50000},
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
@@ -930,15 +937,15 @@ async function renderRanking() {
         // ==========================================
         const donateJuneData = [
             { namecache: "KING_NTV", value: 4000000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 },
+            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 + 625000},
             { namecache: "linhcute2006", value: 1000000 },
             { namecache: "DraWind000", value: 900000 },
-            { namecache: "Sunnn06", value: 725000 + 50000 },
+            { namecache: "Sunnn06", value: 725000 + 50000 + 100000+ 230000},
             { namecache: "Timmythanh007", value: 500000 },
             { namecache: "Rickynguyen", value: 450000 },
-            { namecache: "Chooty_427", value: 450000 },
+            { namecache: "Chooty_427", value: 450000 + 150000},
             { namecache: "nhan", value: 350000 },
-            { namecache: "Linhyumy24", value: 200000 + 100000 },
+            { namecache: "Linhyumy24", value: 200000 + 100000 + 60000},
             { namecache: "PE_Hhnoo1", value: 200000 },
             { namecache: "LSArt203", value: 170000 },
             { namecache: "bill199204", value: 100000 },
@@ -952,12 +959,20 @@ async function renderRanking() {
             { namecache: "LuciCuc", value: 50000 },
             { namecache: "Minhvuongz", value: 20000 },
             { namecache: "NiruMi_XL", value: 25000 },
-            { namecache: "samsungdang", value: 100000 },
+            { namecache: "samsungdang", value: 100000 + 480000 + 500000},
             { namecache: "MinzKhee", value: 200000 + 70000 },
             { namecache: "PE_Linh_chan3931", value: 240000 },
-            { namecache: "VanhDuck08 ", value: 55000 },
+            { namecache: "VanhDuck08 ", value: 55000 + 95000 + 10000 + 500000 + 50000 + 200000 + 100000},
             { namecache: "K_PurpleReaper ", value: 100000 },
-            { namecache: "SeanGeekPlayz ", value: 200000 },
+            { namecache: "SeanGeekPlayz ", value: 200000 + 350000 },
+            { namecache: "Lynhnek ", value: 300000 },
+            { namecache: "KarotTW ", value: 20000 },
+            { namecache: "ZyraGen145 ", value: 200000 },
+            { namecache: "PETERMANE ", value: 20000 },
+            { namecache: "imtrhie", value: 36000},
+            { namecache: "Duckman66", value: 60000 + 90000 + 100000 + 30000},
+            { namecache: "Derlackvn", value: 20000},
+            { namecache: "BachVjpPro1202", value: 50000},
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
