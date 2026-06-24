@@ -818,7 +818,6 @@ async function renderRanking() {
         const moneyBoard = (data["vault_eco_balance"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
         const currentOnlineRaw = dataCurrent["statistic_time_played"] || [];
         const baseOnlineRaw = data["statistic_time_played"] || []; 
-        
 
         const onlineBoard = currentOnlineRaw.map(player => {
             // Tìm người chơi này trong dữ liệu mốc (Base)
@@ -853,7 +852,7 @@ async function renderRanking() {
             { namecache: "PE_Dellcotenok", value: 2225000 },
             { namecache: "PE_PopOcean46064", value: 900000 },
             { namecache: "Timmythanh007", value: 860000 + 500000 }, // Cũ 860k + Mới 500k
-            { namecache: "luan198348", value: 820000 + 800000 },
+            { namecache: "luan198348", value: 820000 + 800000 + 100000},
             { namecache: "Ghast", value: 500000 + 2000000 },
             { namecache: "ShaMein", value: 450000 },
             { namecache: "NgiPam_06", value: 431000 },
@@ -861,7 +860,7 @@ async function renderRanking() {
             { namecache: "LaShan", value: 200000 },
             { namecache: "PE_Mine8889672", value: 200000 },
             { namecache: "CharlesTwoK", value: 170000 },
-            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 + 50000 + 100000+ 230000}, 
+            { namecache: "Sunnn06", value: 150000 + 50000 + 180000 + 330000 + 100000 + 725000 + 200000 + 50000 + 100000+ 230000 + 200000}, 
             { namecache: "111s", value: 100000 },
             { namecache: "Haiyen01", value: 100000 + 500000 },
             { namecache: "68_Hazy", value: 100000 },
@@ -899,7 +898,7 @@ async function renderRanking() {
             { namecache: "imnotlgb", value: 70000 },
             { namecache: "swipey166", value: 50000 },
             { namecache: "Hiro2003", value: 20000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 + 625000},
+            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 + 625000+ 595000},
             { namecache: "WolfMC", value: 40000 },
             { namecache: "Chooty_427", value: 450000 + 150000},
             { namecache: "LSArt203", value: 170000 + 20000 + 20000 },
@@ -921,7 +920,7 @@ async function renderRanking() {
             { namecache: "VanhDuck08 ", value: 55000 + 95000 + 10000 + 500000 + 50000 + 200000 + 100000},
             { namecache: "K_PurpleReaper ", value: 100000 },
             { namecache: "SeanGeekPlayz ", value: 200000 + 350000 },
-            { namecache: "Lynhnek ", value: 300000 },
+            { namecache: "Lynhnek ", value: 300000 + 10000},
             { namecache: "KarotTW ", value: 20000 },
             { namecache: "ZyraGen145 ", value: 200000 },
             { namecache: "PETERMANE ", value: 20000 },
@@ -938,10 +937,11 @@ async function renderRanking() {
         // ==========================================
         const donateJuneData = [
             { namecache: "KING_NTV", value: 4000000 },
-            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 + 625000},
+            { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 + 625000+ 595000},
+            { namecache: "luan198348", value: 100000},
             { namecache: "linhcute2006", value: 1000000 },
             { namecache: "DraWind000", value: 900000 },
-            { namecache: "Sunnn06", value: 725000 + 50000 + 100000+ 230000},
+            { namecache: "Sunnn06", value: 725000 + 50000 + 100000+ 230000 + 200000},
             { namecache: "Timmythanh007", value: 500000 },
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "Chooty_427", value: 450000 + 150000},
@@ -966,7 +966,7 @@ async function renderRanking() {
             { namecache: "VanhDuck08 ", value: 55000 + 95000 + 10000 + 500000 + 50000 + 200000 + 100000},
             { namecache: "K_PurpleReaper ", value: 100000 },
             { namecache: "SeanGeekPlayz ", value: 200000 + 350000 },
-            { namecache: "Lynhnek ", value: 300000 },
+            { namecache: "Lynhnek ", value: 300000 + 10000},
             { namecache: "KarotTW ", value: 20000 },
             { namecache: "ZyraGen145 ", value: 200000 },
             { namecache: "PETERMANE ", value: 20000 },
