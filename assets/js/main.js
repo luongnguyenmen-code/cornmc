@@ -817,7 +817,8 @@ async function renderRanking() {
         // 1. LẤY DỮ LIỆU ĐỘNG TỪ API VÀ SẮP XẾP
         const moneyBoard = (data["vault_eco_balance"] || []).sort((a, b) => (b.value || 0) - (a.value || 0));
         const currentOnlineRaw = dataCurrent["statistic_time_played"] || [];
-        const baseOnlineRaw = data["statistic_time_played"] || [];
+        const baseOnlineRaw = data["statistic_time_played"] || []; 
+        
 
         const onlineBoard = currentOnlineRaw.map(player => {
             // Tìm người chơi này trong dữ liệu mốc (Base)
