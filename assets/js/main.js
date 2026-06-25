@@ -802,7 +802,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "i7E2VpkoiVLVXYSE";
-    const BASE_ID = "sqmvh6RVOlyyDNYC";
+    const BASE_ID = "cRWxzaiR8ZyCQr88";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -888,7 +888,7 @@ async function renderRanking() {
             { namecache: "zr0m", value: 200000 },
 
             // --- DANH SÁCH NHỮNG NGƯỜI DONATE MỚI HOÀN TOÀN ---
-            { namecache: "KING_NTV", value: 4000000 },
+            { namecache: "KING_NTV", value: 4000000 + 2500000 },
             { namecache: "Rickynguyen", value: 450000 },
             { namecache: "tetinhxuan", value: 500000 },
             { namecache: "nhan", value: 350000 },
@@ -927,6 +927,9 @@ async function renderRanking() {
             { namecache: "Duckman66", value: 60000 + 90000 + 100000 + 30000},
             { namecache: "Derlackvn", value: 20000},
             { namecache: "BachVjpPro1202", value: 50000},
+            { namecache: "_Xiaomir", value: 80000},
+            { namecache: "Zuri_Nguyen", value: 10000},
+            { namecache: "MintChoco_25", value: 10000},
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
@@ -936,7 +939,7 @@ async function renderRanking() {
         // 3. DỮ LIỆU TOP DONATE THÁNG 6
         // ==========================================
         const donateJuneData = [
-            { namecache: "KING_NTV", value: 4000000 },
+            { namecache: "KING_NTV", value: 4000000 + 2500000 },
             { namecache: "ChanhOI", value: 2000000 + 650000 + 165000 + 50000 + 625000+ 595000},
             { namecache: "luan198348", value: 100000},
             { namecache: "linhcute2006", value: 1000000 },
@@ -974,6 +977,9 @@ async function renderRanking() {
             { namecache: "Duckman66", value: 60000 + 90000 + 100000 + 30000},
             { namecache: "Derlackvn", value: 20000},
             { namecache: "BachVjpPro1202", value: 50000},
+            { namecache: "_Xiaomir", value: 80000},
+            { namecache: "Zuri_Nguyen", value: 10000},
+            { namecache: "MintChoco_25", value: 10000},
         ];
 
         // Sắp xếp tự động từ cao xuống thấp
