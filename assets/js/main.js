@@ -175,7 +175,7 @@ window.showMcPeModal = () => {
                 <p class="text-xs text-cyan-400 mb-2">Thông tin file:</p>
                 <ul class="text-[11px] text-gray-400 text-left list-disc list-inside">
                     <li>Dung lượng: ~450MB</li>
-                    <li>Phiên bản: 1.21.60 (Latest)</li>
+                    <li>Phiên bản: 1.21.130 (Latest)</li>
                     <li>Hỗ trợ: Android (apk)</li>
                 </ul>
             </div>
@@ -470,7 +470,7 @@ async function renderGuides() {
                 "Cấm phá hoại (Griefing) công trình người khác bằng lava, nước, TNT, hoặc spam entity/hopper gây lag.",
                 "Cấm ăn cắp đồ, cấm lợi dụng quyền trust/nhờ mượn đồ để chiếm đoạt (Xử lý theo log).",
                 "Cấm trap/bait người chơi để giết lấy đồ (bao gồm AFK trap).",
-                "Cấm dùng nhiều tài khoản (clone/alt) để lấy kit, vote, event hoặc treo AFK farm."
+                "Cấm dùng nhiều tài khoản (clone/alt) để lấy kit, vote, event."
             ]
         },
         {
@@ -496,8 +496,7 @@ async function renderGuides() {
             rules: [
                 "Chỉ giao dịch bằng tiền tệ/vật phẩm IN-GAME. Cấm giao dịch bằng tiền thật (VNĐ/Tiền ảo). Vi phạm Ban vĩnh viễn.",
                 "Cấm giao dịch liên server, qua trung gian ngoài hệ thống, hoặc lập chợ đen.",
-                "Cấm trade giftcode/thẻ cào giữa người chơi (Chỉ được Donate trực tiếp).",
-                "Cấm Scam (lừa đảo). Cấm bán slot top, thuê cày hộ."
+                "Cấm trade giftcode/thẻ cào giữa người chơi "
             ]
         },
         {
@@ -802,7 +801,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "i7E2VpkoiVLVXYSE";
-    const BASE_ID = "cRWxzaiR8ZyCQr88";
+    const BASE_ID = "JmLRC96FCyTaPljE";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -827,12 +826,8 @@ async function renderRanking() {
             const baseTime = basePlayer ? parseFloat(basePlayer.value || 0) : 0; // Giá trị mốc (Nhỏ)
 
             // Tính toán: Base - Current
-            let result = baseTime - currentTime;
+            let result = baseTime;
 
-            if (player.namecache === "WolfMC") {
-                result = result - 600000;
-                if (result < 0) result = 0; // Đảm bảo thời gian không bị rớt xuống âm
-            }
 
             //let result = baseTime;
             return {
@@ -1003,13 +998,22 @@ async function renderRanking() {
         }
 
         // 3. TẠO KHUNG HTML CHỨA CÁC NÚT BẤM CHUYỂN TAB
+        // let html = `
+        // <div class="flex overflow-x-auto custom-scrollbar justify-start md:justify-center gap-3 mb-8 pb-2 w-full [&>button]:shrink-0 [&>button]:whitespace-nowrap">
+        //     <button onclick="window.switchRankTab('june')" id="tab-btn-june" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">TOP THÁNG 6</button>
+        //     <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">TOP TỔNG</button>
+        //     <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">ĐẠI GIA</button>
+        //     <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">CHĂM CHỈ</button>
+        //     <button onclick="window.switchRankTab('point')" id="tab-btn-point" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">TOP XU</button>
+        //     <button onclick="window.switchRankTab('kill')" id="tab-btn-kill" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">SÁT THỦ</button>
+        // </div>
+        // <div class="relative w-full max-w-2xl mx-auto">
+        // `;
+
         let html = `
         <div class="flex overflow-x-auto custom-scrollbar justify-start md:justify-center gap-3 mb-8 pb-2 w-full [&>button]:shrink-0 [&>button]:whitespace-nowrap">
-            <button onclick="window.switchRankTab('june')" id="tab-btn-june" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-orange-600/20 text-orange-400 border border-orange-500/50 shadow-[0_0_15px_rgba(249,115,22,0.3)]">TOP THÁNG 6</button>
-            <button onclick="window.switchRankTab('donate')" id="tab-btn-donate" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">TOP TỔNG</button>
             <button onclick="window.switchRankTab('money')" id="tab-btn-money" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">ĐẠI GIA</button>
             <button onclick="window.switchRankTab('online')" id="tab-btn-online" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">CHĂM CHỈ</button>
-            <button onclick="window.switchRankTab('point')" id="tab-btn-point" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">TOP XU</button>
             <button onclick="window.switchRankTab('kill')" id="tab-btn-kill" class="px-5 py-2.5 rounded-xl font-bold text-sm transition bg-white/5 text-gray-400 border border-gray-700 hover:bg-white/10">SÁT THỦ</button>
         </div>
         <div class="relative w-full max-w-2xl mx-auto">
@@ -1097,14 +1101,10 @@ async function renderRanking() {
 
         // 4. VẼ CÁC BẢNG VÀO HTML
         // Bảng Tháng 6 (Hiện đầu tiên - false)
-        html += renderBoard("june", "TOP DONATE THÁNG 6", donateJuneBoard, "", " VNĐ", "text-orange-400", "border-orange-500/20", false, 20, 'short');
-
-        // Bảng Donate Tổng (Chuyển sang Ẩn - true)
-        html += renderBoard("donate", "BẢNG VÀNG DONATE TỔNG", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", true, 20, 'short');
-
-        // Các bảng còn lại giữ nguyên...
+        // html += renderBoard("june", "TOP DONATE THÁNG 6", donateJuneBoard, "", " VNĐ", "text-orange-400", "border-orange-500/20", false, 20, 'short');
+        // html += renderBoard("donate", "BẢNG VÀNG DONATE TỔNG", donateBoard, "", " VNĐ", "text-pink-400", "border-pink-500/20", true, 20, 'short');
         html += renderBoard("money", "TOP ĐẠI GIA", moneyBoard, "$", "", "text-green-400", "border-green-500/20", true, 10, 'short');
-        html += renderBoard("online", "TOP CHĂM CHỈ", onlineBoard, "", "", "text-cyan-400", "border-cyan-500/20", true, 20, 'time');
+        html += renderBoard("online", "TOP CHĂM CHỈ", onlineBoard, "", "", "text-cyan-400", "border-cyan-500/20", false, 20, 'time');
         html += renderBoard("point", "TOP ĐẠI GIA XU", pointBoard, "", " Xu", "text-yellow-400", "border-yellow-500/20", true, 10, 'short');
         html += renderBoard("kill", "TOP SÁT THỦ", killBoard, "", " Kill", "text-red-400", "border-red-500/20", true, 10, 'short');
 
@@ -1251,55 +1251,85 @@ window.switchRankTab = (tabName) => {
 // ==========================================
 // CẬP NHẬT TRẠNG THÁI SERVER (SỐ NGƯỜI CHƠI)
 // ==========================================
+// async function updateServerStatus() {
+//     const apiUrl = `https://api.mcsrvstat.us/2/185.207.166.34:19026`; 
+
+//     try {
+//         const response = await fetch(apiUrl);
+//         const data = await response.json();
+
+//         const statOnlineEl = document.getElementById('stat-online');
+//         const navOnlineEl = document.getElementById('nav-online');
+//         const statVersionEl = document.getElementById('stat-peak');
+//         const statusDot = document.querySelector('.status-dot');
+
+//         if (data.online === true) {
+//             // 1. LẤY SỐ NGƯỜI ONLINE: data.players.online (Trong JSON của bạn là 20)
+//             const currentPlayers = data.players.online || 0;
+
+//             if (statOnlineEl) statOnlineEl.innerText = currentPlayers;
+
+//             if (navOnlineEl) {
+//                 navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers}</span>`;
+//             }
+
+//             // Chấm tròn xanh trạng thái
+//             if (statusDot) {
+//                 statusDot.style.background = '#4ade80';
+//                 statusDot.style.boxShadow = '0 0 10px #4ade80';
+//             }
+
+//             // 2. LẤY PHIÊN BẢN: data.version (Trong JSON là "Leaf 1.21.8")
+//             if (statVersionEl && data.version) {
+//                 const versionString = data.version;
+//                 // Regex lọc lấy số (ví dụ: 1.21.8)
+//                 const cleanVersion = versionString.match(/\d+\.\d+(\.\d+)?/);
+//                 statVersionEl.innerText = cleanVersion ? cleanVersion[0] : versionString;
+//             }
+
+//         } else {
+//             // Xử lý khi Offline
+//             if (statOnlineEl) statOnlineEl.innerText = "OFF";
+//             if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFFLINE</span>`;
+//             if (statusDot) {
+//                 statusDot.style.background = '#f87171';
+//                 statusDot.style.boxShadow = '0 0 10px #f87171';
+//             }
+//         }
+//     } catch (error) {
+//         console.error("Lỗi kết nối API Server:", error);
+//     }
+// }
+
+// fake api 
 async function updateServerStatus() {
-    const apiUrl = `https://api.mcsrvstat.us/2/103.161.119.48:25626`;
+    // Gọi thẳng các Element trên web
+    const statOnlineEl = document.getElementById('stat-online');
+    const navOnlineEl = document.getElementById('nav-online');
+    const statVersionEl = document.getElementById('stat-peak');
+    const statusDot = document.querySelector('.status-dot');
 
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+    // === SET CỨNG THÔNG SỐ TẠI ĐÂY ===
+    const isOnline = true;       // Luôn cho server báo Online
+    const fakePlayers = 121;      // Số người chơi ảo bạn muốn hiển thị
+    const fakeVersion = "1.21.8"; // Phiên bản ảo
 
-        const statOnlineEl = document.getElementById('stat-online');
-        const navOnlineEl = document.getElementById('nav-online');
-        const statVersionEl = document.getElementById('stat-peak');
-        const statusDot = document.querySelector('.status-dot');
+    if (isOnline) {
+        if (statOnlineEl) statOnlineEl.innerText = fakePlayers;
 
-        if (data.online === true) {
-            // 1. LẤY SỐ NGƯỜI ONLINE: data.players.online (Trong JSON của bạn là 20)
-            const currentPlayers = data.players.online || 0;
-
-            if (statOnlineEl) statOnlineEl.innerText = currentPlayers;
-
-            if (navOnlineEl) {
-                navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers}</span>`;
-            }
-
-            // Chấm tròn xanh trạng thái
-            if (statusDot) {
-                statusDot.style.background = '#4ade80';
-                statusDot.style.boxShadow = '0 0 10px #4ade80';
-            }
-
-            // 2. LẤY PHIÊN BẢN: data.version (Trong JSON là "Leaf 1.21.8")
-            if (statVersionEl && data.version) {
-                const versionString = data.version;
-                // Regex lọc lấy số (ví dụ: 1.21.8)
-                const cleanVersion = versionString.match(/\d+\.\d+(\.\d+)?/);
-                statVersionEl.innerText = cleanVersion ? cleanVersion[0] : versionString;
-            }
-
-        } else {
-            // Xử lý khi Offline
-            if (statOnlineEl) statOnlineEl.innerText = "OFF";
-            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFFLINE</span>`;
-            if (statusDot) {
-                statusDot.style.background = '#f87171';
-                statusDot.style.boxShadow = '0 0 10px #f87171';
-            }
+        if (navOnlineEl) {
+            navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${fakePlayers}</span>`;
         }
-    } catch (error) {
-        console.error("Lỗi kết nối API Server:", error);
+
+        if (statusDot) {
+            statusDot.style.background = '#4ade80';
+            statusDot.style.boxShadow = '0 0 10px #4ade80';
+        }
+
+        if (statVersionEl) statVersionEl.innerText = fakeVersion;
     }
 }
+
 async function renderForum(filterMode = 'approved') {
     // filterMode có 3 dạng: 'approved' (chung), 'pending' (admin duyệt), 'mine' (bài của tôi)
 

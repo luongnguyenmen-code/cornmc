@@ -102,9 +102,11 @@ document.getElementById('edit-image-file')?.addEventListener('change', async (e)
 });
 
 // 4. QUẢN LÝ USER (CÓ BAN/UNBAN & BẢO VỆ ADMIN)
+// 4. QUẢN LÝ USER (CÓ BAN/UNBAN & BẢO VỆ ADMIN & HIỂN THỊ LINK)
 async function loadUsers() {
     const list = document.getElementById('user-list');
-    list.innerHTML = '<tr><td colspan="5" class="p-4 text-center text-gray-500">Đang tải...</td></tr>';
+    // Sửa colspan từ 5 thành 6 cho vừa số cột
+    list.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500">Đang tải...</td></tr>';
     
     const users = await fetchAllUsers();
     
@@ -119,11 +121,8 @@ async function loadUsers() {
         // 2. Xử lý Cột Chọn Role (Quyền)
         let roleDisplay = '';
         if (isAdmin) {
-            // Nếu là Admin -> Hiện mác tĩnh, KHÔNG cho dropdown để sửa
             roleDisplay = `<span class="bg-red-900/50 text-red-400 font-bold px-3 py-1.5 rounded text-xs border border-red-500/30 shadow-[0_0_10px_rgba(248,113,113,0.2)]">👑 ADMIN</span>`;
         } else {
-            // Nếu không phải Admin -> Hiện Dropdown bình thường
-            // LƯU Ý: Đã xóa 'admin' ra khỏi danh sách này để không ai cấp quyền admin được
             const roles = ['member', 'vip', 'media', 'helper', 'staff', 'dev'];
             roleDisplay = `
                 <select onchange="window.updateUserRole('${u.id}', this.value)" class="bg-black border border-gray-700 text-xs rounded px-2 py-1 text-white hover:border-cyan-500 transition outline-none">
@@ -135,16 +134,43 @@ async function loadUsers() {
         // 3. Xử lý Cột Nút Bấm Thao Tác (Ban/Unban)
         let actionButton = '';
         if (isAdmin) {
-            // Bảo vệ Admin: Không có nút BAN
-            actionButton = `<span class="text-[10px] text-gray-600 italic font-bold">VÔ HIỆU HÓA THAO TÁC</span>`;
+            actionButton = `<span class="text-[10px] text-gray-600 italic font-bold">VÔ HIỆU HÓA</span>`;
         } else {
-            // User thường: Hiện nút thao tác bình thường
             actionButton = `
                 <button onclick="window.toggleBanUser('${u.id}', ${isBanned})" 
                     class="text-xs font-bold px-3 py-1 rounded border ${isBanned ? 'border-green-500 text-green-500 hover:bg-green-500/10' : 'border-red-500 text-red-500 hover:bg-red-500/10'} transition">
                     ${isBanned ? 'MỞ KHÓA' : 'BAN'}
                 </button>
             `;
+        }
+
+        // 🟢 4. Xử lý Cột Liên Kết (Discord & MXH)
+        let socialsHtml = '';
+        if (u.discordLink || u.websiteLink) {
+            let links = [];
+            
+            // Xử lý nút Discord
+            if (u.discordLink) {
+                const isId = /^\d+$/.test(u.discordLink);
+                const link = isId ? `https://discordapp.com/users/${u.discordLink}` : u.discordLink;
+                links.push(`<a href="${link}" target="_blank" class="px-2 py-1 rounded bg-[#5865F2]/20 hover:bg-[#5865F2]/40 text-[#5865F2] hover:text-white border border-[#5865F2]/30 transition text-[10px] font-bold flex items-center gap-1 w-max" title="${u.discordLink}">💬 Discord</a>`);
+            }
+            
+            // Xử lý nút MXH tự động nhận diện
+            if (u.websiteLink) {
+                let link = u.websiteLink.toLowerCase();
+                let pName = "Website";
+                let pColor = "text-cyan-400 border-cyan-500/30 bg-cyan-500/20 hover:bg-cyan-500/40";
+                
+                if (link.includes("facebook.com") || link.includes("fb.com")) { pName = "Facebook"; pColor = "text-blue-400 border-blue-500/30 bg-blue-600/20 hover:bg-blue-600/40"; }
+                else if (link.includes("youtube.com") || link.includes("youtu.be")) { pName = "YouTube"; pColor = "text-red-400 border-red-500/30 bg-red-600/20 hover:bg-red-600/40"; }
+                else if (link.includes("tiktok.com")) { pName = "TikTok"; pColor = "text-gray-300 border-gray-500/30 bg-gray-600/20 hover:bg-gray-600/40"; }
+
+                links.push(`<a href="${u.websiteLink}" target="_blank" class="px-2 py-1 rounded ${pColor} hover:text-white transition text-[10px] font-bold flex items-center gap-1 w-max" title="${u.websiteLink}">🌐 ${pName}</a>`);
+            }
+            socialsHtml = `<div class="flex flex-col gap-1.5">${links.join('')}</div>`;
+        } else {
+            socialsHtml = `<span class="text-gray-600 text-[10px] italic">Trống</span>`;
         }
 
         return `
@@ -154,7 +180,7 @@ async function loadUsers() {
                 <span class="font-bold text-white">${u.username}</span>
             </td>
             <td class="p-4 text-gray-400 text-xs">${u.email}</td>
-            <td class="p-4">${roleDisplay}</td>
+            <td class="p-4">${socialsHtml}</td> <td class="p-4">${roleDisplay}</td>
             <td class="p-4"><span class="text-xs px-2 py-1 rounded font-bold ${banClass}">${banText}</span></td>
             <td class="p-4 text-right">
                 ${actionButton}

@@ -4,10 +4,10 @@ import { getFirestore, doc, arrayUnion, setDoc, getDoc, collection, addDoc, getD
 
 // 2. CONFIGURATION
 export const defaultConfig = {
-    server_name: "CornMiner.top",
-    server_ip: "cornminer.top",
+    server_name: "Cornmc.vn",
+    server_ip: "cornmc.vn",
     discord_link: "https://discord.gg/cUsA2K4Cpz",
-    welcome_title: "Chào mừng đến với CornMiner.top",
+    welcome_title: "Chào mừng đến với Cornmc.vn",
     welcome_description: "Thế giới sinh tồn đầy thử thách và sáng tạo!"
 };
 
