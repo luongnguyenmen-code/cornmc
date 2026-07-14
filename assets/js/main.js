@@ -1462,7 +1462,7 @@ async function renderAdminTable() {
             const roles = ['member', 'vip', 'media', 'helper', 'staff', 'dev', 'admin'];
 
             return `
-            <tr class="hover:bg-white/5 transition border-b border-purple-500/10 user-row" data-search="${u.username.toLowerCase()} ${u.email.toLowerCase()}">
+            <tr class="hover:bg-white/5 transition border-b border-purple-500/10 user-row" data-search="${(u.username || '').toLowerCase()} ${(u.email || '').toLowerCase()}">
                 <td class="p-4 flex items-center gap-3">
                     <img src="${avatar}" class="w-8 h-8 rounded border border-purple-500/30">
                     <div>
@@ -2258,13 +2258,7 @@ window.addEventListener('load', async () => {
         }
     });
 
-    // 8. Setup Search Admin
-    document.getElementById('user-search')?.addEventListener('keyup', (e) => {
-        const term = e.target.value.toLowerCase();
-        document.querySelectorAll('.user-row').forEach(row => {
-            row.style.display = row.innerText.toLowerCase().includes(term) ? '' : 'none';
-        });
-    });
+    // (Search Admin đã được gán tự động trong renderAdminTable)
 
     // 8. Load Content & Auth
     renderNews();

@@ -175,7 +175,7 @@ async function loadUsers() {
         }
 
         return `
-        <tr class="hover:bg-white/5 transition border-b border-white/5 user-row" data-search="${u.username.toLowerCase()} ${u.email.toLowerCase()}">
+        <tr class="hover:bg-white/5 transition border-b border-white/5 user-row" data-search="${(u.username || '').toLowerCase()} ${(u.email || '').toLowerCase()}">
             <td class="p-4 flex items-center gap-3">
                 <img src="${u.photoURL || `https://mc-heads.net/avatar/${u.username}`}" class="w-8 h-8 rounded border border-gray-700 object-cover bg-black">
                 <span class="font-bold text-white">${u.username}</span>
