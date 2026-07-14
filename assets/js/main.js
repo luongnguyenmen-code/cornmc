@@ -1722,7 +1722,7 @@ function setupAuthForms() {
         const input = document.getElementById('login-email').value;
         const pass = document.getElementById('login-pass').value;
         try {
-            await loginEmail(input, pass);
+            await loginUser(input, pass);
             document.getElementById('auth-modal').classList.remove('active');
         } catch (err) { alert("Đăng nhập thất bại: " + err.message); }
     };
@@ -1733,7 +1733,7 @@ function setupAuthForms() {
         const user = document.getElementById('reg-username').value;
         const pass = document.getElementById('reg-pass').value;
         try {
-            await registerEmail(user, pass);
+            await registerUser(user, pass);
             alert("Đăng ký thành công!");
             document.getElementById('auth-modal').classList.remove('active');
         } catch (err) { alert("Đăng ký lỗi: " + err.message); }
