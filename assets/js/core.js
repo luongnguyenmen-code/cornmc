@@ -593,4 +593,5 @@ export function showCustomModal(title, message, type = 'info', onConfirm = null)
     // Force reflow and add active class to trigger animation
     void modal.offsetWidth;
     modal.classList.add('active');
-}
+    }
+}
