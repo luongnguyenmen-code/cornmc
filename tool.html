@@ -225,7 +225,48 @@
     }
 </style>
 
+<!-- Global Modal -->
+    <div id="global-modal" class="modal" style="z-index: 9999;">
+        <div class="modal-content glass-intense rounded-2xl modal-sm text-center border border-purple-500/50">
+            <div class="modal-body">
+                <div id="global-modal-icon" class="text-5xl mb-4">🔔</div>
+                <h3 id="global-modal-title" class="text-2xl font-black title-font text-white mb-2">THÔNG BÁO</h3>
+                <p id="global-modal-message" class="text-gray-300 text-sm mb-6 leading-relaxed"></p>
+                <div id="global-modal-actions" class="flex justify-center gap-4"></div>
+            </div>
+        </div>
+    </div>
 <script>
+    function showCustomModal(title, message, type = 'info') {
+        const modal = document.getElementById('global-modal');
+        const titleEl = document.getElementById('global-modal-title');
+        const msgEl = document.getElementById('global-modal-message');
+        const actionsEl = document.getElementById('global-modal-actions');
+        const iconEl = document.getElementById('global-modal-icon');
+
+        titleEl.innerText = title;
+        msgEl.innerHTML = message.replace(/\n/g, '<br>');
+        actionsEl.innerHTML = '';
+
+        if (type === 'danger') {
+            iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+            titleEl.className = "text-2xl font-black title-font text-red-500 mb-2";
+        } else {
+            iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+            titleEl.className = "text-2xl font-black title-font text-cyan-400 mb-2";
+        }
+
+        const btnOk = document.createElement('button');
+        btnOk.className = type === 'danger'
+            ? "bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-red-900/50 transition"
+            : "bg-cyan-500 hover:bg-cyan-400 px-6 py-2 rounded-lg font-bold text-sm text-white transition";
+        btnOk.innerText = "ĐÓNG";
+        btnOk.onclick = () => modal.classList.remove('active');
+        actionsEl.appendChild(btnOk);
+
+        modal.classList.add('active');
+    }
+
     function openTool(toolName) {
         document.querySelectorAll('.tool-container').forEach(el => el.style.display = 'none');
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
@@ -245,8 +286,7 @@
         const apiKey = "msk_HW9Ijlzo_Al820AIANVL8YnNh7j5_uxxaaQzyi4W3DiN2Gg1HUVG68xctA6Zq-VB_VLJOuCcT";
 
         if (!fileInput.files[0]) {
-            status.textContent = " Bạn chưa chọn file skin!";
-            status.style.color = "#f38ba8";
+            showCustomModal("LỖI", "Hãy chọn một tấm ảnh trước!", "danger");
             return;
         }
 
@@ -309,8 +349,7 @@
 
         // CHỈ BẮT BUỘC có Skin Gốc
         if (bodyInput.files.length === 0) {
-            statusMsg.textContent = 'Vui lòng chọn Skin GỐC để làm nền!';
-            statusMsg.style.color = '#f38ba8';
+            showCustomModal("LỖI", "Vui lòng chọn Skin GỐC để làm nền!", "danger");
             return;
         }
 
@@ -348,8 +387,8 @@
             statusMsg.style.color = '#a6e3a1';
 
         } catch (error) {
-            statusMsg.textContent = ' Thất bại: ' + error.message;
-            statusMsg.style.color = '#f38ba8';
+            showCustomModal("LỖI", error.message, "danger");
+            statusMsg.textContent = '';
         } finally {
             btn.disabled = false;
             btn.textContent = 'Ghép Lại Ngay ';
@@ -375,8 +414,7 @@
         const convertBtn = document.getElementById('convertBtn');
 
         if (fileInput.files.length === 0) {
-            statusMsg.textContent = ' Vui lòng chọn một file ảnh skin (.png) trước!';
-            statusMsg.style.color = '#f38ba8';
+            showCustomModal("LỖI", "Vui lòng chọn một file ảnh skin (.png) trước!", "danger");
             return;
         }
 
@@ -415,8 +453,8 @@
             statusMsg.style.color = '#a6e3a1';
 
         } catch (error) {
-            statusMsg.textContent = ' Thất bại: ' + error.message;
-            statusMsg.style.color = '#f38ba8';
+            showCustomModal("LỖI", error.message, "danger");
+            statusMsg.textContent = '';
         } finally {
             convertBtn.disabled = false;
             convertBtn.textContent = 'Chuyển Đổi Ngay ';
@@ -429,7 +467,7 @@
         const btn = document.getElementById('aiBtn');
 
         if (fileInput.files.length === 0) {
-            statusMsg.textContent = ' Hãy chọn một tấm ảnh trước!';
+            showCustomModal("LỖI", "Hãy chọn một tấm ảnh trước!", "danger");
             return;
         }
 
@@ -471,8 +509,7 @@
         const btn = document.getElementById('pixelBtn');
 
         if (fileInput.files.length === 0) {
-            statusMsg.textContent = ' Chọn ảnh cái đã ae ơi!';
-            statusMsg.style.color = '#f38ba8';
+            showCustomModal("LỖI", "Chọn ảnh cái đã ae ơi!", "danger");
             return;
         }
 
@@ -506,8 +543,8 @@
             statusMsg.textContent = 'Đã hoàn thành bản vẽ Pixel!';
             statusMsg.style.color = '#a6e3a1';
         } catch (error) {
-            statusMsg.textContent = ' Lỗi: ' + error.message;
-            statusMsg.style.color = '#f38ba8';
+            showCustomModal("LỖI", error.message, "danger");
+            statusMsg.textContent = '';
         } finally {
             btn.disabled = false;
             btn.textContent = 'Scan Pixel Art ';

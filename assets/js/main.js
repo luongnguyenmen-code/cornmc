@@ -1724,7 +1724,7 @@ function setupAuthForms() {
         try {
             await loginUser(input, pass);
             document.getElementById('auth-modal').classList.remove('active');
-        } catch (err) { alert("Đăng nhập thất bại: " + err.message); }
+        } catch (err) { showCustomModal("ĐĂNG NHẬP THẤT BẠI", err.message, "danger"); }
     };
 
     // Register
@@ -1734,9 +1734,9 @@ function setupAuthForms() {
         const pass = document.getElementById('reg-pass').value;
         try {
             await registerUser(user, pass);
-            alert("Đăng ký thành công!");
+            showCustomModal("THÀNH CÔNG", "Đăng ký thành công!", "info");
             document.getElementById('auth-modal').classList.remove('active');
-        } catch (err) { alert("Đăng ký lỗi: " + err.message); }
+        } catch (err) { showCustomModal("ĐĂNG KÝ LỖI", err.message, "danger"); }
     };
 
     // Forgot Password
@@ -1745,15 +1745,15 @@ function setupAuthForms() {
         const email = document.getElementById('forgot-email').value;
         try {
             await resetPassword(email);
-            alert("Đã gửi email khôi phục mật khẩu. Vui lòng kiểm tra hộp thư!");
+            showCustomModal("THÀNH CÔNG", "Đã gửi email khôi phục mật khẩu. Vui lòng kiểm tra hộp thư!", "info");
             window.switchAuthForm('login');
-        } catch (err) { alert("Lỗi: " + err.message); }
+        } catch (err) { showCustomModal("LỖI", err.message, "danger"); }
     };
 
     // Google
     document.getElementById('google-login-btn').onclick = async () => {
         try { await loginGoogle(); document.getElementById('auth-modal').classList.remove('active'); }
-        catch (e) { alert(e.message); }
+        catch (e) { showCustomModal("LỖI", e.message, "danger"); }
     };
 }
 
