@@ -5,7 +5,7 @@ import {
     subscribeToAuth, loginEmail, registerEmail, loginGoogle, logout,
     fetchNews, fetchGuides, fetchForumPosts, createPost,
     fetchAllUsers, fetchMyPosts, fetchStaffMembers, defaultConfig, loginUser, deleteUserAndData,
-    updateUserProfile, editDocument, registerUser, resetPassword,
+    updateUserProfile, editDocument, registerUser, resetPassword, changeUserPassword,
     createGiveaway, fetchActiveGiveaways, joinGiveaway, endGiveaway, sendDiscordWebhook,
     deleteDocument, fetchComments, addComment, deleteComment
 } from './core.js';
@@ -1799,6 +1799,8 @@ function handleAuthUI(user, role, dbData) {
 
             if (document.getElementById('edit-discord-link')) document.getElementById('edit-discord-link').value = currentUserData.discordLink || '';
             if (document.getElementById('edit-website-link')) document.getElementById('edit-website-link').value = currentUserData.websiteLink || '';
+            if (document.getElementById('edit-new-password')) document.getElementById('edit-new-password').value = '';
+            if (document.getElementById('edit-confirm-password')) document.getElementById('edit-confirm-password').value = '';
 
             document.getElementById('profile-modal').classList.add('active');
 
@@ -2212,6 +2214,27 @@ window.addEventListener('load', async () => {
             const discordLink = document.getElementById('edit-discord-link').value.trim();
             const websiteLink = document.getElementById('edit-website-link').value.trim();
             await updateUserProfile(newName, avatarUrl, discordLink, websiteLink);
+
+            // Đổi mật khẩu nếu có nhập
+            const newPass = document.getElementById('edit-new-password')?.value;
+            const confirmPass = document.getElementById('edit-confirm-password')?.value;
+
+            if (newPass) {
+                if (newPass !== confirmPass) {
+                    throw new Error("Mật khẩu xác nhận không khớp!");
+                }
+                if (newPass.length < 6) {
+                    throw new Error("Mật khẩu phải có ít nhất 6 ký tự!");
+                }
+                try {
+                    await changeUserPassword(newPass);
+                } catch (passErr) {
+                    if (passErr.code === 'auth/requires-recent-login') {
+                        throw new Error("Vì lý do bảo mật, bạn cần Đăng Xuất và Đăng Nhập lại trước khi đổi mật khẩu!");
+                    }
+                    throw passErr;
+                }
+            }
 
             if (currentUserData) {
                 currentUserData.discordLink = discordLink;

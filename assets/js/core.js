@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged, updateProfile, GoogleAuthProvider, signInWithPopup, updatePassword } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 import { getFirestore, doc, arrayUnion, setDoc, getDoc, collection, addDoc, getDocs, query, orderBy, where, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 // 2. CONFIGURATION
@@ -145,6 +145,12 @@ export async function updateUserProfile(displayName, photoURL, discordLink, webs
     if (discordLink !== undefined) updateData.discordLink = discordLink;
     if (websiteLink !== undefined) updateData.websiteLink = websiteLink;
     await updateDoc(userRef, updateData);
+}
+
+export async function changeUserPassword(newPassword) {
+    const user = auth.currentUser;
+    if (!user) throw new Error("No user logged in");
+    await updatePassword(user, newPassword);
 }
 
 // ==========================================

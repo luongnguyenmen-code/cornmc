@@ -1,0 +1,255 @@
+ACCESSORY_NHAN_BANG_TINH:
+  base:
+    material: PAPER
+    name: §e§l🌟 <#FF82F1>Nhẫn <#32D6FF>Băng Tinh Phấn Đạo §e§l🌟
+    tier: VERY_RARE
+    max-health: 15.0
+    perm-effects:
+      SPEED: 2
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFF2CC> Tinh hoa của băng tuyết ngàn năm
+    - <#FFF2CC> kết tinh trong sắc hồng của tình yêu.
+    - §7
+    - §7 §8 ◦ §fHồi năng lượng §8[<#32D6FF>+10%§8]
+    - §7 §8 ◦ §fTốc độ chạy §8[<#32D6FF>+2%§8]
+    - §7
+    - <#FFB8B8>✦ §fSở hữu từ <#E08EFF>Sự Kiện Đặc Biệt
+    custom-model-data: 11888.0
+ACCESSORY_CANH_THIEN_SU:
+  base:
+    material: PAPER
+    name: §e§l🌟 <#E08EFF>Donate &7- <#FFDF73>Cánh <#FFFFFF>Thiên Sứ Thánh Quang §e§l🌟
+    tier: LEGENDARY
+    max-health: 40.0 # Buff máu cực mạnh
+    perm-effects:
+      SPEED: 2
+      FIRE_RESISTANCE: 1
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFF2CC> Ban phước từ chín tầng mây cao thẳm,
+    - <#FFF2CC> mang rực rỡ ánh sáng bảo hộ của thần linh.
+    - §7 <#FFF2A7>  §fTốc Độ §8[<#FF97B4>II§8]
+    - §7 <#FFF2A7>  §fKháng Lửa
+    custom-model-data: 12541.0
+    element:
+      lightness:
+        damage: 10.0
+ACCESSORY_CANH_HUYET_NGUYET:
+  base:
+    material: PAPER
+    name: §4§l🌙 <#E08EFF>Donate &7- <#FF3333>Cánh <#FF9933>Huyết Nguyệt Tu La §4§l🌙
+    tier: LEGENDARY
+    max-health: 25.0 # Máu cơ bản nhẹ
+    armor: 10.0 # Tăng giáp cực mạnh (DEF)
+    armor-toughness: 10.0 # Độ cứng của giáp (Giảm sát thương bạo kích)
+    attack-damage: 9.0 # Thêm 1 tí dame
+    perm-effects:
+      SPEED: 2
+      REGENERATION: 1 # Có sẵn hiệu ứng hồi máu liên tục
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFCCCC> Nhuốm máu chiến trường trong đêm trăng đỏ,
+    - <#FFCCCC> mang sức mạnh phòng ngự bất hoại của Tu La.
+    - §7 <#FFF2A7>  §fTốc Độ §8[<#FF97B4>II§8]
+    - §7 <#FFF2A7>  §fHồi phục §8[<#FF97B4>I§8]
+    custom-model-data: 12450.0
+
+# ==========================================
+# CÁNH THIÊN SỨ - CẤP 2 (+12%)
+# ==========================================
+ACCESSORY_CANH_THIEN_SU_1:
+  base:
+    material: PAPER
+    name: §e§l🌟 <#E08EFF>Donate &7- <#FFDF73>Cánh <#FFFFFF>Thiên Sứ Thánh Quang  &8[&f+1&8]
+      §e§l🌟
+    tier: LEGENDARY
+    max-health: 45
+    perm-effects:
+      SPEED: 2
+      FIRE_RESISTANCE: 1
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFF2CC> Ban phước từ chín tầng mây cao thẳm,
+    - <#FFF2CC> mang rực rỡ ánh sáng bảo hộ của thần linh.
+    - §7 <#FFF2A7>  §fTốc Độ §8[<#FF97B4>II§8]
+    - §7 <#FFF2A7>  §fKháng Lửa
+    custom-model-data: 12541.0
+    element:
+      lightness:
+        damage: 13
+
+# ==========================================
+# CÁNH THIÊN SỨ - CẤP 3 (+12% của Cấp 2)
+# ==========================================
+ACCESSORY_CANH_THIEN_SU_2:
+  base:
+    material: PAPER
+    name: §e§l🌟 <#E08EFF>Donate &7- <#FFDF73>Cánh <#FFFFFF>Thiên Sứ Thánh Quang &8[&f+2&8]
+      §e§l🌟
+    tier: LEGENDARY
+    max-health: 50
+    perm-effects:
+      SPEED: 2
+      FIRE_RESISTANCE: 1
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFF2CC> Ban phước từ chín tầng mây cao thẳm,
+    - <#FFF2CC> mang rực rỡ ánh sáng bảo hộ của thần linh.
+    - §7 <#FFF2A7>  §fTốc Độ §8[<#FF97B4>II§8]
+    - §7 <#FFF2A7>  §fKháng Lửa
+    custom-model-data: 12541.0
+    element:
+      lightness:
+        damage: 15
+# ==========================================
+# CÁNH HUYẾT NGUYỆT - CẤP 2 (+12%)
+# ==========================================
+ACCESSORY_CANH_HUYET_NGUYET_1:
+  base:
+    material: PAPER
+    name: §4§l🌙 <#E08EFF>Donate &7- <#FF3333>Cánh <#FF9933>Huyết Nguyệt Tu La &8[&f+1&8]
+      §4§l🌙
+    tier: LEGENDARY
+    max-health: 28.0 # 25 + 12%
+    armor: 10
+    armor-toughness: 10
+    attack-damage: 10
+    perm-effects:
+      SPEED: 2
+      REGENERATION: 1
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFCCCC> Nhuốm máu chiến trường trong đêm trăng đỏ,
+    - <#FFCCCC> mang sức mạnh phòng ngự bất hoại của Tu La.
+    - §7 <#FFF2A7>  §fTốc Độ §8[<#FF97B4>II§8]
+    - §7 <#FFF2A7>  §fHồi phục §8[<#FF97B4>I§8]
+    custom-model-data: 12450.0
+
+# ==========================================
+# CÁNH HUYẾT NGUYỆT - CẤP 3 (+12% của Cấp 2)
+# ==========================================
+ACCESSORY_CANH_HUYET_NGUYET_3:
+  base:
+    material: PAPER
+    name: §4§l🌙 <#E08EFF>Donate &7- <#FF3333>Cánh <#FF9933>Huyết Nguyệt Tu La &8[&f+2&8]
+      §4§l🌙
+    tier: LEGENDARY
+    max-health: 31
+    armor: 10
+    armor-toughness: 10
+    attack-damage: 10
+    perm-effects:
+      SPEED: 2
+      REGENERATION: 2
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFCCCC> Nhuốm máu chiến trường trong đêm trăng đỏ,
+    - <#FFCCCC> mang sức mạnh phòng ngự bất hoại của Tu La.
+    - §7 <#FFF2A7>  §fTốc Độ §8[<#FF97B4>II§8]
+    - §7 <#FFF2A7>  §fHồi phục §8[<#FF97B4>II§8]
+    custom-model-data: 12450.0
+SCROLL_HOANG_KIM:
+  base:
+    material: PAPER
+    name: §e§l🌟 <#FFD700>Bí Kíp <#FFA500>Hoàng Kim §e§l🌟
+    tier: LEGENDARY
+    max-health: 25.0
+    perm-effects:
+      SPEED: 2
+      NIGHT_VISION: 1
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFF2CC> Cuộn giấy rực sáng ánh vàng kim,
+    - <#FFF2CC> chỉ dành cho bậc Quân Vương xưng bá.
+    - §7
+    - §7 §8 ◦ §fTốc chạy <#32D6FF> II §8
+    - §7 §8 ◦ §fNhìn Trong Bóng Tối
+    - §7
+    - <#FFB8B8>✦ §fSự Kiện Dua Top Tháng 4
+    custom-model-data: 11595.0
+    element:
+      lightness:
+        defense: 20.0
+SCROLL_TINH_TU:
+  base:
+    material: PAPER
+    name: §b§l❄ <#82C8FF>Bí Kíp <#32D6FF>Tinh Tú §b§l❄
+    tier: VERY_RARE
+    max-health: 15.0
+    perm-effects:
+      SPEED: 2
+      WATER_BREATHING: 1 
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFF2CC> Hấp thụ tinh hoa của các vì sao,
+    - <#FFF2CC> giúp người sở hữu nhẹ tựa lông hồng.
+    - §7
+    - §7 §8 ◦ §fTốc chạy <#32D6FF> II §8
+    - §7 §8 ◦ §fThở dưới nước 
+    - §7
+    - <#FFB8B8>✦ §fSSự Kiện Dua Top Tháng 4
+    custom-model-data: 11594.0
+    element:
+      water:
+        defense: 15.0
+SCROLL_HU_VO:
+  base:
+    material: PAPER
+    name: §5§l🔮 <#D782FF>Bí Kíp <#A020F0>Hư Vô §5§l🔮
+    tier: RARE
+    max-health: 10.0
+    perm-effects:
+      SPEED: 2
+    disable-crafting: true
+    disable-smelting: true
+    disable-smithing: true
+    disable-enchanting: true
+    disable-repairing: true
+    lore:
+    - <#FFF2CC> Bản thảo cổ xưa mang ma lực hắc ám,
+    - <#FFF2CC> mang đến khả năng nhìn thấu điểm yếu.
+    - §7
+    - §7 §8 ◦ §fTốc chạy <#32D6FF> II §8
+    - §7
+    - <#FFB8B8>✦ §fSự Kiện Dua Top Tháng 4
+    custom-model-data: 11593.0
+    element:
+      darkness:
+        defense: 10.0
