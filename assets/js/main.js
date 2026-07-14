@@ -7,7 +7,7 @@ import {
     fetchAllUsers, fetchMyPosts, fetchStaffMembers, defaultConfig, loginUser, deleteUserAndData,
     updateUserProfile, editDocument, registerUser, resetPassword, changeUserPassword,
     createGiveaway, fetchActiveGiveaways, joinGiveaway, endGiveaway, sendDiscordWebhook,
-    deleteDocument, fetchComments, addComment, deleteComment
+    deleteDocument, fetchComments, addComment, deleteComment, getFirebaseErrorMessage, showCustomModal
 } from './core.js';
 import { uploadImage } from './core.js';
 
@@ -16,71 +16,6 @@ let currentUser = null;
 let currentRole = 'guest';
 let currentUserData = null;
 
-function showCustomModal(title, message, type = 'info', onConfirm = null) {
-    const modal = document.getElementById('global-modal');
-    const titleEl = document.getElementById('global-modal-title');
-    const msgEl = document.getElementById('global-modal-message');
-    const actionsEl = document.getElementById('global-modal-actions');
-    const iconEl = document.getElementById('global-modal-icon');
-    const modalContent = modal.querySelector('.modal-content');
-
-    // 1. Set nội dung
-    titleEl.innerText = title;
-    msgEl.innerHTML = message.replace(/\n/g, '<br>'); // Hỗ trợ xuống dòng
-    actionsEl.innerHTML = ''; // Xóa nút cũ
-
-    // 2. Set Icon & Màu tiêu đề tùy loại
-    if (type === 'danger') {
-        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
-        titleEl.className = "text-2xl font-black title-font text-red-500 mb-2";
-    } else if (type === 'confirm') {
-        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-        titleEl.className = "text-2xl font-black title-font text-yellow-400 mb-2";
-    } else {
-        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
-        titleEl.className = "text-2xl font-black title-font text-cyan-400 mb-2";
-    }
-
-    // 3. Tạo nút bấm
-    if (type === 'confirm' || type === 'danger') {
-        // Nút Hủy
-        const btnCancel = document.createElement('button');
-        btnCancel.className = "text-gray-400 hover:text-white font-bold text-sm px-4 py-2 transition";
-        btnCancel.innerText = "HỦY BỎ";
-        btnCancel.onclick = () => modal.classList.remove('active');
-        actionsEl.appendChild(btnCancel);
-
-        // Nút Đồng ý
-        const btnOk = document.createElement('button');
-        btnOk.className = type === 'danger'
-            ? "bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-red-900/50 transition"
-            : "cyber-btn px-6 py-2 rounded-lg font-bold text-sm text-white transition";
-
-        btnOk.innerText = type === 'danger' ? "XÓA NGAY" : "ĐỒNG Ý";
-
-        btnOk.onclick = async () => {
-            modal.classList.remove('active');
-            if (onConfirm) await onConfirm();
-        };
-        actionsEl.appendChild(btnOk);
-    } else {
-        // Chỉ hiện nút Đóng (Info/Alert)
-        const btnClose = document.createElement('button');
-        btnClose.className = "cyber-btn px-8 py-2 rounded-lg font-bold text-sm text-white";
-        btnClose.innerText = "ĐÃ HIỂU";
-        btnClose.onclick = () => modal.classList.remove('active');
-        actionsEl.appendChild(btnClose);
-    }
-
-    if (type === 'info') {
-        modalContent.classList.add('is-news');
-    } else {
-        modalContent.classList.remove('is-news');
-    }
-
-    // 4. Hiện Modal
-    modal.classList.add('active');
-}
 
 // ==========================================
 // 2. GLOBAL HANDLERS (Gắn vào Window để HTML gọi được)
@@ -230,7 +165,7 @@ window.sendComment = async (postId) => {
         await addComment(postId, content, currentRole);
         input.value = '';
         renderComments(postId);
-    } catch (e) { showCustomModal("LỖI", "Gửi comment thất bại: " + e.message, "danger"); }
+    } catch (e) { showCustomModal("LỖI", "Gửi comment thất bại: " + getFirebaseErrorMessage(e), "danger"); }
 };
 
 window.deleteCommentAction = (postId, commentId) => {
@@ -1527,7 +1462,7 @@ async function renderAdminTable() {
             const roles = ['member', 'vip', 'media', 'helper', 'staff', 'dev', 'admin'];
 
             return `
-            <tr class="hover:bg-white/5 transition border-b border-purple-500/10 user-row">
+            <tr class="hover:bg-white/5 transition border-b border-purple-500/10 user-row" data-search="${u.username.toLowerCase()} ${u.email.toLowerCase()}">
                 <td class="p-4 flex items-center gap-3">
                     <img src="${avatar}" class="w-8 h-8 rounded border border-purple-500/30">
                     <div>
@@ -1547,6 +1482,20 @@ async function renderAdminTable() {
             </tr>`;
         }).join('');
     } catch (e) { tbody.innerHTML = `<tr><td colspan="5" class="text-red-500 text-center">Lỗi: ${e.message}</td></tr>`; }
+
+    // Gắn sự kiện tìm kiếm
+    const searchInput = document.getElementById('user-search');
+    if (searchInput && !searchInput.hasAttribute('data-search-bound')) {
+        searchInput.setAttribute('data-search-bound', 'true');
+        searchInput.addEventListener('input', function(e) {
+            const val = e.target.value.toLowerCase().trim();
+            document.querySelectorAll('.user-row').forEach(row => {
+                if (row.dataset.search) {
+                    row.style.display = row.dataset.search.includes(val) ? '' : 'none';
+                }
+            });
+        });
+    }
 }
 
 // ==========================================
@@ -1658,7 +1607,7 @@ window.joinGiveawayAction = async (id) => {
         } else if (err.message === "ALREADY_JOINED") {
             showCustomModal("THÔNG BÁO", "Bạn đã có tên trong danh sách tham gia sự kiện này rồi!", "info");
         } else {
-            showCustomModal("LỖI KẾT NỐI", err.message, "danger");
+            showCustomModal("LỖI KẾT NỐI", getFirebaseErrorMessage(err), "danger");
         }
     }
 };
@@ -1724,7 +1673,7 @@ function setupAuthForms() {
         try {
             await loginUser(input, pass);
             document.getElementById('auth-modal').classList.remove('active');
-        } catch (err) { showCustomModal("ĐĂNG NHẬP THẤT BẠI", err.message, "danger"); }
+        } catch (err) { showCustomModal("ĐĂNG NHẬP THẤT BẠI", getFirebaseErrorMessage(err), "danger"); }
     };
 
     // Register
@@ -1736,7 +1685,7 @@ function setupAuthForms() {
             await registerUser(user, pass);
             showCustomModal("THÀNH CÔNG", "Đăng ký thành công!", "info");
             document.getElementById('auth-modal').classList.remove('active');
-        } catch (err) { showCustomModal("ĐĂNG KÝ LỖI", err.message, "danger"); }
+        } catch (err) { showCustomModal("ĐĂNG KÝ LỖI", getFirebaseErrorMessage(err), "danger"); }
     };
 
     // Forgot Password
@@ -1747,13 +1696,13 @@ function setupAuthForms() {
             await resetPassword(email);
             showCustomModal("THÀNH CÔNG", "Đã gửi email khôi phục mật khẩu. Vui lòng kiểm tra hộp thư!", "info");
             window.switchAuthForm('login');
-        } catch (err) { showCustomModal("LỖI", err.message, "danger"); }
+        } catch (err) { showCustomModal("LỖI KHÔI PHỤC", getFirebaseErrorMessage(err), "danger"); }
     };
 
     // Google
     document.getElementById('google-login-btn').onclick = async () => {
         try { await loginGoogle(); document.getElementById('auth-modal').classList.remove('active'); }
-        catch (e) { showCustomModal("LỖI", e.message, "danger"); }
+        catch (e) { showCustomModal("LỖI", getFirebaseErrorMessage(e), "danger"); }
     };
 }
 
@@ -1852,7 +1801,7 @@ function handleAuthUI(user, role, dbData) {
 
                 showCustomModal("THÀNH CÔNG", "Mã xác minh đã được tạo trên hệ thống.\n\n⚠️ LƯU Ý: Website đã lưu yêu cầu gửi mã cho Bot. Vui lòng check tin nhắn Discord!", "info");
             } catch (err) {
-                showCustomModal("LỖI", "Lỗi tạo mã: " + err.message, "danger");
+                showCustomModal("LỖI", "Lỗi tạo mã: " + getFirebaseErrorMessage(err), "danger");
             } finally {
                 btn.innerText = "NHẬN MÃ";
                 btn.disabled = false;
@@ -1891,7 +1840,7 @@ function handleAuthUI(user, role, dbData) {
                     showCustomModal("SAI MÃ", "Mã xác minh không chính xác hoặc đã hết hạn!", "danger");
                 }
             } catch (err) {
-                showCustomModal("LỖI", err.message, "danger");
+                showCustomModal("LỖI", getFirebaseErrorMessage(err), "danger");
             } finally {
                 btn.innerText = "XÁC NHẬN";
                 btn.disabled = false;
@@ -2254,7 +2203,7 @@ window.addEventListener('load', async () => {
             statusText.classList.add('hidden');
 
         } catch (err) {
-            showCustomModal("LỖI", err.message, "danger");
+            showCustomModal("LỖI", getFirebaseErrorMessage(err), "danger");
             if (statusText) {
                 statusText.innerText = ' Lỗi tải ảnh!';
                 statusText.className = "text-xs mt-2 text-red-500 font-bold block";
@@ -2302,7 +2251,7 @@ window.addEventListener('load', async () => {
             renderGiveaways();
             e.target.reset();
         } catch (err) {
-            showCustomModal("LỖI", err.message, "danger");
+            showCustomModal("LỖI", getFirebaseErrorMessage(err), "danger");
         } finally {
             btn.innerText = "TẠO NGAY ";
             btn.disabled = false;

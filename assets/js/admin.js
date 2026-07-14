@@ -2,7 +2,7 @@ import {
     subscribeToAuth, loginGoogle, logout,
     fetchNews, fetchGuides, fetchForumPosts, createPost, 
     fetchAllUsers, deleteUserAndData, updateUserProfile, editDocument, 
-    deleteDocument, fetchComments, addComment, deleteComment
+    deleteDocument, fetchComments, addComment, deleteComment, showCustomModal, getFirebaseErrorMessage
 } from './core.js';
 
 import { uploadImage } from './core.js';
@@ -11,8 +11,9 @@ let currentTab = 'dashboard';
 // 1. KIỂM TRA QUYỀN ADMIN KHI VÀO TRANG
 subscribeToAuth((user, role) => {
     if (!user || !['admin', 'dev'].includes(role)) {
-        alert("⛔ BẠN KHÔNG CÓ QUYỀN TRUY CẬP TRANG NÀY!");
-        window.location.href = '/'; // Đá về trang chủ
+        showCustomModal("TỪ CHỐI", "⛔ BẠN KHÔNG CÓ QUYỀN TRUY CẬP TRANG NÀY!", "danger", () => {
+            window.location.href = '/'; // Đá về trang chủ
+        });
     } else {
         // Load dữ liệu lần đầu
         loadDashboard();
@@ -174,7 +175,7 @@ async function loadUsers() {
         }
 
         return `
-        <tr class="hover:bg-white/5 transition border-b border-white/5">
+        <tr class="hover:bg-white/5 transition border-b border-white/5 user-row" data-search="${u.username.toLowerCase()} ${u.email.toLowerCase()}">
             <td class="p-4 flex items-center gap-3">
                 <img src="${u.photoURL || `https://mc-heads.net/avatar/${u.username}`}" class="w-8 h-8 rounded border border-gray-700 object-cover bg-black">
                 <span class="font-bold text-white">${u.username}</span>
@@ -187,12 +188,26 @@ async function loadUsers() {
             </td>
         </tr>`;
     }).join('');
+
+    // Gắn sự kiện tìm kiếm
+    const searchInput = document.getElementById('search-user');
+    if (searchInput && !searchInput.hasAttribute('data-search-bound')) {
+        searchInput.setAttribute('data-search-bound', 'true');
+        searchInput.addEventListener('input', function(e) {
+            const val = e.target.value.toLowerCase().trim();
+            document.querySelectorAll('#user-list tr.user-row').forEach(row => {
+                if (row.dataset.search) {
+                    row.style.display = row.dataset.search.includes(val) ? '' : 'none';
+                }
+            });
+        });
+    }
 }
 
 window.updateUserRole = async (uid, newRole) => {
     if(confirm(`Đổi quyền user này thành ${newRole}?`)) {
         await editDocument('users', uid, { role: newRole });
-        alert("Đã cập nhật!");
+        showCustomModal("THÀNH CÔNG", "Đã cập nhật!", "info");
     }
 };
 
@@ -305,16 +320,16 @@ document.getElementById('editor-form').addEventListener('submit', async (e) => {
         if(id) {
             // Sửa
             await editDocument(collectionName, id, data);
-            alert("Đã cập nhật bài viết!");
+            showCustomModal("THÀNH CÔNG", "Đã cập nhật bài viết!", "info");
         } else {
             // Thêm mới
             await createPost(collectionName, data);
-            alert("Đã thêm bài viết mới!");
+            showCustomModal("THÀNH CÔNG", "Đã thêm bài viết mới!", "info");
         }
         closeEditor();
         loadPosts(collectionName); // Refresh list
     } catch(err) {
-        alert("Lỗi: " + err.message);
+        showCustomModal("LỖI", getFirebaseErrorMessage(err), "danger");
     }
 });
 

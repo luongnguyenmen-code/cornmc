@@ -493,4 +493,104 @@ export async function sendDiscordWebhook(message, embeds = []) {
     } catch (error) {
         console.error("Lỗi gửi Webhook Discord:", error);
     }
+// ==========================================
+// H. UI UTILITIES & ERROR HANDLING
+// ==========================================
+export function getFirebaseErrorMessage(err) {
+    if (!err) return "Lỗi không xác định!";
+    const code = err.code || "";
+    const msg = err.message || "";
+    
+    switch (code) {
+        case 'auth/invalid-credential':
+        case 'auth/user-not-found':
+        case 'auth/wrong-password':
+            return "Sai thông tin đăng nhập (Tên nhân vật/Email hoặc mật khẩu không chính xác)!";
+        case 'auth/email-already-in-use':
+            return "Tên nhân vật này đã có người đăng ký! Vui lòng chọn tên khác.";
+        case 'auth/weak-password':
+            return "Mật khẩu quá yếu (phải dài ít nhất 6 ký tự).";
+        case 'auth/too-many-requests':
+            return "Bạn đã nhập sai quá nhiều lần. Vui lòng đợi một lát rồi thử lại!";
+        case 'auth/network-request-failed':
+            return "Mất kết nối mạng! Vui lòng kiểm tra lại đường truyền internet.";
+        case 'auth/requires-recent-login':
+            return "Vì lý do bảo mật, bạn cần Đăng Xuất và Đăng Nhập lại để thực hiện hành động này!";
+        case 'auth/invalid-email':
+            return "Địa chỉ Email hoặc Tên nhân vật không hợp lệ!";
+        default:
+            if (msg.includes('sendPasswordResetEmail') || code.includes('reset')) {
+                return "Gửi email khôi phục thất bại! Kiểm tra lại địa chỉ email hoặc tài khoản này chưa liên kết email thực.";
+            }
+            return `Lỗi hệ thống: ${msg}`;
+    }
 }
+
+export function showCustomModal(title, message, type = 'info', onConfirm = null) {
+    let modal = document.getElementById('global-modal');
+    if (!modal) {
+        const modalHtml = `
+            <div id="global-modal" class="modal" style="z-index: 9999;">
+                <div class="modal-content glass-intense rounded-2xl modal-sm text-center border border-purple-500/50 p-6">
+                    <div class="modal-body">
+                        <div id="global-modal-icon" class="text-5xl mb-4">🔔</div>
+                        <h3 id="global-modal-title" class="text-2xl font-black title-font text-white mb-2"></h3>
+                        <p id="global-modal-message" class="text-gray-300 text-sm mb-6 leading-relaxed"></p>
+                        <div id="global-modal-actions" class="flex justify-center gap-4"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+        modal = document.getElementById('global-modal');
+    }
+
+    const titleEl = document.getElementById('global-modal-title');
+    const msgEl = document.getElementById('global-modal-message');
+    const actionsEl = document.getElementById('global-modal-actions');
+    const iconEl = document.getElementById('global-modal-icon');
+
+    titleEl.innerText = title;
+    msgEl.innerHTML = message.replace(/\n/g, '<br>');
+    actionsEl.innerHTML = '';
+
+    if (type === 'danger') {
+        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>`;
+        titleEl.className = "text-2xl font-black title-font text-red-500 mb-2";
+    } else if (type === 'confirm') {
+        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        titleEl.className = "text-2xl font-black title-font text-yellow-400 mb-2";
+    } else {
+        iconEl.innerHTML = `<svg class="w-16 h-16 mx-auto mb-2 text-cyan-400 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>`;
+        titleEl.className = "text-2xl font-black title-font text-cyan-400 mb-2";
+    }
+
+    if (type === 'confirm' || type === 'danger') {
+        const btnCancel = document.createElement('button');
+        btnCancel.className = "text-gray-400 hover:text-white font-bold text-sm px-4 py-2 transition";
+        btnCancel.innerText = "HỦY BỎ";
+        btnCancel.onclick = () => modal.classList.remove('active');
+        actionsEl.appendChild(btnCancel);
+
+        const btnOk = document.createElement('button');
+        btnOk.className = type === 'danger'
+            ? "bg-red-600 hover:bg-red-500 text-white px-6 py-2 rounded-lg font-bold text-sm shadow-lg shadow-red-900/50 transition"
+            : "cyber-btn px-6 py-2 rounded-lg font-bold text-sm text-white transition";
+        btnOk.innerText = type === 'danger' ? "XÓA NGAY" : "ĐỒNG Ý";
+        btnOk.onclick = () => {
+            if (onConfirm) onConfirm();
+            modal.classList.remove('active');
+        };
+        actionsEl.appendChild(btnOk);
+    } else {
+        const btnOk = document.createElement('button');
+        btnOk.className = "cyber-btn px-6 py-2 rounded-lg font-bold text-sm text-white transition";
+        btnOk.innerText = "ĐÓNG";
+        btnOk.onclick = () => modal.classList.remove('active');
+        actionsEl.appendChild(btnOk);
+    }
+
+    // Force reflow and add active class to trigger animation
+    void modal.offsetWidth;
+    modal.classList.add('active');
+}

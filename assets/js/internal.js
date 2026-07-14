@@ -11,7 +11,9 @@ import {
     editDocument,
     uploadImage,
     assignTask,
-    fetchTasksForRole
+    fetchTasksForRole,
+    showCustomModal,
+    getFirebaseErrorMessage
 } from './core.js';
 
 let currentUser = null;
@@ -185,7 +187,7 @@ function setupReportForm() {
         const files = Array.from(imageInput.files);
         
         if (files.length > 10) {
-            alert("⚠️ Vui lòng chỉ chọn tối đa 10 ảnh!");
+            showCustomModal("LỖI", "⚠️ Vui lòng chỉ chọn tối đa 10 ảnh!", "danger");
             imageInput.value = ''; 
             return;
         }
@@ -207,7 +209,7 @@ function setupReportForm() {
         const files = Array.from(imageInput.files);
         const btn = e.target.querySelector('button');
 
-        if (files.length > 10) return alert("Chỉ được tải lên tối đa 10 ảnh!");
+        if (files.length > 10) return showCustomModal("LỖI", "Chỉ được tải lên tối đa 10 ảnh!", "danger");
 
         btn.innerText = "⏳ ĐANG TẢI ẢNH VÀ GỬI BÁO CÁO...";
         btn.disabled = true;
@@ -229,11 +231,11 @@ function setupReportForm() {
                 images: imageUrls 
             });
             
-            alert("Đã gửi báo cáo thành công! Chờ quản lý duyệt.");
+            showCustomModal("THÀNH CÔNG", "Đã gửi báo cáo thành công! Chờ quản lý duyệt.", "info");
             e.target.reset();
             previewContainer.innerHTML = '';
         } catch (err) {
-            alert("❌ Gửi thất bại: " + err.message);
+            showCustomModal("LỖI", "❌ Gửi thất bại: " + getFirebaseErrorMessage(err), "danger");
         } finally {
             btn.innerText = "GỬI BÁO CÁO 🚀";
             btn.disabled = false;
@@ -259,11 +261,11 @@ function setupAssignTaskForm() {
         btn.disabled = true;
         try {
             await assignTask(title, desc, targetRole);
-            alert("Đã phát lệnh giao việc thành công!");
+            showCustomModal("THÀNH CÔNG", "Đã phát lệnh giao việc thành công!", "info");
             e.target.reset();
             loadAdminTasks(); // Load lại danh sách vừa tạo
         } catch (err) {
-            alert("❌ Lỗi: " + err.message);
+            showCustomModal("LỖI", "❌ Lỗi: " + getFirebaseErrorMessage(err), "danger");
         } finally {
             btn.innerText = "PHÁT LỆNH GIAO VIỆC 🎯";
             btn.disabled = false;
@@ -501,25 +503,16 @@ window.viewReportDetail = (id) => {
 
 // Hàm xử lý khi Admin bấm Duyệt
 window.approveReportAction = async (docId) => {
-    if (confirm("Xác nhận duyệt báo cáo công việc này?")) {
+    showCustomModal("XÁC NHẬN", "Duyệt báo cáo công việc này?", "confirm", async () => {
         try {
             await editDocument("work_reports", docId, { status: "approved" });
-            alert("Đã duyệt báo cáo thành công!");
-            document.getElementById('report-detail-modal').classList.add('hidden'); // Ẩn Modal
-            loadWorkReports(); // Tải lại danh sách Card
-        } catch (e) { alert("Lỗi khi duyệt: " + e.message); }
-    }
-};
-
-// Cấp quyền gọi hàm duyệt báo cáo ra global
-window.approveReportAction = async (docId) => {
-    if (confirm("Xác nhận duyệt báo cáo công việc này?")) {
-        try {
-            await editDocument("work_reports", docId, { status: "approved" });
-            alert("Đã duyệt báo cáo thành công!");
+            showCustomModal("THÀNH CÔNG", "Đã duyệt báo cáo thành công!", "info");
+            document.getElementById('report-detail-modal').classList.remove('active');
             loadWorkReports(); // Tải lại danh sách
-        } catch (e) { alert("Lỗi khi duyệt: " + e.message); }
-    }
+        } catch (e) { 
+            showCustomModal("LỖI", "Lỗi khi duyệt: " + getFirebaseErrorMessage(e), "danger"); 
+        }
+    });
 };
 
 // ==========================================
@@ -567,7 +560,7 @@ async function loadPayrollAdmin() {
             const reason = document.getElementById('pay-reason').value.trim();
             const btn = e.target.querySelector('button');
 
-            if (!targetUid) return alert("Vui lòng chọn 1 nhân sự!");
+            if (!targetUid) return showCustomModal("LỖI", "Vui lòng chọn 1 nhân sự!", "danger");
             if (!confirm(`Bạn chắc chắn muốn chuyển ${Number(amount).toLocaleString('vi-VN')} Coin với lý do: "${reason}"?`)) return;
 
             btn.innerText = "⏳ ĐANG XỬ LÝ GIAO DỊCH...";
@@ -575,9 +568,9 @@ async function loadPayrollAdmin() {
 
             try {
                 await createPayrollEntry(targetUid, amount, reason);
-                alert("Giao dịch thành công! Dữ liệu đã được cập nhật vào ví của nhân sự.");
+                showCustomModal("THÀNH CÔNG", "Giao dịch thành công! Dữ liệu đã được cập nhật vào ví của nhân sự.", "info");
                 e.target.reset();
-            } catch (err) { alert("❌ Lỗi giao dịch: " + err.message); } 
+            } catch (err) { showCustomModal("LỖI", "❌ Lỗi giao dịch: " + getFirebaseErrorMessage(err), "danger"); }
             finally {
                 btn.innerText = "PHÁT LƯƠNG & GỬI THÔNG BÁO 🚀";
                 btn.disabled = false;
