@@ -493,6 +493,7 @@ export async function sendDiscordWebhook(message, embeds = []) {
     } catch (error) {
         console.error("Lỗi gửi Webhook Discord:", error);
     }
+}
 // ==========================================
 // H. UI UTILITIES & ERROR HANDLING
 // ==========================================
