@@ -379,7 +379,73 @@ export async function createPayrollEntry(targetUid, amount, reason) {
 }
 
 // ==========================================
-// E. HỆ THỐNG GIAO VIỆC (TASKS)
+// E. HỆ THỐNG RÚT TIỀN (WITHDRAW)
+// ==========================================
+
+export async function createWithdrawRequest(amount, type, bankName, accountNumber) {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Vui lòng đăng nhập!");
+    
+    // Check total coin before withdraw
+    const q = query(collection(db, "payroll_history"), where("uid", "==", user.uid));
+    const snap = await getDocs(q);
+    let totalEarned = 0;
+    snap.docs.forEach(doc => totalEarned += (Number(doc.data().amount) || 0));
+
+    const wq = query(collection(db, "withdraw_requests"), where("uid", "==", user.uid));
+    const wSnap = await getDocs(wq);
+    let totalWithdrawn = 0;
+    wSnap.docs.forEach(doc => {
+        const data = doc.data();
+        if (data.status !== 'rejected') {
+            totalWithdrawn += (Number(data.amount) || 0);
+        }
+    });
+
+    const balance = totalEarned - totalWithdrawn;
+    if (balance < amount) {
+        throw new Error("Số dư không đủ để tạo lệnh rút!");
+    }
+
+    return await addDoc(collection(db, "withdraw_requests"), {
+        uid: user.uid,
+        author: user.displayName || user.email.split('@')[0],
+        amount: Number(amount),
+        type: type, // 'game' (1:1) or 'atm' (1:0.5)
+        bankName: bankName || null,
+        accountNumber: accountNumber || null,
+        status: 'pending', // pending, approved, rejected
+        createdAt: serverTimestamp()
+    });
+}
+
+export async function fetchMyWithdraws(uid) {
+    const q = query(collection(db, "withdraw_requests"), where("uid", "==", uid));
+    const snap = await getDocs(q);
+    const requests = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    return requests.sort((a, b) => {
+        const timeA = a.createdAt ? a.createdAt.seconds : 0;
+        const timeB = b.createdAt ? b.createdAt.seconds : 0;
+        return timeB - timeA;
+    });
+}
+
+export async function fetchAllWithdraws() {
+    const q = query(collection(db, "withdraw_requests"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+export async function updateWithdrawStatus(docId, status, rejectReason = null) {
+    const data = { status: status, updatedAt: serverTimestamp() };
+    if (status === 'rejected' && rejectReason) {
+        data.rejectReason = rejectReason;
+    }
+    return await updateDoc(doc(db, "withdraw_requests", docId), data);
+}
+
+// ==========================================
+// F. HỆ THỐNG GIAO VIỆC (TASKS)
 // ==========================================
 
 // Tạo nhiệm vụ mới (Admin/Quản lý)

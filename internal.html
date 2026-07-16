@@ -110,6 +110,49 @@
                         <tbody id="payroll-history-body" class="divide-y divide-white/5"></tbody>
                     </table>
                 </div>
+
+                <!-- KHU VỰC RÚT TIỀN -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                    <!-- Form Rút Tiền -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-yellow-500">
+                        <h3 class="text-2xl font-black title-font text-yellow-400 mb-6 flex items-center gap-2 border-b border-yellow-500/30 pb-4"> RÚT COIN / TIỀN</h3>
+                        <form id="withdraw-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold mb-2 uppercase text-yellow-300">Hình thức rút</label>
+                                <select id="withdraw-type" class="cyber-input w-full p-3 rounded-lg font-bold" required>
+                                    <option value="game">Rút vào Game (1 Coin = 1 Coin Game)</option>
+                                    <option value="atm">Rút về ATM/Momo (1 Coin = 0.5 VNĐ)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-2 uppercase text-yellow-300">Số lượng Coin muốn rút</label>
+                                <input type="number" id="withdraw-amount" min="1000" step="1000" class="cyber-input w-full p-3 rounded-lg font-bold text-cyan-400 text-xl" placeholder="VD: 10000" required>
+                            </div>
+                            
+                            <!-- Nhập thông tin ngân hàng (ẩn mặc định nếu chọn rút game) -->
+                            <div id="withdraw-bank-info" class="hidden space-y-4 bg-yellow-900/20 p-4 rounded-xl border border-yellow-500/30">
+                                <div>
+                                    <label class="block text-xs font-bold mb-2 uppercase text-yellow-400">Tên Ngân Hàng / Ví</label>
+                                    <input type="text" id="withdraw-bank" class="cyber-input w-full p-3 rounded-lg" placeholder="VD: Momo, MB Bank, Vietcombank...">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-2 uppercase text-yellow-400">Số Tài Khoản</label>
+                                    <input type="text" id="withdraw-stk" class="cyber-input w-full p-3 rounded-lg" placeholder="Nhập chính xác số tài khoản...">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="bg-yellow-600 hover:bg-yellow-500 text-white w-full py-4 rounded-xl font-black title-font text-lg mt-4 shadow-[0_0_15px_rgba(234,179,8,0.3)] transition">TẠO LỆNH RÚT 🚀</button>
+                        </form>
+                    </div>
+
+                    <!-- Lịch sử Rút Tiền -->
+                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-purple-500">
+                        <h3 class="text-2xl font-black title-font text-purple-400 mb-6 flex items-center gap-2 border-b border-purple-500/30 pb-4"> Lịch sử rút tiền</h3>
+                        <div id="withdraw-history-list" class="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                            <p class="text-gray-500 text-sm italic">Đang tải lịch sử...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="tab-report" class="tab-content hidden max-w-7xl">
@@ -227,11 +270,20 @@
                 <div id="all-reports-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
-            <div id="tab-payroll" class="tab-content hidden max-w-2xl mx-auto">
+            <div id="tab-payroll" class="tab-content hidden max-w-7xl mx-auto">
                 <h2 class="text-4xl font-black title-font neon-text mb-8 text-center">PHÁT LƯƠNG & THƯỞNG</h2>
-                <div id="payroll-admin-panel" class="glass-intense p-8 rounded-2xl shadow-[0_0_40px_rgba(234,179,8,0.15)] border border-yellow-500/30 relative overflow-hidden">
-                    <div class="absolute -top-20 -right-20 w-60 h-60 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div id="payroll-admin-panel" class="glass-intense p-8 rounded-2xl shadow-[0_0_40px_rgba(234,179,8,0.15)] border border-yellow-500/30 relative overflow-hidden h-fit">
+                        <div class="absolute -top-20 -right-20 w-60 h-60 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
                     </div>
+                    
+                    <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-yellow-500 flex flex-col max-h-[600px]">
+                        <h3 class="text-2xl font-black title-font text-yellow-400 mb-6 border-b border-yellow-500/30 pb-4"> DUYỆT LỆNH RÚT TIỀN</h3>
+                        <div id="admin-withdraw-list" class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                            <p class="text-gray-500 text-sm italic">Đang tải danh sách...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="tab-time-logs" class="tab-content hidden max-w-7xl">

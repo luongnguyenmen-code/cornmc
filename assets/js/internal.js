@@ -20,7 +20,11 @@ import {
     fetchAllTimeLogs,
     fetchMyWorkReports,
     rejectWorkReport,
-    editWorkReportUser
+    editWorkReportUser,
+    createWithdrawRequest,
+    fetchMyWithdraws,
+    fetchAllWithdraws,
+    updateWithdrawStatus
 } from './core.js';
 
 let currentUser = null;
@@ -52,6 +56,7 @@ window.addEventListener('load', () => {
     setupReportForm();
     setupEditReportForm();
     setupAssignTaskForm();
+    setupWithdrawForm();
     setupTimeTrackingEvents();
 
     // Event listeners for report filtering
@@ -105,7 +110,10 @@ function setupTabs() {
                 loadMyReports();
             }
             if (tabId === 'manage-work') loadWorkReports();
-            if (tabId === 'payroll') loadPayrollAdmin();
+            if (tabId === 'payroll') {
+                loadPayrollAdmin();
+                loadAdminWithdraws();
+            }
             if (tabId === 'assign-task') loadAdminTasks();
             if (tabId === 'time-logs') loadTimeLogs();
         });
@@ -125,44 +133,222 @@ async function loadWallet() {
 
     try {
         const payrolls = await fetchMyPayroll(currentUser.uid);
-        let total = 0;
+        const withdraws = await fetchMyWithdraws(currentUser.uid);
+        
+        let totalEarned = 0;
+        let totalWithdrawn = 0;
+        
         tbody.innerHTML = '';
         notifList.innerHTML = '';
 
         if (payrolls.length === 0) {
             tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center text-gray-500 italic">Chưa có giao dịch nào</td></tr>';
             notifList.innerHTML = '<p class="text-gray-600 text-xs italic">Không có thông báo mới.</p>';
-            totalEarnedEl.innerText = '0 Coin';
-            return;
+        } else {
+            payrolls.forEach(p => {
+                const amount = Number(p.amount) || 0;
+                totalEarned += amount;
+                const dateStr = p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Đang cập nhật';
+
+                tbody.innerHTML += `
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                        <td class="p-4 text-gray-400">${dateStr}</td>
+                        <td class="p-4 text-white">${p.reason}</td>
+                        <td class="p-4 text-right font-bold text-green-400">+${amount.toLocaleString('vi-VN')} Coin</td>
+                    </tr>
+                `;
+
+                notifList.innerHTML += `
+                    <div class="bg-gradient-to-r from-green-500/10 to-transparent p-4 rounded-xl border border-green-500/20 shadow-sm mb-2">
+                        <p class="text-xs text-gray-400 mb-1">${dateStr}</p>
+                        <p class="text-sm text-white">💰 Bạn vừa nhận được <span class="text-green-400 font-bold">${amount.toLocaleString('vi-VN')} Coin</span></p>
+                        <p class="text-xs text-gray-500 mt-1">Lý do: ${p.reason}</p>
+                    </div>
+                `;
+            });
+        }
+        
+        // Cập nhật Lịch sử Rút tiền
+        const wList = document.getElementById('withdraw-history-list');
+        wList.innerHTML = '';
+        
+        if (withdraws.length === 0) {
+            wList.innerHTML = '<p class="text-gray-500 text-sm italic">Chưa có lệnh rút tiền nào.</p>';
+        } else {
+            withdraws.forEach(w => {
+                if (w.status !== 'rejected') {
+                    totalWithdrawn += (Number(w.amount) || 0);
+                }
+                const dateStr = w.createdAt ? new Date(w.createdAt.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+                
+                let statusBadge = '';
+                if (w.status === 'approved') statusBadge = '<span class="px-2 py-1 rounded text-[10px] font-bold uppercase border text-green-400 border-green-500/50 bg-green-500/10">✅ Thành công</span>';
+                else if (w.status === 'rejected') statusBadge = '<span class="px-2 py-1 rounded text-[10px] font-bold uppercase border text-red-400 border-red-500/50 bg-red-500/10">❌ Từ chối</span>';
+                else statusBadge = '<span class="px-2 py-1 rounded text-[10px] font-bold uppercase border text-yellow-400 border-yellow-500/50 bg-yellow-500/10">⏳ Đang chờ</span>';
+                
+                let detailHtml = '';
+                if (w.type === 'game') {
+                    detailHtml = `<p class="text-xs text-cyan-400 font-bold mt-1">Vào Game (1:1): Nhận ${Number(w.amount).toLocaleString('vi-VN')} Coin Game</p>`;
+                } else {
+                    const vnd = Number(w.amount) * 0.5;
+                    detailHtml = `
+                        <p class="text-xs text-green-400 font-bold mt-1">Về ATM (1:0.5): Nhận ${vnd.toLocaleString('vi-VN')} VNĐ</p>
+                        <p class="text-xs text-gray-400 mt-1">NH: ${w.bankName} - STK: ${w.accountNumber}</p>
+                    `;
+                }
+
+                wList.innerHTML += `
+                    <div class="bg-black/30 p-4 rounded-xl border border-white/5 mb-2">
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs text-gray-400 font-mono">${dateStr}</span>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-sm font-bold text-yellow-400">- ${Number(w.amount).toLocaleString('vi-VN')} Coin</p>
+                        ${detailHtml}
+                        ${w.status === 'rejected' && w.rejectReason ? `<p class="text-xs text-red-400 mt-2 bg-red-900/30 p-2 rounded">Lý do: ${w.rejectReason}</p>` : ''}
+                    </div>
+                `;
+            });
         }
 
-        payrolls.forEach(p => {
-            const amount = Number(p.amount) || 0;
-            total += amount;
-            const dateStr = p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleDateString('vi-VN') : 'Đang cập nhật';
-
-            tbody.innerHTML += `
-                <tr class="border-b border-white/5 hover:bg-white/5 transition">
-                    <td class="p-4 text-gray-400">${dateStr}</td>
-                    <td class="p-4 text-white">${p.reason}</td>
-                    <td class="p-4 text-right font-bold text-green-400">+${amount.toLocaleString('vi-VN')} Coin</td>
-                </tr>
-            `;
-
-            notifList.innerHTML += `
-                <div class="bg-gradient-to-r from-green-500/10 to-transparent p-4 rounded-xl border border-green-500/20 shadow-sm">
-                    <p class="text-xs text-gray-400 mb-1">${dateStr}</p>
-                    <p class="text-sm text-white">💰 Bạn vừa nhận được <span class="text-green-400 font-bold">${amount.toLocaleString('vi-VN')} Coin</span></p>
-                    <p class="text-xs text-gray-500 mt-1">Lý do: ${p.reason}</p>
-                </div>
-            `;
-        });
-        totalEarnedEl.innerText = `${total.toLocaleString('vi-VN')} Coin`;
+        const balance = totalEarned - totalWithdrawn;
+        totalEarnedEl.innerText = `${balance.toLocaleString('vi-VN')} Coin`;
 
     } catch (error) {
         tbody.innerHTML = `<tr><td colspan="3" class="p-4 text-center text-red-500">Lỗi kết nối máy chủ!</td></tr>`;
     }
 }
+
+// ==========================================
+// 5B. CHỨC NĂNG: RÚT TIỀN (WITHDRAW)
+// ==========================================
+function setupWithdrawForm() {
+    const typeSelect = document.getElementById('withdraw-type');
+    const bankInfo = document.getElementById('withdraw-bank-info');
+    const form = document.getElementById('withdraw-form');
+
+    if (!typeSelect || !form) return;
+
+    typeSelect.addEventListener('change', (e) => {
+        if (e.target.value === 'atm') {
+            bankInfo.classList.remove('hidden');
+        } else {
+            bankInfo.classList.add('hidden');
+        }
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const type = typeSelect.value;
+        const amount = document.getElementById('withdraw-amount').value;
+        const bank = document.getElementById('withdraw-bank').value.trim();
+        const stk = document.getElementById('withdraw-stk').value.trim();
+        const btn = e.target.querySelector('button');
+
+        if (type === 'atm' && (!bank || !stk)) {
+            return showCustomModal("LỖI", "Vui lòng nhập đủ tên Ngân hàng và Số tài khoản!", "danger");
+        }
+
+        btn.innerText = "⏳ ĐANG TẠO LỆNH...";
+        btn.disabled = true;
+
+        try {
+            await createWithdrawRequest(amount, type, bank, stk);
+            showCustomModal("THÀNH CÔNG", "Đã tạo lệnh rút tiền thành công! Đang chờ admin xử lý.", "info");
+            e.target.reset();
+            bankInfo.classList.add('hidden');
+            loadWallet(); // Cập nhật lại số dư và lịch sử
+        } catch (err) {
+            showCustomModal("LỖI", "❌ Tạo lệnh thất bại: " + getFirebaseErrorMessage(err) + (err.message ? " (" + err.message + ")" : ""), "danger");
+        } finally {
+            btn.innerText = "TẠO LỆNH RÚT 🚀";
+            btn.disabled = false;
+        }
+    });
+}
+
+// ==========================================
+// 5C. CHỨC NĂNG: DUYỆT RÚT TIỀN (Cho Admin)
+// ==========================================
+async function loadAdminWithdraws() {
+    const list = document.getElementById('admin-withdraw-list');
+    if (!list) return;
+
+    list.innerHTML = '<p class="text-gray-500 text-sm italic animate-pulse">⏳ Đang tải lệnh rút tiền...</p>';
+
+    try {
+        const withdraws = await fetchAllWithdraws();
+        // Chỉ lấy những lệnh pending
+        const pendingWithdraws = withdraws.filter(w => w.status === 'pending');
+
+        if (pendingWithdraws.length === 0) {
+            list.innerHTML = '<p class="text-gray-500 text-sm italic">Hiện không có lệnh rút tiền nào chờ duyệt.</p>';
+            return;
+        }
+
+        list.innerHTML = pendingWithdraws.map(w => {
+            const dateStr = w.createdAt ? new Date(w.createdAt.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+            let detailHtml = '';
+            
+            if (w.type === 'game') {
+                detailHtml = `<p class="text-xs text-cyan-400 font-bold mb-2">🎮 Rút vào Game (1:1): Yêu cầu <span class="text-white bg-black/50 px-2 py-0.5 rounded">${Number(w.amount).toLocaleString('vi-VN')} Coin</span></p>`;
+            } else {
+                const vnd = Number(w.amount) * 0.5;
+                detailHtml = `
+                    <p class="text-xs text-green-400 font-bold mb-1">💳 Rút về ATM (1:0.5): Yêu cầu <span class="text-white bg-black/50 px-2 py-0.5 rounded">${vnd.toLocaleString('vi-VN')} VNĐ</span></p>
+                    <p class="text-xs text-gray-300 mb-2">NH: <span class="font-bold text-white">${w.bankName}</span> - STK: <span class="font-bold text-white">${w.accountNumber}</span></p>
+                `;
+            }
+
+            return `
+                <div class="bg-black/30 p-4 rounded-xl border border-white/10 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="font-bold text-yellow-400 text-sm block">${w.author}</span>
+                            <span class="text-[10px] text-gray-500 font-mono">${dateStr}</span>
+                        </div>
+                        <span class="font-black text-red-400">- ${Number(w.amount).toLocaleString('vi-VN')} Coin</span>
+                    </div>
+                    
+                    ${detailHtml}
+                    
+                    <div class="flex gap-2 mt-3">
+                        <button onclick="window.rejectWithdrawAction('${w.id}')" class="flex-1 bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white border border-red-500/30 py-2 rounded-lg text-xs font-bold transition">TỪ CHỐI</button>
+                        <button onclick="window.approveWithdrawAction('${w.id}')" class="flex-1 bg-green-600 hover:bg-green-500 text-white border border-green-500/50 py-2 rounded-lg text-xs font-bold transition">✅ ĐÃ CHUYỂN TIỀN</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        list.innerHTML = `<p class="text-red-500 text-sm">Lỗi tải danh sách rút tiền: ${e.message}</p>`;
+    }
+}
+
+window.approveWithdrawAction = async (docId) => {
+    showCustomModal("XÁC NHẬN", "Bạn chắc chắn đã chuyển tiền cho lệnh rút này?", "confirm", async () => {
+        try {
+            await updateWithdrawStatus(docId, 'approved');
+            showCustomModal("THÀNH CÔNG", "Đã duyệt lệnh rút tiền!", "info");
+            loadAdminWithdraws();
+        } catch (e) { 
+            showCustomModal("LỖI", "Lỗi khi duyệt: " + getFirebaseErrorMessage(e), "danger"); 
+        }
+    });
+};
+
+window.rejectWithdrawAction = async (docId) => {
+    const reason = prompt("Nhập lý do từ chối lệnh rút tiền này (VD: Sai số tài khoản):");
+    if (reason === null) return;
+    if (!reason.trim()) return showCustomModal("LỖI", "Vui lòng nhập lý do từ chối!", "danger");
+
+    try {
+        await updateWithdrawStatus(docId, 'rejected', reason.trim());
+        showCustomModal("THÀNH CÔNG", "Đã từ chối lệnh rút và hoàn lại Coin!", "info");
+        loadAdminWithdraws();
+    } catch (e) {
+        showCustomModal("LỖI", "Lỗi khi từ chối: " + getFirebaseErrorMessage(e), "danger");
+    }
+};
 
 // ==========================================
 // 6A. HIỂN THỊ VIỆC CẦN LÀM (Cho nhân sự)
