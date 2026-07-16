@@ -310,9 +310,15 @@ export async function fetchAllWorkReports() {
 
 // Lấy danh sách báo cáo cá nhân
 export async function fetchMyWorkReports(uid) {
-    const q = query(collection(db, "work_reports"), where("uid", "==", uid), orderBy("createdAt", "desc"));
+    const q = query(collection(db, "work_reports"), where("uid", "==", uid));
     const snap = await getDocs(q);
-    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    const reports = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    // Sắp xếp trên client để tránh lỗi cần tạo Index trên Firebase
+    return reports.sort((a, b) => {
+        const timeA = a.createdAt ? a.createdAt.seconds : 0;
+        const timeB = b.createdAt ? b.createdAt.seconds : 0;
+        return timeB - timeA; // Sắp xếp giảm dần (mới nhất lên trên)
+    });
 }
 
 // Từ chối báo cáo

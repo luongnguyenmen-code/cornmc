@@ -45,13 +45,14 @@ window.addEventListener('load', () => {
         setupRoleBasedUI();
         loadWallet();
         loadMyTasks(); // Load việc cần làm của nhân sự
+        loadTimeTrackingStatus();
     });
 
     setupTabs();
     setupReportForm();
     setupEditReportForm();
     setupAssignTaskForm();
-    setupTimeTracking();
+    setupTimeTrackingEvents();
 
     // Event listeners for report filtering
     document.getElementById('search-report-name')?.addEventListener('keyup', loadWorkReports);
@@ -832,67 +833,83 @@ async function loadPayrollAdmin() {
 // 9. HỆ THỐNG ĐIỂM DANH (TIME TRACKING)
 // ==========================================
 let currentLogId = null;
+let timeTrackingEventAttached = false;
 
-async function setupTimeTracking() {
+function setupTimeTrackingEvents() {
     const btnIn = document.getElementById('btn-clock-in');
     const btnOut = document.getElementById('btn-clock-out');
     const statusText = document.getElementById('time-tracking-status');
     if (!btnIn || !btnOut) return;
 
-    // Kiểm tra trạng thái hiện tại
-    if (currentUser) {
-        try {
-            const log = await fetchCurrentTimeLog(currentUser.uid);
-            if (log) {
-                currentLogId = log.id;
-                const inTime = new Date(log.clockInTime.seconds * 1000).toLocaleTimeString('vi-VN');
+    if (!timeTrackingEventAttached) {
+        timeTrackingEventAttached = true;
+        
+        btnIn.addEventListener('click', async () => {
+            btnIn.disabled = true;
+            btnIn.innerText = "ĐANG XỬ LÝ...";
+            try {
+                const docRef = await clockIn();
+                currentLogId = docRef.id;
+                const inTime = new Date().toLocaleTimeString('vi-VN');
                 statusText.innerHTML = `Đang làm việc (Bắt đầu từ: <span class="text-green-400 font-bold">${inTime}</span>)`;
                 btnIn.classList.add('hidden');
                 btnOut.classList.remove('hidden');
+                showCustomModal("THÀNH CÔNG", "Đã bắt đầu ghi nhận thời gian làm việc!", "info");
+            } catch (e) {
+                showCustomModal("LỖI", "Không thể bắt đầu: " + getFirebaseErrorMessage(e), "danger");
+            } finally {
+                btnIn.disabled = false;
+                btnIn.innerText = "BẮT ĐẦU LÀM VIỆC";
             }
-        } catch (e) {
-            console.error("Lỗi lấy trạng thái điểm danh:", e);
-        }
-    }
+        });
 
-    btnIn.addEventListener('click', async () => {
-        btnIn.disabled = true;
-        btnIn.innerText = "ĐANG XỬ LÝ...";
-        try {
-            const docRef = await clockIn();
-            currentLogId = docRef.id;
-            const inTime = new Date().toLocaleTimeString('vi-VN');
+        btnOut.addEventListener('click', async () => {
+            if (!currentLogId) return;
+            btnOut.disabled = true;
+            btnOut.innerText = "ĐANG XỬ LÝ...";
+            try {
+                await clockOut(currentLogId);
+                currentLogId = null;
+                statusText.innerHTML = `Trạng thái: <span class="text-gray-500 font-bold">Chưa bắt đầu</span>`;
+                btnOut.classList.add('hidden');
+                btnIn.classList.remove('hidden');
+                showCustomModal("THÀNH CÔNG", "Đã kết thúc phiên làm việc và ghi nhận thời gian!", "info");
+            } catch (e) {
+                showCustomModal("LỖI", "Không thể kết thúc: " + getFirebaseErrorMessage(e), "danger");
+            } finally {
+                btnOut.disabled = false;
+                btnOut.innerText = "KẾT THÚC (OFFLINE)";
+            }
+        });
+    }
+}
+
+async function loadTimeTrackingStatus() {
+    const btnIn = document.getElementById('btn-clock-in');
+    const btnOut = document.getElementById('btn-clock-out');
+    const statusText = document.getElementById('time-tracking-status');
+    if (!btnIn || !btnOut || !currentUser) return;
+    
+    try {
+        const log = await fetchCurrentTimeLog(currentUser.uid);
+        if (log) {
+            currentLogId = log.id;
+            const inTime = new Date(log.clockInTime.seconds * 1000).toLocaleTimeString('vi-VN');
             statusText.innerHTML = `Đang làm việc (Bắt đầu từ: <span class="text-green-400 font-bold">${inTime}</span>)`;
             btnIn.classList.add('hidden');
             btnOut.classList.remove('hidden');
-            showCustomModal("THÀNH CÔNG", "Đã bắt đầu ghi nhận thời gian làm việc!", "info");
-        } catch (e) {
-            showCustomModal("LỖI", "Không thể bắt đầu: " + getFirebaseErrorMessage(e), "danger");
-        } finally {
-            btnIn.disabled = false;
-            btnIn.innerText = "BẮT ĐẦU LÀM VIỆC";
-        }
-    });
-
-    btnOut.addEventListener('click', async () => {
-        if (!currentLogId) return;
-        btnOut.disabled = true;
-        btnOut.innerText = "ĐANG XỬ LÝ...";
-        try {
-            await clockOut(currentLogId);
+        } else {
             currentLogId = null;
             statusText.innerHTML = `Trạng thái: <span class="text-gray-500 font-bold">Chưa bắt đầu</span>`;
             btnOut.classList.add('hidden');
             btnIn.classList.remove('hidden');
-            showCustomModal("THÀNH CÔNG", "Đã kết thúc phiên làm việc và ghi nhận thời gian!", "info");
-        } catch (e) {
-            showCustomModal("LỖI", "Không thể kết thúc: " + getFirebaseErrorMessage(e), "danger");
-        } finally {
-            btnOut.disabled = false;
-            btnOut.innerText = "KẾT THÚC (OFFLINE)";
         }
-    });
+    } catch (e) {
+        console.error("Lỗi lấy trạng thái điểm danh:", e);
+    }
 }
+
+
 
 async function loadTimeLogs() {
     const tbody = document.getElementById('time-logs-body');
