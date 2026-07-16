@@ -501,7 +501,6 @@ export function getFirebaseErrorMessage(err) {
     if (!err) return "Lỗi không xác định!";
     const code = err.code || "";
     const msg = err.message || "";
-    renderAdminTable
     switch (code) {
         case 'auth/invalid-credential':
         case 'auth/user-not-found':
