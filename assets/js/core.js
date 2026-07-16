@@ -308,6 +308,45 @@ export async function fetchAllWorkReports() {
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
+// Lấy danh sách báo cáo cá nhân
+export async function fetchMyWorkReports(uid) {
+    const q = query(collection(db, "work_reports"), where("uid", "==", uid), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+// Từ chối báo cáo
+export async function rejectWorkReport(docId, reason) {
+    return await updateDoc(doc(db, "work_reports", docId), {
+        status: 'rejected',
+        rejectReason: reason,
+        rejectedAt: serverTimestamp()
+    });
+}
+
+// Chỉnh sửa báo cáo (lưu lịch sử)
+export async function editWorkReportUser(docId, newData) {
+    const docRef = doc(db, "work_reports", docId);
+    const snap = await getDoc(docRef);
+    if (!snap.exists()) throw new Error("Báo cáo không tồn tại");
+    
+    const oldData = snap.data();
+    
+    // Lưu bản cũ vào mảng editHistory
+    const historyItem = {
+        task: oldData.task,
+        percent: oldData.percent,
+        link: oldData.link || "",
+        images: oldData.images || [],
+        editedAt: serverTimestamp()
+    };
+    
+    return await updateDoc(docRef, {
+        ...newData,
+        editHistory: arrayUnion(historyItem)
+    });
+}
+
 // Lấy lịch sử lương thưởng cá nhân
 export async function fetchMyPayroll(uid) {
     const q = query(collection(db, "payroll_history"), where("uid", "==", uid), orderBy("createdAt", "desc"));

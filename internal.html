@@ -161,6 +161,14 @@
                         </form>
                     </div>
                 </div>
+
+                <!-- Lịch sử báo cáo cá nhân -->
+                <div class="mt-8 glass-panel p-6 rounded-2xl border-t-4 border-t-blue-500">
+                    <h3 class="text-2xl font-black title-font text-blue-400 mb-6 flex items-center gap-2 border-b border-blue-500/30 pb-4"> Lịch sử báo cáo của tôi</h3>
+                    <div id="my-reports-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 custom-scrollbar max-h-[600px] overflow-y-auto pr-2">
+                        <p class="text-gray-500 text-sm italic">Đang tải lịch sử báo cáo...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="tab-assign-task" class="tab-content hidden max-w-7xl">
@@ -260,8 +268,54 @@
                 </div>
             </div>
             
-        </main>
-    </div>
+            <!-- MODAL CHỈNH SỬA BÁO CÁO -->
+            <div id="edit-report-modal" class="modal">
+                <div class="modal-content glass-intense rounded-2xl modal-md border border-blue-500/50 flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh]">
+                    <div class="modal-header border-b border-blue-500/30 bg-black/40 rounded-t-2xl p-4 flex justify-between items-center">
+                        <h2 class="text-2xl font-black title-font neon-text text-blue-400">CHỈNH SỬA BÁO CÁO</h2>
+                        <button class="close-modal text-gray-400 hover:text-red-400 transition text-xl font-bold">✕</button>
+                    </div>
+                    <div class="modal-body overflow-y-auto custom-scrollbar p-6">
+                        <form id="edit-report-form" class="space-y-4">
+                            <input type="hidden" id="edit-report-id">
+                            <div>
+                                <label class="block text-xs font-bold mb-1 uppercase text-blue-300">Công việc đang thực hiện</label>
+                                <input type="text" id="edit-report-task" class="cyber-input w-full p-3 rounded-lg font-bold" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-1 uppercase text-blue-300">Tiến độ (%)</label>
+                                <input type="number" id="edit-report-percent" min="0" max="100" class="cyber-input w-full p-3 rounded-lg font-bold text-cyan-400 text-xl" required>
+                            </div>
+                            <div class="bg-cyan-900/20 p-3 rounded-xl border border-cyan-500/30">
+                                <label class="block text-xs font-bold mb-1 uppercase text-cyan-400">Ảnh mới (Tùy chọn, để trống sẽ giữ ảnh cũ)</label>
+                                <input type="file" id="edit-report-images" accept="image/*" multiple class="cyber-input w-full p-2 rounded-lg text-sm text-gray-300">
+                                <div id="edit-report-image-preview" class="flex flex-wrap gap-2 mt-2"></div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-1 uppercase text-blue-300">Link bổ sung</label>
+                                <input type="url" id="edit-report-link" class="cyber-input w-full p-3 rounded-lg">
+                            </div>
+                            <button type="submit" class="cyber-btn w-full py-3 rounded-xl font-black title-font text-lg mt-2">CẬP NHẬT & LƯU VẾT</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL XEM LỊCH SỬ CHỈNH SỬA BÁO CÁO -->
+            <div id="history-modal" class="modal">
+                <div class="modal-content glass-intense rounded-2xl modal-md border border-purple-500/50 flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh]">
+                    <div class="modal-header border-b border-purple-500/30 bg-black/40 rounded-t-2xl p-4 flex justify-between items-center">
+                        <h2 class="text-2xl font-black title-font neon-text text-purple-400">LỊCH SỬ CHỈNH SỬA</h2>
+                        <button class="close-modal text-gray-400 hover:text-red-400 transition text-xl font-bold">✕</button>
+                    </div>
+                    <div id="history-content" class="modal-body overflow-y-auto custom-scrollbar p-6 space-y-4">
+                        <!-- Nội dung được js nạp vào -->
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- Kết thúc w-full -->
+    </div> <!-- Kết thúc flex h-screen -->
 
     <script>
         const initParticles = () => {

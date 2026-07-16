@@ -17,7 +17,10 @@ import {
     clockIn,
     clockOut,
     fetchCurrentTimeLog,
-    fetchAllTimeLogs
+    fetchAllTimeLogs,
+    fetchMyWorkReports,
+    rejectWorkReport,
+    editWorkReportUser
 } from './core.js';
 
 let currentUser = null;
@@ -46,6 +49,7 @@ window.addEventListener('load', () => {
 
     setupTabs();
     setupReportForm();
+    setupEditReportForm();
     setupAssignTaskForm();
     setupTimeTracking();
 
@@ -95,6 +99,10 @@ function setupTabs() {
             if (targetTab) targetTab.classList.remove('hidden');
 
             if (tabId === 'wallet') loadWallet();
+            if (tabId === 'report') {
+                loadMyTasks();
+                loadMyReports();
+            }
             if (tabId === 'manage-work') loadWorkReports();
             if (tabId === 'payroll') loadPayrollAdmin();
             if (tabId === 'assign-task') loadAdminTasks();
@@ -251,6 +259,7 @@ function setupReportForm() {
             showCustomModal("THÀNH CÔNG", "Đã gửi báo cáo thành công! Chờ quản lý duyệt.", "info");
             e.target.reset();
             previewContainer.innerHTML = '';
+            loadMyReports(); // Cập nhật lại danh sách báo cáo
         } catch (err) {
             showCustomModal("LỖI", "❌ Gửi thất bại: " + getFirebaseErrorMessage(err), "danger");
         } finally {
@@ -524,9 +533,20 @@ window.viewReportDetail = (id) => {
         ${linkHtml}
 
         ${canApprove ? `
-            <div class="mt-8 pt-6 border-t border-cyan-500/30 flex justify-end">
-                <button onclick="window.approveReportAction('${r.id}')" class="cyber-btn text-white px-8 py-4 rounded-xl text-lg title-font font-black w-full sm:w-auto flex items-center justify-center gap-2 transition-transform hover:-translate-y-1 shadow-[0_0_20px_rgba(34,211,238,0.3)]">
-                    <span class="text-2xl drop-shadow-md">✅</span> CHẤP NHẬN BÁO CÁO
+            <div class="mt-8 pt-6 border-t border-cyan-500/30 flex flex-col sm:flex-row justify-end gap-4">
+                <button onclick="window.rejectReportAction('${r.id}')" class="bg-red-600 hover:bg-red-500 text-white px-8 py-3 rounded-xl text-sm title-font font-black w-full sm:w-auto transition shadow-lg shadow-red-900/50">
+                    ❌ TỪ CHỐI
+                </button>
+                <button onclick="window.approveReportAction('${r.id}')" class="cyber-btn text-white px-8 py-3 rounded-xl text-sm title-font font-black w-full sm:w-auto flex items-center justify-center gap-2 transition-transform shadow-[0_0_20px_rgba(34,211,238,0.3)]">
+                    ✅ CHẤP NHẬN
+                </button>
+            </div>
+        ` : ''}
+
+        ${r.editHistory && r.editHistory.length > 0 && ['admin', 'dev'].includes(currentRole) ? `
+            <div class="mt-4 flex justify-end">
+                <button onclick="window.viewHistoryAction('${r.id}')" class="text-xs text-gray-400 hover:text-white underline transition">
+                    🕰️ Xem lịch sử chỉnh sửa
                 </button>
             </div>
         ` : ''}
@@ -548,6 +568,198 @@ window.approveReportAction = async (docId) => {
         }
     });
 };
+
+// Hàm xử lý khi Admin bấm Từ chối
+window.rejectReportAction = async (docId) => {
+    const reason = prompt("Nhập lý do từ chối báo cáo này:");
+    if (reason === null) return; // Bấm Cancel
+    if (!reason.trim()) return showCustomModal("LỖI", "Vui lòng nhập lý do từ chối!", "danger");
+
+    try {
+        await rejectWorkReport(docId, reason.trim());
+        showCustomModal("THÀNH CÔNG", "Đã từ chối báo cáo!", "info");
+        document.getElementById('report-detail-modal').classList.remove('active');
+        loadWorkReports(); // Tải lại danh sách
+    } catch (e) {
+        showCustomModal("LỖI", "Lỗi khi từ chối: " + getFirebaseErrorMessage(e), "danger");
+    }
+};
+
+window.viewHistoryAction = (docId) => {
+    const r = window.allLoadedReports.find(x => x.id === docId) || window.myLoadedReports?.find(x => x.id === docId);
+    if (!r || !r.editHistory) return;
+
+    const modal = document.getElementById('history-modal');
+    const content = document.getElementById('history-content');
+
+    let historyHtml = r.editHistory.map((h, idx) => {
+        const timeStr = h.editedAt ? new Date(h.editedAt.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+        return `
+            <div class="glass-panel p-4 rounded-xl border border-white/10 mb-4">
+                <p class="text-xs text-gray-400 mb-2">Bản lưu lúc: ${timeStr}</p>
+                <p class="text-sm text-white mb-2"><strong>Công việc:</strong> ${h.task}</p>
+                <p class="text-sm text-cyan-400 mb-2"><strong>Tiến độ:</strong> ${h.percent}%</p>
+                ${h.link ? `<p class="text-sm text-purple-300"><strong>Link:</strong> <a href="${h.link}" target="_blank" class="underline">${h.link}</a></p>` : ''}
+                ${h.images && h.images.length > 0 ? `
+                    <div class="mt-2 flex gap-2 overflow-x-auto">
+                        ${h.images.map(img => `<img src="${img}" class="h-16 rounded">`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+
+    content.innerHTML = historyHtml;
+    modal.classList.add('active');
+};
+
+// ==========================================
+// 7C. LỊCH SỬ BÁO CÁO CÁ NHÂN VÀ CHỈNH SỬA
+// ==========================================
+window.myLoadedReports = [];
+
+async function loadMyReports() {
+    const list = document.getElementById('my-reports-list');
+    if (!list || !currentUser) return;
+
+    try {
+        const reports = await fetchMyWorkReports(currentUser.uid);
+        window.myLoadedReports = reports;
+
+        if (reports.length === 0) {
+            list.innerHTML = '<div class="col-span-full p-4 text-center text-gray-500 italic">Chưa có báo cáo nào.</div>';
+            return;
+        }
+
+        list.innerHTML = reports.map(r => {
+            const dateStr = r.createdAt ? new Date(r.createdAt.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+            let statusBadge = '';
+            let editBtn = '';
+            
+            if (r.status === 'approved') {
+                statusBadge = '<span class="px-2 py-1 rounded text-[10px] font-bold uppercase border text-green-400 border-green-500/50 bg-green-500/10">✅ Đã Duyệt</span>';
+            } else if (r.status === 'rejected') {
+                statusBadge = '<span class="px-2 py-1 rounded text-[10px] font-bold uppercase border text-red-400 border-red-500/50 bg-red-500/10">❌ Từ Chối</span>';
+            } else {
+                statusBadge = '<span class="px-2 py-1 rounded text-[10px] font-bold uppercase border text-yellow-400 border-yellow-500/50 bg-yellow-500/10">⏳ Đang Chờ</span>';
+                editBtn = `<button onclick="window.openEditReportModal('${r.id}')" class="text-xs text-blue-400 hover:text-white underline mt-2">Chỉnh sửa báo cáo ➔</button>`;
+            }
+
+            return `
+                <div class="bg-black/30 p-4 rounded-xl border border-white/5 relative flex flex-col justify-between">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="text-xs text-gray-400 font-mono">${dateStr}</span>
+                            ${statusBadge}
+                        </div>
+                        <p class="text-sm text-gray-200 line-clamp-2 mb-2 font-bold">${r.task}</p>
+                        <p class="text-xs text-cyan-400 font-bold mb-2">Tiến độ: ${r.percent}%</p>
+                        ${r.status === 'rejected' && r.rejectReason ? `<p class="text-xs text-red-400 bg-red-500/10 p-2 rounded"><strong>Lý do từ chối:</strong> ${r.rejectReason}</p>` : ''}
+                    </div>
+                    <div class="text-right">
+                        ${editBtn}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        list.innerHTML = `<div class="col-span-full text-red-500 text-sm">Lỗi tải danh sách: ${e.message}</div>`;
+    }
+}
+
+window.openEditReportModal = (docId) => {
+    const r = window.myLoadedReports.find(x => x.id === docId);
+    if (!r) return;
+    
+    document.getElementById('edit-report-id').value = r.id;
+    document.getElementById('edit-report-task').value = r.task;
+    document.getElementById('edit-report-percent').value = r.percent;
+    document.getElementById('edit-report-link').value = r.link || '';
+    document.getElementById('edit-report-images').value = '';
+    
+    const previewContainer = document.getElementById('edit-report-image-preview');
+    previewContainer.innerHTML = '';
+    if (r.images && r.images.length > 0) {
+        r.images.forEach(img => {
+            previewContainer.innerHTML += `<img src="${img}" class="h-16 rounded object-cover border border-cyan-500/50 opacity-70">`;
+        });
+    }
+
+    document.getElementById('edit-report-modal').classList.add('active');
+};
+
+function setupEditReportForm() {
+    const form = document.getElementById('edit-report-form');
+    const imageInput = document.getElementById('edit-report-images');
+    const previewContainer = document.getElementById('edit-report-image-preview');
+    if (!form) return;
+
+    imageInput.addEventListener('change', () => {
+        previewContainer.innerHTML = '';
+        const files = Array.from(imageInput.files);
+        if (files.length > 10) {
+            showCustomModal("LỖI", "⚠️ Vui lòng chỉ chọn tối đa 10 ảnh!", "danger");
+            imageInput.value = ''; 
+            return;
+        }
+        files.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewContainer.innerHTML += `<img src="${e.target.result}" class="h-16 rounded object-cover border border-cyan-500/50">`;
+            };
+            reader.readAsDataURL(file);
+        });
+    });
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const docId = document.getElementById('edit-report-id').value;
+        const task = document.getElementById('edit-report-task').value.trim();
+        const percent = document.getElementById('edit-report-percent').value;
+        const link = document.getElementById('edit-report-link').value.trim();
+        const files = Array.from(imageInput.files);
+        const btn = e.target.querySelector('button');
+
+        btn.innerText = "⏳ ĐANG LƯU VẾT & CẬP NHẬT...";
+        btn.disabled = true;
+
+        try {
+            let imageUrls = [];
+            // Nếu người dùng có chọn ảnh mới, thì tải lên, nếu không thì không đụng đến r.images cũ
+            if (files.length > 0) {
+                for (const file of files) {
+                    const url = await uploadImage(file);
+                    imageUrls.push(url);
+                }
+            }
+
+            const r = window.myLoadedReports.find(x => x.id === docId);
+            const newData = {
+                task: task,
+                percent: Number(percent),
+                link: link
+            };
+            
+            if (files.length > 0) {
+                newData.images = imageUrls;
+            } else {
+                newData.images = r.images || [];
+            }
+
+            await editWorkReportUser(docId, newData);
+            
+            showCustomModal("THÀNH CÔNG", "Đã cập nhật báo cáo thành công!", "info");
+            document.getElementById('edit-report-modal').classList.remove('active');
+            loadMyReports(); // Cập nhật UI
+            
+        } catch (err) {
+            showCustomModal("LỖI", "❌ Cập nhật thất bại: " + getFirebaseErrorMessage(err), "danger");
+        } finally {
+            btn.innerText = "CẬP NHẬT & LƯU VẾT";
+            btn.disabled = false;
+        }
+    });
+}
 
 // ==========================================
 // 8. CHỨC NĂNG: QUẢN LÝ LƯƠNG & THƯỞNG (ADMIN)
