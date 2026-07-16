@@ -501,7 +501,7 @@ export function getFirebaseErrorMessage(err) {
     if (!err) return "Lỗi không xác định!";
     const code = err.code || "";
     const msg = err.message || "";
-    
+    renderAdminTable
     switch (code) {
         case 'auth/invalid-credential':
         case 'auth/user-not-found':
@@ -595,3 +595,62 @@ export function showCustomModal(title, message, type = 'info', onConfirm = null)
     void modal.offsetWidth;
     modal.classList.add('active');
 }
+
+// ==========================================
+// I. HỆ THỐNG ĐIỂM DANH (TIME TRACKING)
+// ==========================================
+
+export async function clockIn() {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Chưa đăng nhập");
+    const role = localStorage.getItem('cached_user_role') || 'member';
+
+    return await addDoc(collection(db, "time_logs"), {
+        uid: user.uid,
+        username: user.displayName,
+        role: role,
+        clockInTime: serverTimestamp(),
+        clockOutTime: null,
+        durationMinutes: 0,
+        status: 'online'
+    });
+}
+
+export async function clockOut(logId) {
+    const logRef = doc(db, "time_logs", logId);
+    
+    const snap = await getDoc(logRef);
+    if (!snap.exists()) throw new Error("Không tìm thấy phiên làm việc");
+    
+    const data = snap.data();
+    let durationMins = 0;
+    if (data.clockInTime) {
+        const inDate = new Date(data.clockInTime.seconds * 1000);
+        const outDate = new Date(); // Lấy time client để tính tạm
+        durationMins = Math.round((outDate - inDate) / 60000); 
+    }
+
+    await updateDoc(logRef, {
+        clockOutTime: serverTimestamp(),
+        durationMinutes: durationMins,
+        status: 'offline'
+    });
+}
+
+export async function fetchCurrentTimeLog(uid) {
+    const q = query(
+        collection(db, "time_logs"), 
+        where("uid", "==", uid), 
+        where("status", "==", "online")
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    return { id: snap.docs[0].id, ...snap.docs[0].data() };
+}
+
+export async function fetchAllTimeLogs() {
+    const q = query(collection(db, "time_logs"), orderBy("clockInTime", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+

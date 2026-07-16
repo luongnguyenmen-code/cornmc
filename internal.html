@@ -70,6 +70,11 @@
                         id="admin-payroll-btn">
                          Phát Lương Thưởng
                     </button>
+                    <button data-tab="time-logs"
+                        class="sidebar-link w-full text-left px-4 py-3 rounded-lg font-bold flex items-center gap-3 transition hidden"
+                        id="admin-timelogs-btn">
+                         Thống kê Giờ làm
+                    </button>
                 </div>
             </nav>
             <div class="p-4 border-t border-white/10 bg-black/40">
@@ -109,6 +114,19 @@
 
             <div id="tab-report" class="tab-content hidden max-w-7xl">
                 <h2 class="text-4xl font-black title-font neon-text mb-8">BÁO CÁO & NHIỆM VỤ</h2>
+
+                <!-- Widget Điểm danh cho Helper -->
+                <div id="time-tracking-widget" class="hidden glass-panel p-6 rounded-2xl border-l-4 border-cyan-500 mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-black/40 gap-4">
+                    <div>
+                        <h3 class="text-xl font-bold text-cyan-400 uppercase tracking-wider title-font flex items-center gap-2">⏱️ Điểm Danh Phiên Làm Việc</h3>
+                        <p class="text-sm text-gray-400 mt-1" id="time-tracking-status">Trạng thái: <span class="text-gray-500 font-bold">Chưa bắt đầu</span></p>
+                    </div>
+                    <div class="flex gap-3">
+                        <button id="btn-clock-in" class="cyber-btn px-6 py-3 rounded-lg font-bold text-sm text-white transition shadow-[0_0_15px_rgba(34,211,238,0.3)]">BẮT ĐẦU LÀM VIỆC</button>
+                        <button id="btn-clock-out" class="bg-red-600 hover:bg-red-500 text-white px-6 py-3 rounded-lg font-bold text-sm shadow-lg shadow-red-900/50 transition hidden">KẾT THÚC (OFFLINE)</button>
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div class="flex flex-col h-full glass-panel p-6 rounded-2xl">
                         <h3 class="text-2xl font-black title-font text-cyan-400 mb-6 flex items-center gap-2 border-b border-cyan-500/30 pb-4"> Việc cần làm</h3>
@@ -182,12 +200,19 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-white/10 pb-6">
                     <h2 class="text-4xl font-black title-font neon-text">DUYỆT BÁO CÁO</h2>
                     
-                    <div class="flex bg-black/50 p-1.5 rounded-xl border border-purple-500/30 overflow-x-auto w-full sm:w-auto custom-scrollbar shadow-inner">
-                        <button onclick="window.filterReports('all')" id="filter-all" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold bg-cyan-600 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)] border border-cyan-400 transition whitespace-nowrap">🌐 Tất cả</button>
-                        <button onclick="window.filterReports('media')" id="filter-media" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🎬 Media</button>
-                        <button onclick="window.filterReports('helper')" id="filter-helper" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🤝 Helper</button>
-                        <button onclick="window.filterReports('staff')" id="filter-staff" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🛡️ Staff</button>
-                        <button onclick="window.filterReports('dev')" id="filter-dev" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">💻 Dev</button>
+                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+                        <div class="flex gap-2">
+                            <input type="text" id="search-report-name" placeholder="🔍 Tên nhân sự..." class="cyber-input p-2 rounded-lg text-sm font-bold w-32 sm:w-40">
+                            <input type="date" id="search-report-date" class="cyber-input p-2 rounded-lg text-sm font-bold">
+                        </div>
+
+                        <div class="flex bg-black/50 p-1.5 rounded-xl border border-purple-500/30 overflow-x-auto w-full sm:w-auto custom-scrollbar shadow-inner">
+                            <button onclick="window.filterReports('all')" id="filter-all" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold bg-cyan-600 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)] border border-cyan-400 transition whitespace-nowrap">🌐 Tất cả</button>
+                            <button onclick="window.filterReports('media')" id="filter-media" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🎬 Media</button>
+                            <button onclick="window.filterReports('helper')" id="filter-helper" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🤝 Helper</button>
+                            <button onclick="window.filterReports('staff')" id="filter-staff" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🛡️ Staff</button>
+                            <button onclick="window.filterReports('dev')" id="filter-dev" class="report-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">💻 Dev</button>
+                        </div>
                     </div>
                 </div>
                 
@@ -199,6 +224,29 @@
                 <div id="payroll-admin-panel" class="glass-intense p-8 rounded-2xl shadow-[0_0_40px_rgba(234,179,8,0.15)] border border-yellow-500/30 relative overflow-hidden">
                     <div class="absolute -top-20 -right-20 w-60 h-60 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none"></div>
                     </div>
+            </div>
+
+            <div id="tab-time-logs" class="tab-content hidden max-w-7xl">
+                <h2 class="text-4xl font-black title-font neon-text mb-8">THỐNG KÊ GIỜ LÀM</h2>
+                <div class="glass-panel p-6 rounded-2xl border border-white/10">
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-cyan-900/40 text-cyan-200 uppercase text-[10px] tracking-wider title-font">
+                                <tr>
+                                    <th class="p-4">Tên Nhân Sự</th>
+                                    <th class="p-4">Bộ Phận</th>
+                                    <th class="p-4">Trạng Thái</th>
+                                    <th class="p-4">Bắt Đầu (Clock In)</th>
+                                    <th class="p-4">Kết Thúc (Clock Out)</th>
+                                    <th class="p-4 text-right">Tổng Thời Gian</th>
+                                </tr>
+                            </thead>
+                            <tbody id="time-logs-body" class="divide-y divide-white/5">
+                                <tr><td colspan="6" class="p-4 text-center text-gray-500">Đang tải dữ liệu...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
 
             <div id="report-detail-modal" class="modal">

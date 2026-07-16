@@ -13,7 +13,11 @@ import {
     assignTask,
     fetchTasksForRole,
     showCustomModal,
-    getFirebaseErrorMessage
+    getFirebaseErrorMessage,
+    clockIn,
+    clockOut,
+    fetchCurrentTimeLog,
+    fetchAllTimeLogs
 } from './core.js';
 
 let currentUser = null;
@@ -43,6 +47,11 @@ window.addEventListener('load', () => {
     setupTabs();
     setupReportForm();
     setupAssignTaskForm();
+    setupTimeTracking();
+
+    // Event listeners for report filtering
+    document.getElementById('search-report-name')?.addEventListener('keyup', loadWorkReports);
+    document.getElementById('search-report-date')?.addEventListener('change', loadWorkReports);
 });
 
 // ==========================================
@@ -51,6 +60,8 @@ window.addEventListener('load', () => {
 function setupRoleBasedUI() {
     const managerTools = document.getElementById('manager-tools');
     const adminPayrollBtn = document.getElementById('admin-payroll-btn');
+    const adminTimelogsBtn = document.getElementById('admin-timelogs-btn');
+    const timeTrackingWidget = document.getElementById('time-tracking-widget');
 
     if (['staff', 'admin', 'dev'].includes(currentRole)) {
         if (managerTools) managerTools.classList.remove('hidden');
@@ -58,6 +69,11 @@ function setupRoleBasedUI() {
 
     if (['admin', 'dev'].includes(currentRole)) {
         if (adminPayrollBtn) adminPayrollBtn.classList.remove('hidden');
+        if (adminTimelogsBtn) adminTimelogsBtn.classList.remove('hidden');
+    }
+
+    if (['media', 'helper', 'staff', 'dev', 'admin'].includes(currentRole)) {
+        if (timeTrackingWidget) timeTrackingWidget.classList.remove('hidden');
     }
 }
 
@@ -82,6 +98,7 @@ function setupTabs() {
             if (tabId === 'manage-work') loadWorkReports();
             if (tabId === 'payroll') loadPayrollAdmin();
             if (tabId === 'assign-task') loadAdminTasks();
+            if (tabId === 'time-logs') loadTimeLogs();
         });
     });
 }
@@ -353,6 +370,23 @@ async function loadWorkReports() {
         if (window.currentReportFilter !== 'all') {
             reports = reports.filter(r => (r.authorRole || 'member') === window.currentReportFilter);
         }
+
+        const nameFilter = document.getElementById('search-report-name')?.value.toLowerCase() || '';
+        const dateFilter = document.getElementById('search-report-date')?.value || '';
+
+        if (nameFilter) {
+            reports = reports.filter(r => r.author?.toLowerCase().includes(nameFilter));
+        }
+
+        if (dateFilter) {
+            reports = reports.filter(r => {
+                if (!r.createdAt) return false;
+                const d = new Date(r.createdAt.seconds * 1000);
+                // Đảm bảo UTC offset hoặc lấy đúng ngày local
+                const rDateStr = d.toLocaleDateString('sv-SE'); // sv-SE cho ra chuẩn YYYY-MM-DD
+                return rDateStr === dateFilter;
+            });
+        }
         
         // 🟢 GÁN AVATAR ĐỘNG VÀO BIẾN TOÀN CỤC ĐỂ MODAL ĐỌC ĐƯỢC
         window.allLoadedReports = reports.map(r => ({
@@ -579,5 +613,109 @@ async function loadPayrollAdmin() {
 
     } catch (e) {
         panel.innerHTML = `<div class="text-red-500 p-4">Lỗi tải form quản lý: ${e.message}</div>`;
+    }
+}
+
+// ==========================================
+// 9. HỆ THỐNG ĐIỂM DANH (TIME TRACKING)
+// ==========================================
+let currentLogId = null;
+
+async function setupTimeTracking() {
+    const btnIn = document.getElementById('btn-clock-in');
+    const btnOut = document.getElementById('btn-clock-out');
+    const statusText = document.getElementById('time-tracking-status');
+    if (!btnIn || !btnOut) return;
+
+    // Kiểm tra trạng thái hiện tại
+    if (currentUser) {
+        try {
+            const log = await fetchCurrentTimeLog(currentUser.uid);
+            if (log) {
+                currentLogId = log.id;
+                const inTime = new Date(log.clockInTime.seconds * 1000).toLocaleTimeString('vi-VN');
+                statusText.innerHTML = `Đang làm việc (Bắt đầu từ: <span class="text-green-400 font-bold">${inTime}</span>)`;
+                btnIn.classList.add('hidden');
+                btnOut.classList.remove('hidden');
+            }
+        } catch (e) {
+            console.error("Lỗi lấy trạng thái điểm danh:", e);
+        }
+    }
+
+    btnIn.addEventListener('click', async () => {
+        btnIn.disabled = true;
+        btnIn.innerText = "ĐANG XỬ LÝ...";
+        try {
+            const docRef = await clockIn();
+            currentLogId = docRef.id;
+            const inTime = new Date().toLocaleTimeString('vi-VN');
+            statusText.innerHTML = `Đang làm việc (Bắt đầu từ: <span class="text-green-400 font-bold">${inTime}</span>)`;
+            btnIn.classList.add('hidden');
+            btnOut.classList.remove('hidden');
+            showCustomModal("THÀNH CÔNG", "Đã bắt đầu ghi nhận thời gian làm việc!", "info");
+        } catch (e) {
+            showCustomModal("LỖI", "Không thể bắt đầu: " + getFirebaseErrorMessage(e), "danger");
+        } finally {
+            btnIn.disabled = false;
+            btnIn.innerText = "BẮT ĐẦU LÀM VIỆC";
+        }
+    });
+
+    btnOut.addEventListener('click', async () => {
+        if (!currentLogId) return;
+        btnOut.disabled = true;
+        btnOut.innerText = "ĐANG XỬ LÝ...";
+        try {
+            await clockOut(currentLogId);
+            currentLogId = null;
+            statusText.innerHTML = `Trạng thái: <span class="text-gray-500 font-bold">Chưa bắt đầu</span>`;
+            btnOut.classList.add('hidden');
+            btnIn.classList.remove('hidden');
+            showCustomModal("THÀNH CÔNG", "Đã kết thúc phiên làm việc và ghi nhận thời gian!", "info");
+        } catch (e) {
+            showCustomModal("LỖI", "Không thể kết thúc: " + getFirebaseErrorMessage(e), "danger");
+        } finally {
+            btnOut.disabled = false;
+            btnOut.innerText = "KẾT THÚC (OFFLINE)";
+        }
+    });
+}
+
+async function loadTimeLogs() {
+    const tbody = document.getElementById('time-logs-body');
+    if (!tbody) return;
+    
+    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500 animate-pulse">⏳ Đang tải dữ liệu điểm danh...</td></tr>';
+
+    try {
+        const logs = await fetchAllTimeLogs();
+        if (logs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500 italic">Chưa có dữ liệu.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = logs.map(l => {
+            const inTime = l.clockInTime ? new Date(l.clockInTime.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+            const outTime = l.clockOutTime ? new Date(l.clockOutTime.seconds * 1000).toLocaleString('vi-VN') : '--';
+            const statusHtml = l.status === 'online' 
+                ? '<span class="text-green-400 font-bold text-xs bg-green-500/10 px-2 py-1 rounded border border-green-500/30">ONLINE</span>' 
+                : '<span class="text-gray-400 font-bold text-xs bg-white/5 px-2 py-1 rounded border border-white/10">OFFLINE</span>';
+            const duration = l.durationMinutes ? `${Math.floor(l.durationMinutes/60)}h ${l.durationMinutes%60}m` : '--';
+
+            return `
+                <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                    <td class="p-4 font-bold text-white">${l.username}</td>
+                    <td class="p-4"><span class="text-[10px] bg-purple-900/40 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30 uppercase">${l.role}</span></td>
+                    <td class="p-4">${statusHtml}</td>
+                    <td class="p-4 text-gray-400 text-xs">${inTime}</td>
+                    <td class="p-4 text-gray-400 text-xs">${outTime}</td>
+                    <td class="p-4 text-right font-bold text-cyan-400">${duration}</td>
+                </tr>
+            `;
+        }).join('');
+
+    } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
     }
 }
