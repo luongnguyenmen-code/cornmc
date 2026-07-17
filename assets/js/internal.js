@@ -24,7 +24,8 @@ import {
     createWithdrawRequest,
     fetchMyWithdraws,
     fetchAllWithdraws,
-    updateWithdrawStatus
+    updateWithdrawStatus,
+    approveTimeLogStatus
 } from './core.js';
 
 let currentUser = null;
@@ -193,7 +194,7 @@ async function loadWallet() {
                     const vnd = Number(w.amount) * 0.5;
                     detailHtml = `
                         <p class="text-xs text-green-400 font-bold mt-1">Về ATM (1:0.5): Nhận ${vnd.toLocaleString('vi-VN')} VNĐ</p>
-                        <p class="text-xs text-gray-400 mt-1">NH: ${w.bankName} - STK: ${w.accountNumber}</p>
+                        <p class="text-xs text-gray-400 mt-1">NH: ${w.bankName} - STK: ${w.accountNumber} - Tên: ${w.accountName || 'N/A'}</p>
                     `;
                 }
 
@@ -243,17 +244,18 @@ function setupWithdrawForm() {
         const amount = document.getElementById('withdraw-amount').value;
         const bank = document.getElementById('withdraw-bank').value.trim();
         const stk = document.getElementById('withdraw-stk').value.trim();
+        const name = document.getElementById('withdraw-name')?.value.trim();
         const btn = e.target.querySelector('button');
 
-        if (type === 'atm' && (!bank || !stk)) {
-            return showCustomModal("LỖI", "Vui lòng nhập đủ tên Ngân hàng và Số tài khoản!", "danger");
+        if (type === 'atm' && (!bank || !stk || !name)) {
+            return showCustomModal("LỖI", "Vui lòng nhập đủ tên Ngân hàng, Số tài khoản và Tên chủ tài khoản!", "danger");
         }
 
         btn.innerText = "⏳ ĐANG TẠO LỆNH...";
         btn.disabled = true;
 
         try {
-            await createWithdrawRequest(amount, type, bank, stk);
+            await createWithdrawRequest(amount, type, bank, stk, name);
             showCustomModal("THÀNH CÔNG", "Đã tạo lệnh rút tiền thành công! Đang chờ admin xử lý.", "info");
             e.target.reset();
             bankInfo.classList.add('hidden');
@@ -296,7 +298,7 @@ async function loadAdminWithdraws() {
                 const vnd = Number(w.amount) * 0.5;
                 detailHtml = `
                     <p class="text-xs text-green-400 font-bold mb-1">💳 Rút về ATM (1:0.5): Yêu cầu <span class="text-white bg-black/50 px-2 py-0.5 rounded">${vnd.toLocaleString('vi-VN')} VNĐ</span></p>
-                    <p class="text-xs text-gray-300 mb-2">NH: <span class="font-bold text-white">${w.bankName}</span> - STK: <span class="font-bold text-white">${w.accountNumber}</span></p>
+                    <p class="text-xs text-gray-300 mb-2">NH: <span class="font-bold text-white">${w.bankName}</span> - STK: <span class="font-bold text-white">${w.accountNumber}</span> - Tên: <span class="font-bold text-white">${w.accountName || 'N/A'}</span></p>
                 `;
             }
 
@@ -1101,22 +1103,75 @@ async function loadTimeLogs() {
     const tbody = document.getElementById('time-logs-body');
     if (!tbody) return;
     
-    tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500 animate-pulse">⏳ Đang tải dữ liệu điểm danh...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500 animate-pulse">⏳ Đang tải dữ liệu điểm danh...</td></tr>';
 
     try {
         const logs = await fetchAllTimeLogs();
-        if (logs.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="6" class="p-4 text-center text-gray-500 italic">Chưa có dữ liệu.</td></tr>';
+        
+        const searchInput = document.getElementById('time-log-search')?.value.toLowerCase().trim() || '';
+        const monthInput = document.getElementById('time-log-month')?.value || '';
+        
+        const filteredLogs = logs.filter(l => {
+            let matchSearch = true;
+            let matchMonth = true;
+            
+            if (searchInput) {
+                matchSearch = l.username?.toLowerCase().includes(searchInput) || l.role?.toLowerCase().includes(searchInput);
+            }
+            
+            if (monthInput && l.clockInTime) {
+                const date = new Date(l.clockInTime.seconds * 1000);
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const yyyy = date.getFullYear();
+                const logMonth = `${yyyy}-${mm}`;
+                matchMonth = logMonth === monthInput;
+            }
+            
+            return matchSearch && matchMonth;
+        });
+
+        if (filteredLogs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500 italic">Chưa có dữ liệu hoặc không tìm thấy.</td></tr>';
             return;
         }
+        
+        const role = localStorage.getItem('cached_user_role') || 'member';
+        const isAdmin = role === 'admin' || role === 'manager' || role === 'owner';
+        
+        const thead = document.getElementById('time-logs-head');
+        if (thead) {
+            thead.innerHTML = `
+                <tr>
+                    <th class="p-4">Tên Nhân Sự</th>
+                    <th class="p-4">Bộ Phận</th>
+                    <th class="p-4">Trạng Thái</th>
+                    <th class="p-4">Bắt Đầu (Clock In)</th>
+                    <th class="p-4">Kết Thúc (Clock Out)</th>
+                    <th class="p-4 text-right">Tổng Thời Gian</th>
+                    ${isAdmin ? '<th class="p-4 text-center">Thao Tác</th>' : ''}
+                </tr>
+            `;
+        }
 
-        tbody.innerHTML = logs.map(l => {
+        tbody.innerHTML = filteredLogs.map(l => {
             const inTime = l.clockInTime ? new Date(l.clockInTime.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
             const outTime = l.clockOutTime ? new Date(l.clockOutTime.seconds * 1000).toLocaleString('vi-VN') : '--';
-            const statusHtml = l.status === 'online' 
-                ? '<span class="text-green-400 font-bold text-xs bg-green-500/10 px-2 py-1 rounded border border-green-500/30">ONLINE</span>' 
-                : '<span class="text-gray-400 font-bold text-xs bg-white/5 px-2 py-1 rounded border border-white/10">OFFLINE</span>';
+            
+            let statusHtml = '';
+            if (l.status === 'online') statusHtml = '<span class="text-green-400 font-bold text-xs bg-green-500/10 px-2 py-1 rounded border border-green-500/30">ONLINE</span>';
+            else if (l.status === 'approved') statusHtml = '<span class="text-blue-400 font-bold text-xs bg-blue-500/10 px-2 py-1 rounded border border-blue-500/30">ĐÃ DUYỆT</span>';
+            else statusHtml = '<span class="text-gray-400 font-bold text-xs bg-white/5 px-2 py-1 rounded border border-white/10">OFFLINE</span>';
+            
             const duration = l.durationMinutes ? `${Math.floor(l.durationMinutes/60)}h ${l.durationMinutes%60}m` : '--';
+            
+            let adminAction = '';
+            if (isAdmin) {
+                if (l.status === 'offline') {
+                    adminAction = `<button onclick="window.approveTimeLog('${l.id}')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-3 py-1.5 rounded-lg border border-blue-500/50 shadow-[0_0_10px_rgba(37,99,235,0.3)] transition font-bold">Xác Nhận</button>`;
+                } else if (l.status === 'approved') {
+                    adminAction = `<span class="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/30 font-bold">Đã Duyệt ✅</span>`;
+                }
+            }
 
             return `
                 <tr class="border-b border-white/5 hover:bg-white/5 transition">
@@ -1126,11 +1181,24 @@ async function loadTimeLogs() {
                     <td class="p-4 text-gray-400 text-xs">${inTime}</td>
                     <td class="p-4 text-gray-400 text-xs">${outTime}</td>
                     <td class="p-4 text-right font-bold text-cyan-400">${duration}</td>
+                    ${isAdmin ? `<td class="p-4 text-center">${adminAction}</td>` : ''}
                 </tr>
             `;
         }).join('');
 
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-red-500">Lỗi tải dữ liệu: ${e.message}</td></tr>`;
     }
 }
+
+window.approveTimeLog = async (logId) => {
+    showCustomModal("XÁC NHẬN", "Bạn có chắc chắn muốn duyệt giờ làm này?", "confirm", async () => {
+        try {
+            await approveTimeLogStatus(logId);
+            showCustomModal("THÀNH CÔNG", "Đã duyệt giờ làm thành công!", "info");
+            loadTimeLogs();
+        } catch (e) {
+            showCustomModal("LỖI", "Lỗi khi duyệt: " + getFirebaseErrorMessage(e), "danger");
+        }
+    });
+};

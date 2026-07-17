@@ -382,7 +382,7 @@ export async function createPayrollEntry(targetUid, amount, reason) {
 // E. HỆ THỐNG RÚT TIỀN (WITHDRAW)
 // ==========================================
 
-export async function createWithdrawRequest(amount, type, bankName, accountNumber) {
+export async function createWithdrawRequest(amount, type, bankName, accountNumber, accountName) {
     const user = auth.currentUser;
     if (!user) throw new Error("Vui lòng đăng nhập!");
     
@@ -414,6 +414,7 @@ export async function createWithdrawRequest(amount, type, bankName, accountNumbe
         type: type, // 'game' (1:1) or 'atm' (1:0.5)
         bankName: bankName || null,
         accountNumber: accountNumber || null,
+        accountName: accountName || null,
         status: 'pending', // pending, approved, rejected
         createdAt: serverTimestamp()
     });
@@ -744,6 +745,13 @@ export async function clockOut(logId) {
         clockOutTime: serverTimestamp(),
         durationMinutes: durationMins,
         status: 'offline'
+    });
+}
+
+export async function approveTimeLogStatus(logId) {
+    const logRef = doc(db, "time_logs", logId);
+    await updateDoc(logRef, {
+        status: 'approved'
     });
 }
 

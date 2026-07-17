@@ -139,6 +139,10 @@
                                     <label class="block text-xs font-bold mb-2 uppercase text-yellow-400">Số Tài Khoản</label>
                                     <input type="text" id="withdraw-stk" class="cyber-input w-full p-3 rounded-lg" placeholder="Nhập chính xác số tài khoản...">
                                 </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-2 uppercase text-yellow-400">Tên Chủ Tài Khoản</label>
+                                    <input type="text" id="withdraw-name" class="cyber-input w-full p-3 rounded-lg" placeholder="Nhập tên chủ tài khoản...">
+                                </div>
                             </div>
                             
                             <button type="submit" class="bg-yellow-600 hover:bg-yellow-500 text-white w-full py-4 rounded-xl font-black title-font text-lg mt-4 shadow-[0_0_15px_rgba(234,179,8,0.3)] transition">TẠO LỆNH RÚT 🚀</button>
@@ -288,10 +292,26 @@
 
             <div id="tab-time-logs" class="tab-content hidden max-w-7xl">
                 <h2 class="text-4xl font-black title-font neon-text mb-8">THỐNG KÊ GIỜ LÀM</h2>
+                
+                <!-- Bộ lọc -->
+                <div class="glass-panel p-4 rounded-2xl mb-6 flex flex-col md:flex-row gap-4 items-end border border-white/10">
+                    <div class="flex-1 w-full">
+                        <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">Tìm tên nhân sự / Bộ phận</label>
+                        <input type="text" id="time-log-search" class="cyber-input w-full p-3 rounded-lg" placeholder="Nhập tên hoặc bộ phận...">
+                    </div>
+                    <div class="flex-1 w-full">
+                        <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">Chọn tháng</label>
+                        <input type="month" id="time-log-month" class="cyber-input w-full p-3 rounded-lg">
+                    </div>
+                    <div class="w-full md:w-auto">
+                        <button onclick="loadTimeLogs()" class="bg-cyan-600 hover:bg-cyan-500 text-white w-full md:w-auto px-6 py-3 rounded-xl font-bold transition">LỌC</button>
+                    </div>
+                </div>
+
                 <div class="glass-panel p-6 rounded-2xl border border-white/10">
                     <div class="overflow-x-auto custom-scrollbar">
                         <table class="w-full text-left text-sm whitespace-nowrap">
-                            <thead class="bg-cyan-900/40 text-cyan-200 uppercase text-[10px] tracking-wider title-font">
+                            <thead class="bg-cyan-900/40 text-cyan-200 uppercase text-[10px] tracking-wider title-font" id="time-logs-head">
                                 <tr>
                                     <th class="p-4">Tên Nhân Sự</th>
                                     <th class="p-4">Bộ Phận</th>
