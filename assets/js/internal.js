@@ -34,6 +34,9 @@ let currentRole = 'guest';
 // Biến lưu trạng thái Bộ lọc đang chọn ở Tab Duyệt Báo cáo
 window.currentReportFilter = 'all';
 
+// Biến lưu trạng thái Bộ lọc ở Tab Thống kê giờ làm
+window.currentTimeLogFilter = 'all';
+
 // ==========================================
 // 2. KHỞI TẠO DASHBOARD
 // ==========================================
@@ -591,6 +594,19 @@ async function loadWorkReports() {
             ...r,
             avatar: userMap[r.uid] || r.avatar || `https://mc-heads.net/avatar/${r.author}`
         })); 
+
+        // 🟢 SẮP XẾP ƯU TIÊN BÁO CÁO CHƯA DUYỆT LÊN TRƯỚC
+        window.allLoadedReports.sort((a, b) => {
+            const isApprovedA = a.status === 'approved' ? 1 : 0;
+            const isApprovedB = b.status === 'approved' ? 1 : 0;
+            if (isApprovedA !== isApprovedB) {
+                return isApprovedA - isApprovedB; // 0 (pending) lên trước 1 (approved)
+            }
+            // Nếu cùng trạng thái thì xếp theo thời gian mới nhất
+            const timeA = a.createdAt ? a.createdAt.seconds : 0;
+            const timeB = b.createdAt ? b.createdAt.seconds : 0;
+            return timeB - timeA;
+        });
         
         if (window.allLoadedReports.length === 0) {
             listContainer.innerHTML = `<div class="glass-panel p-8 text-center text-gray-500 italic rounded-2xl col-span-2 md:col-span-3 border border-dashed border-gray-700">Không có báo cáo nào thuộc bộ phận này.</div>`;
@@ -1114,9 +1130,10 @@ async function loadTimeLogs() {
         const filteredLogs = logs.filter(l => {
             let matchSearch = true;
             let matchMonth = true;
+            let matchRole = true;
             
             if (searchInput) {
-                matchSearch = l.username?.toLowerCase().includes(searchInput) || l.role?.toLowerCase().includes(searchInput);
+                matchSearch = l.username?.toLowerCase().includes(searchInput);
             }
             
             if (monthInput && l.clockInTime) {
@@ -1126,8 +1143,29 @@ async function loadTimeLogs() {
                 const logMonth = `${yyyy}-${mm}`;
                 matchMonth = logMonth === monthInput;
             }
+
+            if (window.currentTimeLogFilter !== 'all') {
+                matchRole = (l.role || 'member') === window.currentTimeLogFilter;
+            }
             
-            return matchSearch && matchMonth;
+            return matchSearch && matchMonth && matchRole;
+        });
+
+        // Sắp xếp: Online (đang làm) -> Offline (chờ duyệt) -> Approved (đã duyệt) -> Theo thời gian
+        filteredLogs.sort((a, b) => {
+            const getStatusScore = (s) => {
+                if (s === 'online') return 0;
+                if (s === 'offline') return 1; // pending approval
+                return 2; // approved
+            };
+            const scoreA = getStatusScore(a.status);
+            const scoreB = getStatusScore(b.status);
+            if (scoreA !== scoreB) {
+                return scoreA - scoreB;
+            }
+            const timeA = a.clockInTime ? a.clockInTime.seconds : 0;
+            const timeB = b.clockInTime ? b.clockInTime.seconds : 0;
+            return timeB - timeA;
         });
 
         if (filteredLogs.length === 0) {
@@ -1201,4 +1239,22 @@ window.approveTimeLog = async (logId) => {
             showCustomModal("LỖI", "Lỗi khi duyệt: " + getFirebaseErrorMessage(e), "danger");
         }
     });
+};
+
+window.filterTimeLogs = (role) => {
+    window.currentTimeLogFilter = role;
+    
+    // Cập nhật UI nút filter
+    document.querySelectorAll('.tl-filter-btn').forEach(btn => {
+        btn.classList.remove('bg-cyan-600', 'text-white', 'shadow-[0_0_10px_rgba(34,211,238,0.4)]', 'border-cyan-400');
+        btn.classList.add('text-gray-400', 'border-transparent');
+    });
+    
+    const activeBtn = document.getElementById(`tl-filter-${role}`);
+    if (activeBtn) {
+        activeBtn.classList.remove('text-gray-400', 'border-transparent');
+        activeBtn.classList.add('bg-cyan-600', 'text-white', 'shadow-[0_0_10px_rgba(34,211,238,0.4)]', 'border-cyan-400');
+    }
+    
+    loadTimeLogs();
 };
