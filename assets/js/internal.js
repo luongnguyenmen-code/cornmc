@@ -298,7 +298,7 @@ async function loadAdminWithdraws() {
             if (w.type === 'game') {
                 detailHtml = `<p class="text-xs text-cyan-400 font-bold mb-2">🎮 Rút vào Game (1:1): Yêu cầu <span class="text-white bg-black/50 px-2 py-0.5 rounded">${Number(w.amount).toLocaleString('vi-VN')} Coin</span></p>`;
             } else {
-                const vnd = Number(w.amount) * 0.5;
+                const vnd = Number(w.amount) * 500;
                 detailHtml = `
                     <p class="text-xs text-green-400 font-bold mb-1">💳 Rút về ATM (1:0.5): Yêu cầu <span class="text-white bg-black/50 px-2 py-0.5 rounded">${vnd.toLocaleString('vi-VN')} VNĐ</span></p>
                     <p class="text-xs text-gray-300 mb-2">NH: <span class="font-bold text-white">${w.bankName}</span> - STK: <span class="font-bold text-white">${w.accountNumber}</span> - Tên: <span class="font-bold text-white">${w.accountName || 'N/A'}</span></p>
