@@ -194,7 +194,7 @@ async function loadWallet() {
                 if (w.type === 'game') {
                     detailHtml = `<p class="text-xs text-cyan-400 font-bold mt-1">Vào Game (1:1): Nhận ${Number(w.amount).toLocaleString('vi-VN')} Coin Game</p>`;
                 } else {
-                    const vnd = Number(w.amount) * 0.5;
+                    const vnd = Number(w.amount) * 500;
                     detailHtml = `
                         <p class="text-xs text-green-400 font-bold mt-1">Về ATM (1:0.5): Nhận ${vnd.toLocaleString('vi-VN')} VNĐ</p>
                         <p class="text-xs text-gray-400 mt-1">NH: ${w.bankName} - STK: ${w.accountNumber} - Tên: ${w.accountName || 'N/A'}</p>
