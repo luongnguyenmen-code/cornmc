@@ -585,12 +585,23 @@ async function loadWorkReports() {
         if (window.currentReportFilter !== 'all') {
             reports = reports.filter(r => (r.authorRole || 'member') === window.currentReportFilter);
         }
+        
+        // Populate select if empty
+        const searchSelect = document.getElementById('search-report-name');
+        if (searchSelect && searchSelect.tagName === 'SELECT' && searchSelect.options.length <= 1) {
+            users.filter(u => ['admin', 'dev', 'staff', 'media', 'helper'].includes(u.role)).forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.username.toLowerCase();
+                opt.textContent = u.username;
+                searchSelect.appendChild(opt);
+            });
+        }
 
         const nameFilter = document.getElementById('search-report-name')?.value.toLowerCase() || '';
         const dateFilter = document.getElementById('search-report-date')?.value || '';
 
         if (nameFilter) {
-            reports = reports.filter(r => r.author?.toLowerCase().includes(nameFilter));
+            reports = reports.filter(r => (r.author || '').toLowerCase() === nameFilter);
         }
 
         if (dateFilter) {

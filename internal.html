@@ -267,7 +267,9 @@
                     
                     <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                         <div class="flex gap-2">
-                            <input type="text" id="search-report-name" placeholder="🔍 Tên nhân sự..." class="cyber-input p-2 rounded-lg text-sm font-bold w-32 sm:w-40">
+                            <select id="search-report-name" class="cyber-input p-2 rounded-lg text-sm font-bold w-40" onchange="loadWorkReports()">
+                                <option value="">Tất cả nhân sự</option>
+                            </select>
                             <input type="date" id="search-report-date" class="cyber-input p-2 rounded-lg text-sm font-bold">
                         </div>
 
@@ -330,15 +332,6 @@
                 </div>
             </div>
 
-            <div id="tab-time-logs" class="tab-content hidden max-w-7xl">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-white/10 pb-6">
-                    <h2 class="text-4xl font-black title-font neon-text">THỐNG KÊ GIỜ LÀM</h2>
-                    
-                    <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-                        <div class="flex gap-2">
-                            <input type="text" id="time-log-search" placeholder="🔍 Tên nhân sự..." class="cyber-input p-2 rounded-lg text-sm font-bold w-32 sm:w-40" oninput="loadTimeLogs()">
-                            <input type="month" id="time-log-month" class="cyber-input p-2 rounded-lg text-sm font-bold" onchange="loadTimeLogs()">
-                        </div>
             <div id="tab-statistics" class="tab-content hidden max-w-7xl mx-auto">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4 border-b border-white/10 pb-6">
                     <h2 class="text-4xl font-black title-font neon-text">BÁO CÁO THỐNG KÊ</h2>
