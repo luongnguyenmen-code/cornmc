@@ -78,6 +78,7 @@ function setupRoleBasedUI() {
     const managerTools = document.getElementById('manager-tools');
     const adminPayrollBtn = document.getElementById('admin-payroll-btn');
     const adminTimelogsBtn = document.getElementById('admin-timelogs-btn');
+    const adminWalletsBtn = document.getElementById('admin-wallets-btn');
     const timeTrackingWidget = document.getElementById('time-tracking-widget');
 
     if (['staff', 'admin', 'dev'].includes(currentRole)) {
@@ -87,6 +88,7 @@ function setupRoleBasedUI() {
     if (['admin', 'dev'].includes(currentRole)) {
         if (adminPayrollBtn) adminPayrollBtn.classList.remove('hidden');
         if (adminTimelogsBtn) adminTimelogsBtn.classList.remove('hidden');
+        if (adminWalletsBtn) adminWalletsBtn.classList.remove('hidden');
     }
 
     if (['media', 'helper', 'staff', 'dev', 'admin'].includes(currentRole)) {
@@ -121,6 +123,8 @@ function setupTabs() {
                 loadPayrollAdmin();
                 loadAdminWithdraws();
                 loadAdminPayrollHistory();
+            }
+            if (tabId === 'user-wallets') {
                 loadAdminUserBalances();
             }
             if (tabId === 'assign-task') loadAdminTasks();

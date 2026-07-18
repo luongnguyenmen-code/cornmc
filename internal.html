@@ -70,6 +70,11 @@
                         id="admin-payroll-btn">
                          Phát Lương Thưởng
                     </button>
+                    <button data-tab="user-wallets"
+                        class="sidebar-link w-full text-left px-4 py-3 rounded-lg font-bold flex items-center gap-3 transition hidden"
+                        id="admin-wallets-btn">
+                         Quản Lý Ví
+                    </button>
                     <button data-tab="time-logs"
                         class="sidebar-link w-full text-left px-4 py-3 rounded-lg font-bold flex items-center gap-3 transition hidden"
                         id="admin-timelogs-btn">
@@ -295,10 +300,12 @@
                         <p class="text-gray-500 text-sm italic">Đang tải danh sách...</p>
                     </div>
                 </div>
+            </div>
 
-                <div class="mt-8 glass-panel p-6 rounded-2xl border-t-4 border-t-blue-500 lg:col-span-2">
-                    <h3 class="text-2xl font-black title-font text-blue-400 mb-6 border-b border-blue-500/30 pb-4"> QUẢN LÝ VÍ NHÂN VIÊN</h3>
-                    <div class="overflow-x-auto custom-scrollbar max-h-[600px]">
+            <div id="tab-user-wallets" class="tab-content hidden max-w-7xl mx-auto">
+                <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-blue-500">
+                    <h3 class="text-3xl font-black title-font neon-text text-blue-400 mb-6 border-b border-blue-500/30 pb-4"> QUẢN LÝ VÍ NHÂN VIÊN</h3>
+                    <div class="overflow-x-auto custom-scrollbar max-h-[700px]">
                         <table class="w-full text-left text-sm whitespace-nowrap">
                             <thead class="bg-blue-900/40 text-blue-200 uppercase text-[10px] tracking-wider title-font">
                                 <tr>
