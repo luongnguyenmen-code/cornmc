@@ -397,7 +397,7 @@ export async function createPayrollEntry(targetUid, amount, reason) {
 // E. HỆ THỐNG RÚT TIỀN (WITHDRAW)
 // ==========================================
 
-export async function createWithdrawRequest(amount, type, bankName, accountNumber, accountName) {
+export async function createWithdrawRequest(amount, type, bankName, accountNumber, accountName, ingameName, qrUrl) {
     const user = auth.currentUser;
     if (!user) throw new Error("Vui lòng đăng nhập!");
     
@@ -430,6 +430,8 @@ export async function createWithdrawRequest(amount, type, bankName, accountNumbe
         bankName: bankName || null,
         accountNumber: accountNumber || null,
         accountName: accountName || null,
+        ingameName: ingameName || null,
+        qrUrl: qrUrl || null,
         status: 'pending', // pending, approved, rejected
         createdAt: serverTimestamp()
     });

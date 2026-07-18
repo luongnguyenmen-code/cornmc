@@ -736,7 +736,7 @@ async function renderRanking() {
     container.innerHTML = '<div class="text-center py-12"><div class="loader-ring w-12 h-12 mx-auto mb-4"></div><p class="text-cyan-400 font-bold neon-text animate-pulse">Đang tải dữ liệu từ máy chủ...</p></div>';
 
     const CURRENT_ID = "i7E2VpkoiVLVXYSE";
-    const BASE_ID = "X780QcWzTS6fxSxF";
+    const BASE_ID = "zxdU1Jav0w5rScbo";
 
     try {
         const [resCurrent, resBase] = await Promise.all([
@@ -1186,84 +1186,84 @@ window.switchRankTab = (tabName) => {
 // ==========================================
 // CẬP NHẬT TRẠNG THÁI SERVER (SỐ NGƯỜI CHƠI)
 // ==========================================
-// async function updateServerStatus() {
-//     const apiUrl = `https://api.mcsrvstat.us/2/185.207.166.34:19026`; 
-
-//     try {
-//         const response = await fetch(apiUrl);
-//         const data = await response.json();
-
-//         const statOnlineEl = document.getElementById('stat-online');
-//         const navOnlineEl = document.getElementById('nav-online');
-//         const statVersionEl = document.getElementById('stat-peak');
-//         const statusDot = document.querySelector('.status-dot');
-
-//         if (data.online === true) {
-//             // 1. LẤY SỐ NGƯỜI ONLINE: data.players.online (Trong JSON của bạn là 20)
-//             const currentPlayers = data.players.online || 0;
-
-//             if (statOnlineEl) statOnlineEl.innerText = currentPlayers;
-
-//             if (navOnlineEl) {
-//                 navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers}</span>`;
-//             }
-
-//             // Chấm tròn xanh trạng thái
-//             if (statusDot) {
-//                 statusDot.style.background = '#4ade80';
-//                 statusDot.style.boxShadow = '0 0 10px #4ade80';
-//             }
-
-//             // 2. LẤY PHIÊN BẢN: data.version (Trong JSON là "Leaf 1.21.8")
-//             if (statVersionEl && data.version) {
-//                 const versionString = data.version;
-//                 // Regex lọc lấy số (ví dụ: 1.21.8)
-//                 const cleanVersion = versionString.match(/\d+\.\d+(\.\d+)?/);
-//                 statVersionEl.innerText = cleanVersion ? cleanVersion[0] : versionString;
-//             }
-
-//         } else {
-//             // Xử lý khi Offline
-//             if (statOnlineEl) statOnlineEl.innerText = "OFF";
-//             if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFFLINE</span>`;
-//             if (statusDot) {
-//                 statusDot.style.background = '#f87171';
-//                 statusDot.style.boxShadow = '0 0 10px #f87171';
-//             }
-//         }
-//     } catch (error) {
-//         console.error("Lỗi kết nối API Server:", error);
-//     }
-// }
-
-// fake api 
 async function updateServerStatus() {
-    // Gọi thẳng các Element trên web
-    const statOnlineEl = document.getElementById('stat-online');
-    const navOnlineEl = document.getElementById('nav-online');
-    const statVersionEl = document.getElementById('stat-peak');
-    const statusDot = document.querySelector('.status-dot');
+    const apiUrl = `https://api.mcsrvstat.us/2/103.161.119.18:19931`; 
 
-    // === SET CỨNG THÔNG SỐ TẠI ĐÂY ===
-    const isOnline = true;       // Luôn cho server báo Online
-    const fakePlayers = 121;      // Số người chơi ảo bạn muốn hiển thị
-    const fakeVersion = "1.21.8"; // Phiên bản ảo
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
 
-    if (isOnline) {
-        if (statOnlineEl) statOnlineEl.innerText = fakePlayers;
+        const statOnlineEl = document.getElementById('stat-online');
+        const navOnlineEl = document.getElementById('nav-online');
+        const statVersionEl = document.getElementById('stat-peak');
+        const statusDot = document.querySelector('.status-dot');
 
-        if (navOnlineEl) {
-            navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${fakePlayers}</span>`;
+        if (data.online === true) {
+            // 1. LẤY SỐ NGƯỜI ONLINE: data.players.online (Trong JSON của bạn là 20)
+            const currentPlayers = data.players.online || 0;
+
+            if (statOnlineEl) statOnlineEl.innerText = currentPlayers;
+
+            if (navOnlineEl) {
+                navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${currentPlayers}</span>`;
+            }
+
+            // Chấm tròn xanh trạng thái
+            if (statusDot) {
+                statusDot.style.background = '#4ade80';
+                statusDot.style.boxShadow = '0 0 10px #4ade80';
+            }
+
+            // 2. LẤY PHIÊN BẢN: data.version (Trong JSON là "Leaf 1.21.8")
+            if (statVersionEl && data.version) {
+                const versionString = data.version;
+                // Regex lọc lấy số (ví dụ: 1.21.8)
+                const cleanVersion = versionString.match(/\d+\.\d+(\.\d+)?/);
+                statVersionEl.innerText = cleanVersion ? cleanVersion[0] : versionString;
+            }
+
+        } else {
+            // Xử lý khi Offline
+            if (statOnlineEl) statOnlineEl.innerText = "OFF";
+            if (navOnlineEl) navOnlineEl.innerHTML = `<span class="text-red-400">OFFLINE</span>`;
+            if (statusDot) {
+                statusDot.style.background = '#f87171';
+                statusDot.style.boxShadow = '0 0 10px #f87171';
+            }
         }
-
-        if (statusDot) {
-            statusDot.style.background = '#4ade80';
-            statusDot.style.boxShadow = '0 0 10px #4ade80';
-        }
-
-        if (statVersionEl) statVersionEl.innerText = fakeVersion;
+    } catch (error) {
+        console.error("Lỗi kết nối API Server:", error);
     }
 }
+
+// fake api 
+// async function updateServerStatus() {
+//     // Gọi thẳng các Element trên web
+//     const statOnlineEl = document.getElementById('stat-online');
+//     const navOnlineEl = document.getElementById('nav-online');
+//     const statVersionEl = document.getElementById('stat-peak');
+//     const statusDot = document.querySelector('.status-dot');
+
+//     // === SET CỨNG THÔNG SỐ TẠI ĐÂY ===
+//     const isOnline = true;       // Luôn cho server báo Online
+//     const fakePlayers = 121;      // Số người chơi ảo bạn muốn hiển thị
+//     const fakeVersion = "1.21.8"; // Phiên bản ảo
+
+//     if (isOnline) {
+//         if (statOnlineEl) statOnlineEl.innerText = fakePlayers;
+
+//         if (navOnlineEl) {
+//             navOnlineEl.innerHTML = `<span class="text-green-400 drop-shadow-[0_0_5px_rgba(74,222,128,0.8)]">${fakePlayers}</span>`;
+//         }
+
+//         if (statusDot) {
+//             statusDot.style.background = '#4ade80';
+//             statusDot.style.boxShadow = '0 0 10px #4ade80';
+//         }
+
+//         if (statVersionEl) statVersionEl.innerText = fakeVersion;
+//     }
+// }
 
 async function renderForum(filterMode = 'approved') {
     // filterMode có 3 dạng: 'approved' (chung), 'pending' (admin duyệt), 'mine' (bài của tôi)

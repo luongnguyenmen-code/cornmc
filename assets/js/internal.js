@@ -206,12 +206,16 @@ async function loadWallet() {
                 
                 let detailHtml = '';
                 if (w.type === 'game') {
-                    detailHtml = `<p class="text-xs text-cyan-400 font-bold mt-1">Vào Game (1:1): Nhận ${Number(w.amount).toLocaleString('vi-VN')} Coin Game</p>`;
+                    detailHtml = `
+                        <p class="text-xs text-cyan-400 font-bold mt-1">Vào Game (1:1): Nhận ${Number(w.amount).toLocaleString('vi-VN')} Coin Game</p>
+                        <p class="text-xs text-gray-400 mt-1">Ingame: ${w.ingameName || 'N/A'}</p>
+                    `;
                 } else {
                     const vnd = Number(w.amount) * 500;
                     detailHtml = `
                         <p class="text-xs text-green-400 font-bold mt-1">Về ATM (1:0.5): Nhận ${vnd.toLocaleString('vi-VN')} VNĐ</p>
                         <p class="text-xs text-gray-400 mt-1">NH: ${w.bankName} - STK: ${w.accountNumber} - Tên: ${w.accountName || 'N/A'}</p>
+                        ${w.qrUrl ? `<div class="mt-2"><p class="text-[10px] text-yellow-400 mb-1">Mã QR đã tải lên:</p><a href="${w.qrUrl}" target="_blank"><img src="${w.qrUrl}" class="w-16 h-16 object-cover rounded border border-yellow-500/30"></a></div>` : ''}
                     `;
                 }
 
@@ -243,15 +247,19 @@ async function loadWallet() {
 function setupWithdrawForm() {
     const typeSelect = document.getElementById('withdraw-type');
     const bankInfo = document.getElementById('withdraw-bank-info');
+    const gameInfo = document.getElementById('withdraw-game-info');
     const form = document.getElementById('withdraw-form');
+    const qrInput = document.getElementById('withdraw-qr');
 
     if (!typeSelect || !form) return;
 
     typeSelect.addEventListener('change', (e) => {
         if (e.target.value === 'atm') {
             bankInfo.classList.remove('hidden');
+            gameInfo.classList.add('hidden');
         } else {
             bankInfo.classList.add('hidden');
+            gameInfo.classList.remove('hidden');
         }
     });
 
@@ -262,20 +270,32 @@ function setupWithdrawForm() {
         const bank = document.getElementById('withdraw-bank').value.trim();
         const stk = document.getElementById('withdraw-stk').value.trim();
         const name = document.getElementById('withdraw-name')?.value.trim();
+        const ingame = document.getElementById('withdraw-ingame')?.value.trim();
         const btn = e.target.querySelector('button');
 
         if (type === 'atm' && (!bank || !stk || !name)) {
             return showCustomModal("LỖI", "Vui lòng nhập đủ tên Ngân hàng, Số tài khoản và Tên chủ tài khoản!", "danger");
+        }
+        if (type === 'game' && !ingame) {
+            return showCustomModal("LỖI", "Vui lòng nhập Tên Ingame!", "danger");
         }
 
         btn.innerText = "⏳ ĐANG TẠO LỆNH...";
         btn.disabled = true;
 
         try {
-            await createWithdrawRequest(amount, type, bank, stk, name);
+            let qrUrl = null;
+            if (type === 'atm' && qrInput && qrInput.files.length > 0) {
+                btn.innerText = "⏳ ĐANG TẢI ẢNH QR...";
+                qrUrl = await uploadImage(qrInput.files[0]);
+                btn.innerText = "⏳ ĐANG TẠO LỆNH...";
+            }
+
+            await createWithdrawRequest(amount, type, bank, stk, name, ingame, qrUrl);
             showCustomModal("THÀNH CÔNG", "Đã tạo lệnh rút tiền thành công! Đang chờ admin xử lý.", "info");
             e.target.reset();
             bankInfo.classList.add('hidden');
+            gameInfo.classList.remove('hidden'); // Default is game
             loadWallet(); // Cập nhật lại số dư và lịch sử
         } catch (err) {
             showCustomModal("LỖI", "❌ Tạo lệnh thất bại: " + getFirebaseErrorMessage(err) + (err.message ? " (" + err.message + ")" : ""), "danger");
@@ -310,12 +330,16 @@ async function loadAdminWithdraws() {
             let detailHtml = '';
             
             if (w.type === 'game') {
-                detailHtml = `<p class="text-xs text-cyan-400 font-bold mb-2">🎮 Rút vào Game (1:1): Yêu cầu <span class="text-white bg-black/50 px-2 py-0.5 rounded">${Number(w.amount).toLocaleString('vi-VN')} Coin</span></p>`;
+                detailHtml = `
+                    <p class="text-xs text-cyan-400 font-bold mb-2">🎮 Rút vào Game (1:1): Yêu cầu <span class="text-white bg-black/50 px-2 py-0.5 rounded">${Number(w.amount).toLocaleString('vi-VN')} Coin</span></p>
+                    <p class="text-xs text-gray-300 mb-2">Ingame: <span class="font-bold text-white">${w.ingameName || 'N/A'}</span></p>
+                `;
             } else {
                 const vnd = Number(w.amount) * 500;
                 detailHtml = `
                     <p class="text-xs text-green-400 font-bold mb-1">💳 Rút về ATM (1:0.5): Yêu cầu <span class="text-white bg-black/50 px-2 py-0.5 rounded">${vnd.toLocaleString('vi-VN')} VNĐ</span></p>
                     <p class="text-xs text-gray-300 mb-2">NH: <span class="font-bold text-white">${w.bankName}</span> - STK: <span class="font-bold text-white">${w.accountNumber}</span> - Tên: <span class="font-bold text-white">${w.accountName || 'N/A'}</span></p>
+                    ${w.qrUrl ? `<div class="mt-2"><p class="text-xs text-yellow-400 font-bold mb-1">Ảnh QR:</p><a href="${w.qrUrl}" target="_blank"><img src="${w.qrUrl}" class="w-20 h-20 object-cover rounded-lg border border-yellow-500/30 hover:scale-110 transition"></a></div>` : ''}
                 `;
             }
 

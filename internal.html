@@ -139,6 +139,14 @@
                                 <input type="number" id="withdraw-amount" min="100" step="100" class="cyber-input w-full p-3 rounded-lg font-bold text-cyan-400 text-xl" placeholder="VD: 10000" required>
                             </div>
                             
+                            <!-- Nhập thông tin Ingame (hiển thị khi chọn rút game) -->
+                            <div id="withdraw-game-info" class="space-y-4 bg-yellow-900/20 p-4 rounded-xl border border-yellow-500/30">
+                                <div>
+                                    <label class="block text-xs font-bold mb-2 uppercase text-yellow-400">Tên Ingame (Minecraft)</label>
+                                    <input type="text" id="withdraw-ingame" class="cyber-input w-full p-3 rounded-lg" placeholder="VD: Player123">
+                                </div>
+                            </div>
+                            
                             <!-- Nhập thông tin ngân hàng (ẩn mặc định nếu chọn rút game) -->
                             <div id="withdraw-bank-info" class="hidden space-y-4 bg-yellow-900/20 p-4 rounded-xl border border-yellow-500/30">
                                 <div>
@@ -152,6 +160,10 @@
                                 <div>
                                     <label class="block text-xs font-bold mb-2 uppercase text-yellow-400">Tên Chủ Tài Khoản</label>
                                     <input type="text" id="withdraw-name" class="cyber-input w-full p-3 rounded-lg" placeholder="Nhập tên chủ tài khoản...">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold mb-2 uppercase text-yellow-400 flex items-center gap-2">Mã QR (Nếu có) <span class="text-gray-500 text-[10px]">(Không bắt buộc)</span></label>
+                                    <input type="file" id="withdraw-qr" accept="image/*" class="cyber-input w-full p-2 rounded-lg text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-yellow-600 file:text-white hover:file:bg-yellow-500 cursor-pointer outline-none transition">
                                 </div>
                             </div>
                             
