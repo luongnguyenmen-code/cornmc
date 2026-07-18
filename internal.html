@@ -288,6 +288,13 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="mt-8 glass-panel p-6 rounded-2xl border-t-4 border-t-green-500 flex flex-col max-h-[600px]">
+                    <h3 class="text-2xl font-black title-font text-green-400 mb-6 border-b border-green-500/30 pb-4"> LỊCH SỬ ĐÃ PHÁT LƯƠNG/THƯỞNG</h3>
+                    <div id="admin-payroll-history" class="space-y-4 flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                        <p class="text-gray-500 text-sm italic">Đang tải danh sách...</p>
+                    </div>
+                </div>
             </div>
 
             <div id="tab-time-logs" class="tab-content hidden max-w-7xl">
@@ -307,6 +314,24 @@
                             <button onclick="window.filterTimeLogs('staff')" id="tl-filter-staff" class="tl-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">🛡️ Staff</button>
                             <button onclick="window.filterTimeLogs('dev')" id="tl-filter-dev" class="tl-filter-btn px-5 py-2 rounded-lg text-sm font-bold text-gray-400 border border-transparent hover:bg-white/10 hover:border-gray-600 transition whitespace-nowrap">💻 Dev</button>
                         </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-2xl border-t-4 border-t-cyan-500 mb-8" id="monthly-summary-panel" style="display: none;">
+                    <h3 class="text-xl font-black title-font text-cyan-400 mb-4 border-b border-cyan-500/30 pb-2"> TỔNG HỢP TRONG THÁNG</h3>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-cyan-900/40 text-cyan-200 uppercase text-[10px] tracking-wider title-font">
+                                <tr>
+                                    <th class="p-3">Nhân Sự</th>
+                                    <th class="p-3 text-center">Tổng Báo Cáo (Đã duyệt)</th>
+                                    <th class="p-3 text-right">Tổng Giờ Làm (Đã duyệt)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="time-logs-summary-body" class="divide-y divide-white/5">
+                                <tr><td colspan="3" class="p-3 text-center text-gray-500">Vui lòng chọn tháng để thống kê</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 

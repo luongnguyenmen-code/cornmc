@@ -360,6 +360,21 @@ export async function fetchMyPayroll(uid) {
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 }
 
+// Lấy tất cả lịch sử lương thưởng (Admin)
+export async function fetchAllPayroll() {
+    const q = query(collection(db, "payroll_history"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+// Chỉnh sửa số lượng trong lịch sử lương thưởng (Admin)
+export async function updatePayrollAmount(docId, newAmount) {
+    return await updateDoc(doc(db, "payroll_history", docId), {
+        amount: Number(newAmount),
+        updatedAt: serverTimestamp()
+    });
+}
+
 // Tạo phiếu lương/thưởng (Chỉ Admin)
 export async function createPayrollEntry(targetUid, amount, reason) {
     await addDoc(collection(db, "payroll_history"), {
@@ -752,6 +767,13 @@ export async function approveTimeLogStatus(logId) {
     const logRef = doc(db, "time_logs", logId);
     await updateDoc(logRef, {
         status: 'approved'
+    });
+}
+
+export async function rejectTimeLogStatus(logId) {
+    const logRef = doc(db, "time_logs", logId);
+    await updateDoc(logRef, {
+        status: 'rejected'
     });
 }
 

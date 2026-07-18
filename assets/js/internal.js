@@ -25,7 +25,10 @@ import {
     fetchMyWithdraws,
     fetchAllWithdraws,
     updateWithdrawStatus,
-    approveTimeLogStatus
+    approveTimeLogStatus,
+    rejectTimeLogStatus,
+    fetchAllPayroll,
+    updatePayrollAmount
 } from './core.js';
 
 let currentUser = null;
@@ -117,6 +120,7 @@ function setupTabs() {
             if (tabId === 'payroll') {
                 loadPayrollAdmin();
                 loadAdminWithdraws();
+                loadAdminPayrollHistory();
             }
             if (tabId === 'assign-task') loadAdminTasks();
             if (tabId === 'time-logs') loadTimeLogs();
@@ -1133,7 +1137,7 @@ async function loadTimeLogs() {
             let matchRole = true;
             
             if (searchInput) {
-                matchSearch = l.username?.toLowerCase().includes(searchInput);
+                matchSearch = (l.username || '').toLowerCase().includes(searchInput);
             }
             
             if (monthInput && l.clockInTime) {
@@ -1168,6 +1172,65 @@ async function loadTimeLogs() {
             return timeB - timeA;
         });
 
+        // === THỐNG KÊ THÁNG ===
+        const summaryPanel = document.getElementById('monthly-summary-panel');
+        const summaryBody = document.getElementById('time-logs-summary-body');
+        
+        if (monthInput && summaryPanel && summaryBody) {
+            summaryPanel.style.display = 'block';
+            const userStats = {};
+            
+            // 1. Tính tổng giờ làm đã duyệt
+            logs.forEach(l => {
+                if (l.status === 'approved' && l.clockInTime) {
+                    const date = new Date(l.clockInTime.seconds * 1000);
+                    const mm = String(date.getMonth() + 1).padStart(2, '0');
+                    const yyyy = date.getFullYear();
+                    if (`${yyyy}-${mm}` === monthInput) {
+                        const uid = l.uid;
+                        if (!userStats[uid]) userStats[uid] = { username: l.username, totalMins: 0, reports: 0 };
+                        userStats[uid].totalMins += (Number(l.durationMinutes) || 0);
+                    }
+                }
+            });
+
+            // 2. Lấy số lượng báo cáo đã duyệt
+            try {
+                const allReports = await fetchAllWorkReports();
+                allReports.forEach(r => {
+                    if (r.status === 'approved' && r.createdAt) {
+                        const date = new Date(r.createdAt.seconds * 1000);
+                        const mm = String(date.getMonth() + 1).padStart(2, '0');
+                        const yyyy = date.getFullYear();
+                        if (`${yyyy}-${mm}` === monthInput) {
+                            const uid = r.uid;
+                            if (!userStats[uid]) userStats[uid] = { username: r.author || r.uid, totalMins: 0, reports: 0 };
+                            userStats[uid].reports += 1;
+                        }
+                    }
+                });
+            } catch (e) { console.error("Lỗi lấy báo cáo thống kê", e); }
+
+            if (Object.keys(userStats).length === 0) {
+                summaryBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500 italic">Không có dữ liệu đã duyệt trong tháng này.</td></tr>';
+            } else {
+                const statRows = Object.values(userStats).sort((a,b) => b.totalMins - a.totalMins).map(st => {
+                    const hrs = Math.floor(st.totalMins / 60);
+                    const mins = st.totalMins % 60;
+                    return `
+                        <tr class="border-b border-white/5 hover:bg-white/5">
+                            <td class="p-3 font-bold text-white">${st.username}</td>
+                            <td class="p-3 text-center text-purple-400 font-bold">${st.reports} bài</td>
+                            <td class="p-3 text-right text-cyan-400 font-bold">${hrs}h ${mins}m</td>
+                        </tr>
+                    `;
+                });
+                summaryBody.innerHTML = statRows.join('');
+            }
+        } else if (summaryPanel) {
+            summaryPanel.style.display = 'none';
+        }
+
         if (filteredLogs.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500 italic">Chưa có dữ liệu hoặc không tìm thấy.</td></tr>';
             return;
@@ -1198,6 +1261,7 @@ async function loadTimeLogs() {
             let statusHtml = '';
             if (l.status === 'online') statusHtml = '<span class="text-green-400 font-bold text-xs bg-green-500/10 px-2 py-1 rounded border border-green-500/30">ONLINE</span>';
             else if (l.status === 'approved') statusHtml = '<span class="text-blue-400 font-bold text-xs bg-blue-500/10 px-2 py-1 rounded border border-blue-500/30">ĐÃ DUYỆT</span>';
+            else if (l.status === 'rejected') statusHtml = '<span class="text-red-400 font-bold text-xs bg-red-500/10 px-2 py-1 rounded border border-red-500/30">TỪ CHỐI (X)</span>';
             else statusHtml = '<span class="text-gray-400 font-bold text-xs bg-white/5 px-2 py-1 rounded border border-white/10">OFFLINE</span>';
             
             const duration = l.durationMinutes ? `${Math.floor(l.durationMinutes/60)}h ${l.durationMinutes%60}m` : '--';
@@ -1205,9 +1269,16 @@ async function loadTimeLogs() {
             let adminAction = '';
             if (isAdmin) {
                 if (l.status === 'offline') {
-                    adminAction = `<button onclick="window.approveTimeLog('${l.id}')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-3 py-1.5 rounded-lg border border-blue-500/50 shadow-[0_0_10px_rgba(37,99,235,0.3)] transition font-bold">Xác Nhận</button>`;
+                    adminAction = `
+                        <div class="flex gap-1 justify-center">
+                            <button onclick="window.approveTimeLog('${l.id}')" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] px-2 py-1.5 rounded-lg border border-blue-500/50 shadow-[0_0_10px_rgba(37,99,235,0.3)] transition font-bold">Duyệt</button>
+                            <button onclick="window.rejectTimeLog('${l.id}')" class="bg-red-600 hover:bg-red-500 text-white text-[10px] px-2 py-1.5 rounded-lg border border-red-500/50 transition font-bold">Từ Chối (X)</button>
+                        </div>
+                    `;
                 } else if (l.status === 'approved') {
                     adminAction = `<span class="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/30 font-bold">Đã Duyệt ✅</span>`;
+                } else if (l.status === 'rejected') {
+                    adminAction = `<span class="text-[10px] text-red-400 bg-red-500/10 px-2 py-1 rounded border border-red-500/30 font-bold">Đã Từ Chối ❌</span>`;
                 }
             }
 
@@ -1241,6 +1312,18 @@ window.approveTimeLog = async (logId) => {
     });
 };
 
+window.rejectTimeLog = async (logId) => {
+    showCustomModal("XÁC NHẬN", "Bạn có chắc chắn muốn từ chối (bỏ xác nhận) giờ làm này?", "confirm", async () => {
+        try {
+            await rejectTimeLogStatus(logId);
+            showCustomModal("THÀNH CÔNG", "Đã từ chối giờ làm!", "info");
+            loadTimeLogs();
+        } catch (e) {
+            showCustomModal("LỖI", "Lỗi: " + getFirebaseErrorMessage(e), "danger");
+        }
+    });
+};
+
 window.filterTimeLogs = (role) => {
     window.currentTimeLogFilter = role;
     
@@ -1257,4 +1340,57 @@ window.filterTimeLogs = (role) => {
     }
     
     loadTimeLogs();
+};
+
+async function loadAdminPayrollHistory() {
+    const list = document.getElementById('admin-payroll-history');
+    if (!list) return;
+
+    list.innerHTML = '<p class="text-gray-500 text-sm italic animate-pulse">⏳ Đang tải lịch sử...</p>';
+
+    try {
+        const payrolls = await fetchAllPayroll();
+        if (payrolls.length === 0) {
+            list.innerHTML = '<p class="text-gray-500 text-sm italic">Chưa có dữ liệu.</p>';
+            return;
+        }
+
+        const users = await fetchAllUsers();
+        const userMap = {};
+        users.forEach(u => userMap[u.id] = u.username);
+
+        list.innerHTML = payrolls.map(p => {
+            const dateStr = p.createdAt ? new Date(p.createdAt.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+            const username = userMap[p.uid] || 'Unknown';
+            return `
+                <div class="bg-black/30 p-4 rounded-xl border border-white/10 mb-2 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="font-bold text-green-400 text-sm block">Đến: ${username}</span>
+                        <span class="text-[10px] text-gray-500 font-mono">${dateStr}</span>
+                    </div>
+                    <p class="text-sm font-bold text-white mb-1">Số lượng: <span class="text-yellow-400">${Number(p.amount).toLocaleString('vi-VN')} Coin</span></p>
+                    <p class="text-xs text-gray-400 mb-2">Lý do: ${p.reason}</p>
+                    <button onclick="window.editPayrollAmountAction('${p.id}', ${p.amount})" class="absolute bottom-4 right-4 bg-blue-600/20 hover:bg-blue-500 text-blue-400 hover:text-white border border-blue-500/30 px-3 py-1 rounded text-xs transition">Sửa số lượng</button>
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        list.innerHTML = `<p class="text-red-500 text-sm">Lỗi tải danh sách: ${e.message}</p>`;
+    }
+}
+
+window.editPayrollAmountAction = (docId, oldAmount) => {
+    const newAmount = prompt(`Nhập số lượng Coin mới (Số lượng cũ: ${oldAmount}):`, oldAmount);
+    if (newAmount === null || newAmount.trim() === '') return;
+    if (isNaN(newAmount) || Number(newAmount) < 0) return showCustomModal("LỖI", "Số lượng không hợp lệ!", "danger");
+
+    showCustomModal("XÁC NHẬN", `Bạn muốn đổi số tiền thành ${Number(newAmount).toLocaleString()} Coin?`, "confirm", async () => {
+        try {
+            await updatePayrollAmount(docId, newAmount);
+            showCustomModal("THÀNH CÔNG", "Đã cập nhật số lượng!", "info");
+            loadAdminPayrollHistory();
+        } catch (e) {
+            showCustomModal("LỖI", "Lỗi: " + getFirebaseErrorMessage(e), "danger");
+        }
+    });
 };
