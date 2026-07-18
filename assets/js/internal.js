@@ -79,6 +79,7 @@ function setupRoleBasedUI() {
     const adminPayrollBtn = document.getElementById('admin-payroll-btn');
     const adminTimelogsBtn = document.getElementById('admin-timelogs-btn');
     const adminWalletsBtn = document.getElementById('admin-wallets-btn');
+    const adminStatisticsBtn = document.getElementById('admin-statistics-btn');
     const timeTrackingWidget = document.getElementById('time-tracking-widget');
 
     if (['staff', 'admin', 'dev'].includes(currentRole)) {
@@ -89,6 +90,7 @@ function setupRoleBasedUI() {
         if (adminPayrollBtn) adminPayrollBtn.classList.remove('hidden');
         if (adminTimelogsBtn) adminTimelogsBtn.classList.remove('hidden');
         if (adminWalletsBtn) adminWalletsBtn.classList.remove('hidden');
+        if (adminStatisticsBtn) adminStatisticsBtn.classList.remove('hidden');
     }
 
     if (['media', 'helper', 'staff', 'dev', 'admin'].includes(currentRole)) {
@@ -126,6 +128,9 @@ function setupTabs() {
             }
             if (tabId === 'user-wallets') {
                 loadAdminUserBalances();
+            }
+            if (tabId === 'statistics') {
+                loadStatistics();
             }
             if (tabId === 'assign-task') loadAdminTasks();
             if (tabId === 'time-logs') loadTimeLogs();
@@ -1136,13 +1141,25 @@ async function loadTimeLogs() {
         const searchInput = document.getElementById('time-log-search')?.value.toLowerCase().trim() || '';
         const monthInput = document.getElementById('time-log-month')?.value || '';
         
+        // Populate select if empty
+        const searchSelect = document.getElementById('time-log-search');
+        if (searchSelect && searchSelect.options.length <= 1) {
+            const users = await fetchAllUsers();
+            users.filter(u => ['admin', 'dev', 'staff', 'media', 'helper'].includes(u.role)).forEach(u => {
+                const opt = document.createElement('option');
+                opt.value = u.username.toLowerCase();
+                opt.textContent = u.username;
+                searchSelect.appendChild(opt);
+            });
+        }
+
         const filteredLogs = logs.filter(l => {
             let matchSearch = true;
             let matchMonth = true;
             let matchRole = true;
             
             if (searchInput) {
-                matchSearch = (l.username || '').toLowerCase().includes(searchInput);
+                matchSearch = (l.username || '').toLowerCase() === searchInput;
             }
             
             if (monthInput && l.clockInTime) {
@@ -1177,70 +1194,7 @@ async function loadTimeLogs() {
             return timeB - timeA;
         });
 
-        // === THỐNG KÊ THÁNG ===
-        const summaryPanel = document.getElementById('monthly-summary-panel');
-        const summaryBody = document.getElementById('time-logs-summary-body');
-        
-        if (summaryPanel && summaryBody) {
-            let summaryMonth = monthInput;
-            if (!summaryMonth) {
-                const now = new Date();
-                const mm = String(now.getMonth() + 1).padStart(2, '0');
-                const yyyy = now.getFullYear();
-                summaryMonth = `${yyyy}-${mm}`;
-            }
 
-            summaryPanel.style.display = 'block';
-            const userStats = {};
-            
-            // 1. Tính tổng giờ làm đã duyệt
-            logs.forEach(l => {
-                if (l.status === 'approved' && l.clockInTime) {
-                    const date = new Date(l.clockInTime.seconds * 1000);
-                    const mm = String(date.getMonth() + 1).padStart(2, '0');
-                    const yyyy = date.getFullYear();
-                    if (`${yyyy}-${mm}` === summaryMonth) {
-                        const uid = l.uid;
-                        if (!userStats[uid]) userStats[uid] = { username: l.username, totalMins: 0, reports: 0 };
-                        userStats[uid].totalMins += (Number(l.durationMinutes) || 0);
-                    }
-                }
-            });
-
-            // 2. Lấy số lượng báo cáo đã duyệt
-            try {
-                const allReports = await fetchAllWorkReports();
-                allReports.forEach(r => {
-                    if (r.status === 'approved' && r.createdAt) {
-                        const date = new Date(r.createdAt.seconds * 1000);
-                        const mm = String(date.getMonth() + 1).padStart(2, '0');
-                        const yyyy = date.getFullYear();
-                        if (`${yyyy}-${mm}` === summaryMonth) {
-                            const uid = r.uid;
-                            if (!userStats[uid]) userStats[uid] = { username: r.author || r.uid, totalMins: 0, reports: 0 };
-                            userStats[uid].reports += 1;
-                        }
-                    }
-                });
-            } catch (e) { console.error("Lỗi lấy báo cáo thống kê", e); }
-
-            if (Object.keys(userStats).length === 0) {
-                summaryBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500 italic">Không có dữ liệu đã duyệt trong tháng này.</td></tr>';
-            } else {
-                const statRows = Object.values(userStats).sort((a,b) => b.totalMins - a.totalMins).map(st => {
-                    const hrs = Math.floor(st.totalMins / 60);
-                    const mins = st.totalMins % 60;
-                    return `
-                        <tr class="border-b border-white/5 hover:bg-white/5">
-                            <td class="p-3 font-bold text-white">${st.username}</td>
-                            <td class="p-3 text-center text-purple-400 font-bold">${st.reports} bài</td>
-                            <td class="p-3 text-right text-cyan-400 font-bold">${hrs}h ${mins}m</td>
-                        </tr>
-                    `;
-                });
-                summaryBody.innerHTML = statRows.join('');
-            }
-        }
 
         if (filteredLogs.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-gray-500 italic">Chưa có dữ liệu hoặc không tìm thấy.</td></tr>';
@@ -1451,12 +1405,105 @@ async function loadAdminUserBalances() {
                     <td class="p-4 text-right font-bold text-green-400">${u.totalEarned.toLocaleString('vi-VN')}</td>
                     <td class="p-4 text-right font-bold text-red-400">${u.totalWithdrawn.toLocaleString('vi-VN')}</td>
                     <td class="p-4 text-right font-black text-yellow-400 text-lg">${balance.toLocaleString('vi-VN')}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="window.editUserBalance('${u.id}', ${balance})" class="bg-blue-600/20 hover:bg-blue-500 text-blue-400 hover:text-white border border-blue-500/30 px-3 py-1.5 rounded text-xs transition font-bold shadow-[0_0_10px_rgba(37,99,235,0.2)]">Sửa Coin</button>
+                    </td>
                 </tr>
             `;
         });
 
-        tbody.innerHTML = rows.join('') || '<tr><td colspan="5" class="p-4 text-center text-gray-500 italic">Không có dữ liệu nhân sự.</td></tr>';
+        tbody.innerHTML = rows.join('') || '<tr><td colspan="6" class="p-4 text-center text-gray-500 italic">Không có dữ liệu nhân sự.</td></tr>';
     } catch (e) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Lỗi tính toán: ${e.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">Lỗi tính toán: ${e.message}</td></tr>`;
     }
 }
+
+window.editUserBalance = (uid, currentBalance) => {
+    const newBalanceStr = prompt(`Nhập số dư Coin mới cho nhân viên (Số dư hiện tại: ${currentBalance}):`, currentBalance);
+    if (newBalanceStr === null || newBalanceStr.trim() === '') return;
+    
+    const newBalance = Number(newBalanceStr);
+    if (isNaN(newBalance)) return showCustomModal("LỖI", "Số dư không hợp lệ!", "danger");
+
+    const diff = newBalance - currentBalance;
+    if (diff === 0) return; // No change
+
+    showCustomModal("XÁC NHẬN", `Xác nhận đổi số dư thành ${newBalance.toLocaleString()} Coin? (Hệ thống sẽ tạo giao dịch ${diff > 0 ? '+' : ''}${diff.toLocaleString()} Coin)`, "confirm", async () => {
+        try {
+            await createPayrollEntry(uid, diff, "Admin điều chỉnh số dư ví");
+            showCustomModal("THÀNH CÔNG", "Đã cập nhật số dư!", "info");
+            loadAdminUserBalances();
+        } catch (e) {
+            showCustomModal("LỖI", "Lỗi: " + getFirebaseErrorMessage(e), "danger");
+        }
+    });
+};
+
+async function loadStatistics() {
+    const summaryBody = document.getElementById('time-logs-summary-body');
+    const monthInputEl = document.getElementById('stats-month');
+    if (!summaryBody || !monthInputEl) return;
+
+    let summaryMonth = monthInputEl.value;
+    if (!summaryMonth) {
+        const now = new Date();
+        const mm = String(now.getMonth() + 1).padStart(2, '0');
+        const yyyy = now.getFullYear();
+        summaryMonth = `${yyyy}-${mm}`;
+        monthInputEl.value = summaryMonth;
+    }
+
+    summaryBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500 animate-pulse">⏳ Đang tải thống kê...</td></tr>';
+
+    try {
+        const logs = await fetchAllTimeLogs();
+        const userStats = {};
+        
+        logs.forEach(l => {
+            if (l.status === 'approved' && l.clockInTime) {
+                const date = new Date(l.clockInTime.seconds * 1000);
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const yyyy = date.getFullYear();
+                if (`${yyyy}-${mm}` === summaryMonth) {
+                    const uid = l.uid;
+                    if (!userStats[uid]) userStats[uid] = { username: l.username, totalMins: 0, reports: 0 };
+                    userStats[uid].totalMins += (Number(l.durationMinutes) || 0);
+                }
+            }
+        });
+
+        const allReports = await fetchAllWorkReports();
+        allReports.forEach(r => {
+            if (r.status === 'approved' && r.createdAt) {
+                const date = new Date(r.createdAt.seconds * 1000);
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const yyyy = date.getFullYear();
+                if (`${yyyy}-${mm}` === summaryMonth) {
+                    const uid = r.uid;
+                    if (!userStats[uid]) userStats[uid] = { username: r.author || r.uid, totalMins: 0, reports: 0 };
+                    userStats[uid].reports += 1;
+                }
+            }
+        });
+
+        if (Object.keys(userStats).length === 0) {
+            summaryBody.innerHTML = '<tr><td colspan="3" class="p-3 text-center text-gray-500 italic">Không có dữ liệu đã duyệt trong tháng này.</td></tr>';
+        } else {
+            const statRows = Object.values(userStats).sort((a,b) => b.totalMins - a.totalMins).map(st => {
+                const hrs = Math.floor(st.totalMins / 60);
+                const mins = st.totalMins % 60;
+                return `
+                    <tr class="border-b border-white/5 hover:bg-white/5">
+                        <td class="p-3 font-bold text-white">${st.username}</td>
+                        <td class="p-3 text-center text-purple-400 font-bold">${st.reports} bài</td>
+                        <td class="p-3 text-right text-cyan-400 font-bold">${hrs}h ${mins}m</td>
+                    </tr>
+                `;
+            });
+            summaryBody.innerHTML = statRows.join('');
+        }
+    } catch (e) {
+        summaryBody.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-red-500">Lỗi: ${e.message}</td></tr>`;
+    }
+}
+window.loadStatistics = loadStatistics;
