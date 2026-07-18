@@ -121,6 +121,7 @@ function setupTabs() {
                 loadPayrollAdmin();
                 loadAdminWithdraws();
                 loadAdminPayrollHistory();
+                loadAdminUserBalances();
             }
             if (tabId === 'assign-task') loadAdminTasks();
             if (tabId === 'time-logs') loadTimeLogs();
@@ -1176,7 +1177,15 @@ async function loadTimeLogs() {
         const summaryPanel = document.getElementById('monthly-summary-panel');
         const summaryBody = document.getElementById('time-logs-summary-body');
         
-        if (monthInput && summaryPanel && summaryBody) {
+        if (summaryPanel && summaryBody) {
+            let summaryMonth = monthInput;
+            if (!summaryMonth) {
+                const now = new Date();
+                const mm = String(now.getMonth() + 1).padStart(2, '0');
+                const yyyy = now.getFullYear();
+                summaryMonth = `${yyyy}-${mm}`;
+            }
+
             summaryPanel.style.display = 'block';
             const userStats = {};
             
@@ -1186,7 +1195,7 @@ async function loadTimeLogs() {
                     const date = new Date(l.clockInTime.seconds * 1000);
                     const mm = String(date.getMonth() + 1).padStart(2, '0');
                     const yyyy = date.getFullYear();
-                    if (`${yyyy}-${mm}` === monthInput) {
+                    if (`${yyyy}-${mm}` === summaryMonth) {
                         const uid = l.uid;
                         if (!userStats[uid]) userStats[uid] = { username: l.username, totalMins: 0, reports: 0 };
                         userStats[uid].totalMins += (Number(l.durationMinutes) || 0);
@@ -1202,7 +1211,7 @@ async function loadTimeLogs() {
                         const date = new Date(r.createdAt.seconds * 1000);
                         const mm = String(date.getMonth() + 1).padStart(2, '0');
                         const yyyy = date.getFullYear();
-                        if (`${yyyy}-${mm}` === monthInput) {
+                        if (`${yyyy}-${mm}` === summaryMonth) {
                             const uid = r.uid;
                             if (!userStats[uid]) userStats[uid] = { username: r.author || r.uid, totalMins: 0, reports: 0 };
                             userStats[uid].reports += 1;
@@ -1227,8 +1236,6 @@ async function loadTimeLogs() {
                 });
                 summaryBody.innerHTML = statRows.join('');
             }
-        } else if (summaryPanel) {
-            summaryPanel.style.display = 'none';
         }
 
         if (filteredLogs.length === 0) {
@@ -1389,8 +1396,63 @@ window.editPayrollAmountAction = (docId, oldAmount) => {
             await updatePayrollAmount(docId, newAmount);
             showCustomModal("THÀNH CÔNG", "Đã cập nhật số lượng!", "info");
             loadAdminPayrollHistory();
+            loadAdminUserBalances(); // reload balances after edit
         } catch (e) {
             showCustomModal("LỖI", "Lỗi: " + getFirebaseErrorMessage(e), "danger");
         }
     });
 };
+
+async function loadAdminUserBalances() {
+    const tbody = document.getElementById('admin-user-balances-body');
+    if (!tbody) return;
+
+    try {
+        const [users, payrolls, withdraws] = await Promise.all([
+            fetchAllUsers(),
+            fetchAllPayroll(),
+            fetchAllWithdraws()
+        ]);
+
+        const userBalances = {};
+
+        const staffUsers = users.filter(u => ['admin', 'dev', 'staff', 'media', 'helper'].includes(u.role));
+        staffUsers.forEach(u => {
+            userBalances[u.id] = {
+                username: u.username,
+                role: u.role,
+                totalEarned: 0,
+                totalWithdrawn: 0
+            };
+        });
+
+        payrolls.forEach(p => {
+            if (userBalances[p.uid]) {
+                userBalances[p.uid].totalEarned += (Number(p.amount) || 0);
+            }
+        });
+
+        withdraws.forEach(w => {
+            if (userBalances[w.uid] && w.status !== 'rejected') {
+                userBalances[w.uid].totalWithdrawn += (Number(w.amount) || 0);
+            }
+        });
+
+        const rows = Object.values(userBalances).map(u => {
+            const balance = u.totalEarned - u.totalWithdrawn;
+            return `
+                <tr class="border-b border-white/5 hover:bg-white/5 transition">
+                    <td class="p-4 font-bold text-white">${u.username}</td>
+                    <td class="p-4 text-center"><span class="text-[10px] bg-purple-900/40 text-purple-300 px-2 py-0.5 rounded border border-purple-500/30 uppercase">${u.role}</span></td>
+                    <td class="p-4 text-right font-bold text-green-400">${u.totalEarned.toLocaleString('vi-VN')}</td>
+                    <td class="p-4 text-right font-bold text-red-400">${u.totalWithdrawn.toLocaleString('vi-VN')}</td>
+                    <td class="p-4 text-right font-black text-yellow-400 text-lg">${balance.toLocaleString('vi-VN')}</td>
+                </tr>
+            `;
+        });
+
+        tbody.innerHTML = rows.join('') || '<tr><td colspan="5" class="p-4 text-center text-gray-500 italic">Không có dữ liệu nhân sự.</td></tr>';
+    } catch (e) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500">Lỗi tính toán: ${e.message}</td></tr>`;
+    }
+}
