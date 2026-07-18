@@ -179,7 +179,7 @@ async function loadWallet() {
                 notifList.innerHTML += `
                     <div class="bg-gradient-to-r from-green-500/10 to-transparent p-4 rounded-xl border border-green-500/20 shadow-sm mb-2">
                         <p class="text-xs text-gray-400 mb-1">${dateStr}</p>
-                        <p class="text-sm text-white">💰 Bạn vừa nhận được <span class="text-green-400 font-bold">${amount.toLocaleString('vi-VN')} Coin</span></p>
+                        <p class="text-sm text-white">Bạn vừa nhận được <span class="text-green-400 font-bold">${amount.toLocaleString('vi-VN')} Coin</span></p>
                         <p class="text-xs text-gray-500 mt-1">Lý do: ${p.reason}</p>
                     </div>
                 `;
@@ -280,7 +280,7 @@ function setupWithdrawForm() {
         } catch (err) {
             showCustomModal("LỖI", "❌ Tạo lệnh thất bại: " + getFirebaseErrorMessage(err) + (err.message ? " (" + err.message + ")" : ""), "danger");
         } finally {
-            btn.innerText = "TẠO LỆNH RÚT 🚀";
+            btn.innerText = "TẠO LỆNH RÚT ";
             btn.disabled = false;
         }
     });
@@ -469,7 +469,7 @@ function setupReportForm() {
         } catch (err) {
             showCustomModal("LỖI", "❌ Gửi thất bại: " + getFirebaseErrorMessage(err), "danger");
         } finally {
-            btn.innerText = "GỬI BÁO CÁO 🚀";
+            btn.innerText = "GỬI BÁO CÁO ";
             btn.disabled = false;
         }
     });
@@ -1009,22 +1009,22 @@ async function loadPayrollAdmin() {
         panel.innerHTML = `
             <form id="payroll-form" class="space-y-5">
                 <div>
-                    <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">👤 Chọn Nhân Sự Nhận Thưởng</label>
+                    <label class="block text-xs font-bold mb-2 uppercase text-cyan-400"> Chọn Nhân Sự Nhận Thưởng</label>
                     <select id="pay-uid" class="w-full bg-black/40 border border-purple-500/30 rounded-lg p-3 text-white outline-none focus:border-cyan-500" required>
                         <option value="" disabled selected>-- Vui lòng chọn nhân sự --</option>
                         ${optionsHtml}
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">💸 Số Tiền (Coin)</label>
+                    <label class="block text-xs font-bold mb-2 uppercase text-cyan-400"> Số Tiền (Coin)</label>
                     <input type="number" id="pay-amount" min="0" class="w-full bg-black/40 border border-purple-500/30 rounded-lg p-3 text-white outline-none focus:border-cyan-500" placeholder="VD: 50000" required>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold mb-2 uppercase text-cyan-400">📝 Lý do phát lương / thưởng</label>
+                    <label class="block text-xs font-bold mb-2 uppercase text-cyan-400"> Lý do phát lương / thưởng</label>
                     <input type="text" id="pay-reason" class="w-full bg-black/40 border border-purple-500/30 rounded-lg p-3 text-white outline-none focus:border-cyan-500" placeholder="VD: Thưởng quay Video Trailer" required>
                 </div>
                 <button type="submit" class="bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 text-white font-black w-full py-4 rounded-xl shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:-translate-y-1 transition-all">
-                    PHÁT LƯƠNG & GỬI THÔNG BÁO 🚀
+                    PHÁT LƯƠNG & GỬI THÔNG BÁO 
                 </button>
             </form>
         `;
@@ -1048,7 +1048,7 @@ async function loadPayrollAdmin() {
                 e.target.reset();
             } catch (err) { showCustomModal("LỖI", "❌ Lỗi giao dịch: " + getFirebaseErrorMessage(err), "danger"); }
             finally {
-                btn.innerText = "PHÁT LƯƠNG & GỬI THÔNG BÁO 🚀";
+                btn.innerText = "PHÁT LƯƠNG & GỬI THÔNG BÁO ";
                 btn.disabled = false;
             }
         });
@@ -1518,3 +1518,5 @@ async function loadStatistics() {
     }
 }
 window.loadStatistics = loadStatistics;
+window.loadWorkReports = loadWorkReports;
+window.loadTimeLogs = loadTimeLogs;
