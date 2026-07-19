@@ -124,6 +124,7 @@ function setupTabs() {
             if (tabId === 'payroll') {
                 loadPayrollAdmin();
                 loadAdminWithdraws();
+                loadAdminWithdrawHistory();
                 loadAdminPayrollHistory();
             }
             if (tabId === 'user-wallets') {
@@ -367,12 +368,70 @@ async function loadAdminWithdraws() {
     }
 }
 
+async function loadAdminWithdrawHistory() {
+    const list = document.getElementById('admin-withdraw-history');
+    if (!list) return;
+
+    list.innerHTML = '<p class="text-gray-500 text-sm italic animate-pulse">⏳ Đang tải lịch sử rút tiền...</p>';
+
+    try {
+        const withdraws = await fetchAllWithdraws();
+        // Lấy những lệnh đã duyệt hoặc từ chối, sắp xếp mới nhất lên đầu
+        const historyWithdraws = withdraws.filter(w => w.status !== 'pending').sort((a, b) => {
+            const timeA = a.updatedAt ? a.updatedAt.seconds : (a.createdAt ? a.createdAt.seconds : 0);
+            const timeB = b.updatedAt ? b.updatedAt.seconds : (b.createdAt ? b.createdAt.seconds : 0);
+            return timeB - timeA;
+        });
+
+        if (historyWithdraws.length === 0) {
+            list.innerHTML = '<p class="text-gray-500 text-sm italic">Chưa có lịch sử duyệt rút tiền nào.</p>';
+            return;
+        }
+
+        list.innerHTML = historyWithdraws.map(w => {
+            const timeToUse = w.updatedAt || w.createdAt;
+            const dateStr = timeToUse ? new Date(timeToUse.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
+            let detailHtml = '';
+            
+            if (w.type === 'game') {
+                detailHtml = `<p class="text-xs text-gray-300 mb-1">🎮 Rút Game - Ingame: <span class="font-bold text-white">${w.ingameName || 'N/A'}</span></p>`;
+            } else {
+                detailHtml = `<p class="text-xs text-gray-300 mb-1">💳 ATM - NH: <span class="font-bold text-white">${w.bankName}</span> - STK: <span class="font-bold text-white">${w.accountNumber}</span></p>`;
+            }
+
+            const statusClass = w.status === 'approved' ? 'text-green-400' : 'text-red-400';
+            const statusText = w.status === 'approved' ? '✅ Đã Chuyển Tiền' : '❌ Từ Chối';
+            const reasonHtml = w.reason ? `<p class="text-xs text-red-300 mt-1 italic">Lý do: ${w.reason}</p>` : '';
+
+            return `
+                <div class="bg-black/30 p-3 rounded-xl border border-white/10 relative">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="font-bold text-yellow-400 text-sm block">${w.author}</span>
+                            <span class="text-[10px] text-gray-500 font-mono">${dateStr}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-black ${statusClass} text-sm block">${statusText}</span>
+                            <span class="font-bold text-gray-300 text-xs">${Number(w.amount).toLocaleString('vi-VN')} Coin</span>
+                        </div>
+                    </div>
+                    ${detailHtml}
+                    ${reasonHtml}
+                </div>
+            `;
+        }).join('');
+    } catch (e) {
+        list.innerHTML = `<p class="text-red-500 text-sm">Lỗi tải lịch sử rút tiền: ${e.message}</p>`;
+    }
+}
+
 window.approveWithdrawAction = async (docId) => {
     showCustomModal("XÁC NHẬN", "Bạn chắc chắn đã chuyển tiền cho lệnh rút này?", "confirm", async () => {
         try {
             await updateWithdrawStatus(docId, 'approved');
             showCustomModal("THÀNH CÔNG", "Đã duyệt lệnh rút tiền!", "info");
             loadAdminWithdraws();
+            loadAdminWithdrawHistory();
         } catch (e) { 
             showCustomModal("LỖI", "Lỗi khi duyệt: " + getFirebaseErrorMessage(e), "danger"); 
         }
@@ -388,6 +447,7 @@ window.rejectWithdrawAction = async (docId) => {
         await updateWithdrawStatus(docId, 'rejected', reason.trim());
         showCustomModal("THÀNH CÔNG", "Đã từ chối lệnh rút và hoàn lại Coin!", "info");
         loadAdminWithdraws();
+        loadAdminWithdrawHistory();
     } catch (e) {
         showCustomModal("LỖI", "Lỗi khi từ chối: " + getFirebaseErrorMessage(e), "danger");
     }
