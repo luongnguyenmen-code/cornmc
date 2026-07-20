@@ -190,7 +190,7 @@ async function renderNews() {
     if (!container) return;
 
     const news = await fetchNews();
-    const isStaff = ['admin', 'dev'].includes(currentRole);
+    const isStaff = ['admin', 'dev', 'staff', 'mod', 'media'].includes(currentRole);
 
     if (news.length === 0) {
         container.innerHTML = `<div class="glass-panel p-6 text-center text-gray-400">Chưa có tin tức nào.</div>`;
@@ -1317,7 +1317,7 @@ async function renderForum(filterMode = 'approved') {
             </button>`;
 
         // Nếu là Admin/Dev -> Hiện tab Duyệt bài
-        if (['admin', 'dev'].includes(currentRole)) {
+        if (['admin', 'dev', 'staff', 'mod'].includes(currentRole)) {
             tabsHTML += `
             <button id="tab-pending" onclick="window.filterForum('pending')" 
                 class="px-5 py-2 rounded-lg font-bold text-sm transition border border-yellow-500/30 text-gray-400 hover:text-yellow-400 hover:bg-yellow-500/10">
@@ -1371,7 +1371,7 @@ async function renderForum(filterMode = 'approved') {
             posts = await fetchMyPosts(currentUser.uid);
         } else {
             // Nếu filter là 'pending' nhưng user ko phải admin -> Ép về 'approved' để bảo mật
-            if (filterMode === 'pending' && !['admin', 'dev'].includes(currentRole)) filterMode = 'approved';
+            if (filterMode === 'pending' && !['admin', 'dev', 'staff', 'mod'].includes(currentRole)) filterMode = 'approved';
             posts = await fetchForumPosts(filterMode);
         }
     } catch (err) {
@@ -1380,7 +1380,7 @@ async function renderForum(filterMode = 'approved') {
         return;
     }
 
-    const isStaff = ['admin', 'dev', 'mod', 'staff', 'helper', 'media'].includes(currentRole);
+    const isStaff = ['admin', 'dev', 'staff', 'mod'].includes(currentRole);
 
     if (posts.length === 0) {
         let emptyMsg = "Chưa có bài viết nào.";
@@ -1454,7 +1454,7 @@ async function renderComments(postId) {
 
     try {
         const comments = await fetchComments(postId);
-        const isStaff = ['admin', 'dev'].includes(currentRole);
+        const isStaff = ['admin', 'dev', 'staff', 'mod'].includes(currentRole);
 
         if (comments.length === 0) {
             container.innerHTML = '<div class="text-xs text-gray-600 italic">Chưa có bình luận nào.</div>';
@@ -1542,7 +1542,7 @@ async function renderGiveaways() {
     if (!container) return;
 
     // Hiện nút Tạo Sự kiện nếu là Ban Quản Trị
-    if (['admin', 'dev', 'mod', 'staff', 'media'].includes(currentRole)) {
+    if (['admin', 'dev', 'staff', 'mod'].includes(currentRole)) {
         document.getElementById('admin-giveaway-controls')?.classList.remove('hidden');
     } else {
         document.getElementById('admin-giveaway-controls')?.classList.add('hidden');
@@ -2261,7 +2261,7 @@ window.addEventListener('load', async () => {
         const title = document.getElementById('forum-title').value;
         const content = document.getElementById('forum-content').value;
         try {
-            const status = ['admin', 'dev'].includes(currentRole) ? 'approved' : 'pending';
+            const status = ['admin', 'dev', 'staff', 'mod'].includes(currentRole) ? 'approved' : 'pending';
             await createPost('forum_posts', { title, content, status, authorRole: currentRole });
             showCustomModal(status === 'approved' ? "ĐĂNG BÀI THÀNH CÔNG" : "ĐÃ GỬI DUYỆT", status === 'approved' ? "Bài viết đã được đăng!" : "Bài viết đang chờ admin duyệt.", "info");
             document.getElementById('post-modal').classList.remove('active');

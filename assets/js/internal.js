@@ -82,13 +82,13 @@ function setupRoleBasedUI() {
     const adminStatisticsBtn = document.getElementById('admin-statistics-btn');
     const timeTrackingWidget = document.getElementById('time-tracking-widget');
 
-    if (['staff', 'admin', 'dev'].includes(currentRole)) {
+    if (['admin', 'dev', 'staff', 'mod'].includes(currentRole)) {
         if (managerTools) managerTools.classList.remove('hidden');
+        if (adminTimelogsBtn) adminTimelogsBtn.classList.remove('hidden');
     }
 
     if (['admin', 'dev'].includes(currentRole)) {
         if (adminPayrollBtn) adminPayrollBtn.classList.remove('hidden');
-        if (adminTimelogsBtn) adminTimelogsBtn.classList.remove('hidden');
         if (adminWalletsBtn) adminWalletsBtn.classList.remove('hidden');
         if (adminStatisticsBtn) adminStatisticsBtn.classList.remove('hidden');
     }
@@ -857,7 +857,7 @@ window.viewReportDetail = (id) => {
             </div>
         ` : ''}
 
-        ${r.editHistory && r.editHistory.length > 0 && ['admin', 'dev'].includes(currentRole) ? `
+        ${r.editHistory && r.editHistory.length > 0 && ['admin', 'dev', 'staff', 'mod'].includes(currentRole) ? `
             <div class="mt-4 flex justify-end">
                 <button onclick="window.viewHistoryAction('${r.id}')" class="text-xs text-gray-400 hover:text-white underline transition">
                     🕰️ Xem lịch sử chỉnh sửa
