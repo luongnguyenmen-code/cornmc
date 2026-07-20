@@ -751,6 +751,10 @@ export async function clockOut(logId) {
     if (!snap.exists()) throw new Error("Không tìm thấy phiên làm việc");
     
     const data = snap.data();
+    if (data.status === 'rejected') {
+        throw new Error("REJECTED");
+    }
+
     let durationMins = 0;
     if (data.clockInTime) {
         const inDate = new Date(data.clockInTime.seconds * 1000);

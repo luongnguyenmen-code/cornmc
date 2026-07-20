@@ -1197,7 +1197,15 @@ function setupTimeTrackingEvents() {
                 btnIn.classList.remove('hidden');
                 showCustomModal("THÀNH CÔNG", "Đã kết thúc phiên làm việc và ghi nhận thời gian!", "info");
             } catch (e) {
-                showCustomModal("LỖI", "Không thể kết thúc: " + getFirebaseErrorMessage(e), "danger");
+                if (e.message && e.message.includes('REJECTED')) {
+                    showCustomModal("LỖI", "Phiên làm việc này đã bị Quản lý hủy bỏ do vi phạm!", "danger");
+                    currentLogId = null;
+                    statusText.innerHTML = `Trạng thái: <span class="text-gray-500 font-bold">Chưa bắt đầu</span>`;
+                    btnOut.classList.add('hidden');
+                    btnIn.classList.remove('hidden');
+                } else {
+                    showCustomModal("LỖI", "Không thể kết thúc: " + getFirebaseErrorMessage(e), "danger");
+                }
             } finally {
                 btnOut.disabled = false;
                 btnOut.innerText = "KẾT THÚC (OFFLINE)";
