@@ -275,6 +275,7 @@ async function renderGuides() {
         },
         {
             title: "💰 Kinh Tế & Mua Bán",
+            videoLink: "https://www.tiktok.com/@menng1337/video/7654218713142480135?is_from_webapp=1&sender_device=pc",
             commands: [
                 { cmd: "/balance, /bal", desc: "Xem số tiền bạn có", color: "yellow" },
                 { cmd: "/ah", desc: "Mở chợ đấu giá cộng đồng", color: "orange" },
@@ -287,7 +288,7 @@ async function renderGuides() {
         },
         {
             title: "🛡️ Bảo Vệ Đất (Claim)",
-            videoLink: "https://streamable.com/oym4xe",
+            videoLink: "https://www.tiktok.com/@menng1337/video/7664576569746230549?is_from_webapp=1&sender_device=pc",
             commands: [
                 { cmd: "/claim", desc: "Tạo vùng bảo vệ (Cần Golden Shovel)", color: "yellow" },
                 { cmd: "/claimshop", desc: "Mua thêm Claimblocks", color: "yellow" },
@@ -315,6 +316,7 @@ async function renderGuides() {
         },
         {
             title: "💼 Hệ Thống Nghề Nghiệp (Jobs)",
+            videoLink: "https://www.tiktok.com/@menng1337/video/7644891622445960466?is_from_webapp=1&sender_device=pc",
             commands: [
                 { cmd: "/jobs join <Tên>", desc: "Tham gia nghề (VD: /jobs join Miner)", color: "green" },
                 { cmd: "/jobs leave <Tên>", desc: "Rời khỏi nghề hiện tại", color: "red" },
@@ -502,7 +504,10 @@ async function renderGuides() {
                 <div class="glass-panel rounded-2xl border border-purple-500/30 overflow-hidden mb-3">
                     <div class="p-4 flex justify-between items-center cursor-pointer hover:bg-white/5 transition group"
                         onclick="this.nextElementSibling.classList.toggle('hidden'); this.querySelector('.toggle-icon').classList.toggle('rotate-180');">
-                        <h4 class="font-bold text-white title-font group-hover:text-cyan-300 transition-colors">${group.title}</h4>
+                        <div class="flex items-center gap-3">
+                            <h4 class="font-bold text-white title-font group-hover:text-cyan-300 transition-colors">${group.title}</h4>
+                            ${group.videoLink ? `<a href="${group.videoLink}" target="_blank" onclick="event.stopPropagation()" class="text-[10px] sm:text-xs bg-[#ff0050]/20 text-white hover:bg-[#ff0050]/40 px-2 py-1 rounded-full border border-[#ff0050]/30 transition-all font-bold flex items-center gap-1 hover:scale-105"><svg class="w-3 h-3 text-white" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.04-.1z"/></svg> Hướng Dẫn</a>` : ''}
+                        </div>
                         <span class="toggle-icon text-cyan-400 font-bold transition-transform duration-300 text-xs">▼</span>
                     </div>
                     
