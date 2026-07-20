@@ -124,7 +124,7 @@ async function loadUsers() {
         if (isAdmin) {
             roleDisplay = `<span class="bg-red-900/50 text-red-400 font-bold px-3 py-1.5 rounded text-xs border border-red-500/30 shadow-[0_0_10px_rgba(248,113,113,0.2)]">👑 ADMIN</span>`;
         } else {
-            const roles = ['member', 'vip', 'media', 'helper', 'staff', 'dev'];
+            const roles = ['member', 'vip', 'media', 'helper', 'staff', 'mod', 'dev'];
             roleDisplay = `
                 <select onchange="window.updateUserRole('${u.id}', this.value)" class="bg-black border border-gray-700 text-xs rounded px-2 py-1 text-white hover:border-cyan-500 transition outline-none">
                     ${roles.map(r => `<option value="${r}" ${u.role === r ? 'selected' : ''}>${r.toUpperCase()}</option>`).join('')}
