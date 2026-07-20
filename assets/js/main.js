@@ -269,8 +269,7 @@ async function renderGuides() {
                 { cmd: "/tpaccept", desc: "Chấp nhận yêu cầu", color: "green" },
                 { cmd: "/tpdeny", desc: "Từ chối yêu cầu", color: "red" },
                 { cmd: "/msg, /w, /tell <tên>", desc: "Nhắn tin riêng", color: "blue" },
-                { cmd: "/pay <tên> <tiền>", desc: "Chuyển tiền cho người khác", color: "purple" },
-                { cmd: "/points pay <tên> <xu>", desc: "Chuyển xu cho người khác", color: "purple" }
+                { cmd: "/pay <tên> <tiền>", desc: "Chuyển tiền cho người khác", color: "purple" }
             ]
         },
         {
@@ -283,7 +282,7 @@ async function renderGuides() {
                 { cmd: "/shop", desc: "Mở cửa hàng hệ thống", color: "blue" },
                 { cmd: "/sellgui", desc: "Mở Menu bán đồ nhanh", color: "blue" },
                 { cmd: "/sellall <tên>", desc: "Bán tất cả 1 loại đồ", color: "blue" },
-                { cmd: "/rank", desc: "Xem menu mua Rank VIP", color: "cyan" }
+                { cmd: "/rank", desc: "Xem menu mua Rank", color: "cyan" }
             ]
         },
         {
@@ -329,7 +328,6 @@ async function renderGuides() {
             title: "📊 Hệ Thống Thông Tin & Chat",
             commands: [
                 { cmd: "/bangthongtin", desc: "Bật/Tắt bảng thông tin bên phải màn hình", color: "cyan" },
-                { cmd: "/taixiu toggle", desc: "Ẩn hoặc hiện các thông báo Tài Xỉu", color: "orange" },
                 { cmd: "/chatgame toggle", desc: "Ẩn hoặc hiện các thông báo Minigame", color: "green" },
                 { cmd: "/chattoggle", desc: "Tắt hoàn toàn chat từ người chơi khác", color: "red" }
             ]
