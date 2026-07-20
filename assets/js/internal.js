@@ -520,6 +520,7 @@ function setupReportForm() {
         e.preventDefault();
         const task = document.getElementById('report-task').value.trim();
         const percent = document.getElementById('report-percent').value;
+        const quantity = document.getElementById('report-quantity').value;
         const link = document.getElementById('report-link').value.trim();
         const files = Array.from(imageInput.files);
         const btn = e.target.querySelector('button');
@@ -542,6 +543,7 @@ function setupReportForm() {
             await submitWorkReport({ 
                 task, 
                 percent: Number(percent), 
+                quantity: Number(quantity) || 1,
                 link,
                 images: imageUrls 
             });
@@ -800,12 +802,17 @@ window.viewReportDetail = (id) => {
 
     let linkHtml = '';
     if (r.link) {
+        const links = r.link.split(/\r?\n|\s+/).filter(l => l.trim() !== '');
         linkHtml = `
             <div class="mb-6 pt-5 border-t border-cyan-500/20">
-                <p class="text-sm text-cyan-400 mb-3 uppercase font-bold tracking-wider title-font flex items-center gap-2">🔗 Tệp đính kèm / Kết quả</p>
-                <a href="${r.link}" target="_blank" class="inline-flex items-center gap-3 text-sm text-purple-300 hover:text-white transition bg-purple-900/20 hover:bg-purple-900/40 px-5 py-3 rounded-xl border border-purple-500/30 w-full break-all shadow-inner group">
-                    <span class="text-xl group-hover:scale-110 transition">🌐</span> ${r.link}
-                </a>
+                <p class="text-sm text-cyan-400 mb-3 uppercase font-bold tracking-wider title-font flex items-center gap-2">🔗 Tệp đính kèm / Kết quả (${links.length})</p>
+                <div class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-2">
+                    ${links.map(l => `
+                        <a href="${l}" target="_blank" class="flex items-center gap-3 text-sm text-purple-300 hover:text-white transition bg-purple-900/20 hover:bg-purple-900/40 px-4 py-2.5 rounded-xl border border-purple-500/30 w-full break-all shadow-inner group">
+                            <span class="text-xl group-hover:scale-110 transition shrink-0">🌐</span> ${l}
+                        </a>
+                    `).join('')}
+                </div>
             </div>
         `;
     }
@@ -988,6 +995,7 @@ window.openEditReportModal = (docId) => {
     document.getElementById('edit-report-id').value = r.id;
     document.getElementById('edit-report-task').value = r.task;
     document.getElementById('edit-report-percent').value = r.percent;
+    document.getElementById('edit-report-quantity').value = r.quantity || 1;
     document.getElementById('edit-report-link').value = r.link || '';
     document.getElementById('edit-report-images').value = '';
     
@@ -1030,6 +1038,7 @@ function setupEditReportForm() {
         const docId = document.getElementById('edit-report-id').value;
         const task = document.getElementById('edit-report-task').value.trim();
         const percent = document.getElementById('edit-report-percent').value;
+        const quantity = document.getElementById('edit-report-quantity').value;
         const link = document.getElementById('edit-report-link').value.trim();
         const files = Array.from(imageInput.files);
         const btn = e.target.querySelector('button');
@@ -1576,7 +1585,7 @@ async function loadStatistics() {
                 if (`${yyyy}-${mm}` === summaryMonth) {
                     const uid = r.uid;
                     if (!userStats[uid]) userStats[uid] = { username: r.author || r.uid, totalMins: 0, reports: 0 };
-                    userStats[uid].reports += 1;
+                    userStats[uid].reports += (Number(r.quantity) || 1);
                 }
             }
         });
