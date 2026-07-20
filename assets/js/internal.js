@@ -1344,6 +1344,12 @@ async function loadTimeLogs() {
                             <button onclick="window.rejectTimeLog('${l.id}')" class="bg-red-600 hover:bg-red-500 text-white text-[10px] px-2 py-1.5 rounded-lg border border-red-500/50 transition font-bold">Từ Chối (X)</button>
                         </div>
                     `;
+                } else if (l.status === 'online') {
+                    adminAction = `
+                        <div class="flex gap-1 justify-center">
+                            <button onclick="window.rejectTimeLog('${l.id}')" class="bg-red-600 hover:bg-red-500 text-white text-[10px] px-2 py-1.5 rounded-lg border border-red-500/50 transition font-bold" title="Hủy bỏ phiên làm việc này ngay lập tức">Hủy Phiên (X)</button>
+                        </div>
+                    `;
                 } else if (l.status === 'approved') {
                     adminAction = `<span class="text-[10px] text-blue-400 bg-blue-500/10 px-2 py-1 rounded border border-blue-500/30 font-bold">Đã Duyệt ✅</span>`;
                 } else if (l.status === 'rejected') {
