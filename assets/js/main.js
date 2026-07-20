@@ -652,11 +652,44 @@ async function renderStaff() {
         };
 
         // Ưu tiên sắp xếp (Admin hiện trước -> Dev -> Staff -> Media -> Helper)
-        const rolePriority = { 'admin': 1, 'dev': 2, 'staff': 3, 'media': 4, 'helper': 5 };
+        const rolePriority = { 'admin': 1, 'dev': 2, 'mod': 3, 'staff': 4, 'media': 5, 'helper': 6 };
         staffList.sort((a, b) => (rolePriority[a.role] || 99) - (rolePriority[b.role] || 99));
 
         const html = staffList.map(staff => {
             const avatar = staff.photoURL || `https://mc-heads.net/avatar/${staff.username || 'Steve'}`;
+            const roleConfig = {
+                mod: { name: 'MODERATOR', icon: '🛡️', color: 'text-green-400', border: 'border-green-500/50', bg: 'bg-green-500/10' },
+                admin: { name: 'ADMIN', icon: '👑', color: 'text-red-500', border: 'border-red-600', bg: 'bg-red-500/20' },
+                'dev': {
+                    name: 'Developer',
+                    icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>`,
+                    color: 'text-yellow-400',
+                    border: 'border-yellow-500/50',
+                    bg: 'bg-yellow-500/10 shadow-[0_0_15px_rgba(250,204,21,0.2)]'
+                },
+                'staff': {
+                    name: 'Staff',
+                    icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.618 5.984A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016zM12 9v2m0 4h.01"></path></svg>`,
+                    color: 'text-purple-400',
+                    border: 'border-purple-500/50',
+                    bg: 'bg-purple-500/10 shadow-[0_0_15px_rgba(168,85,247,0.2)]'
+                },
+                'media': {
+                    name: 'Media',
+                    icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>`,
+                    color: 'text-pink-400',
+                    border: 'border-pink-500/50',
+                    bg: 'bg-pink-500/10 shadow-[0_0_15px_rgba(236,72,153,0.2)]'
+                },
+                'helper': {
+                    name: 'Helper',
+                    icon: `<svg class="w-4 h-4 inline-block align-text-bottom mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>`,
+                    color: 'text-green-400',
+                    border: 'border-green-500/50',
+                    bg: 'bg-green-500/10 shadow-[0_0_15px_rgba(74,222,128,0.2)]'
+                }
+            };
+            
             const conf = roleConfig[staff.role] || { name: staff.role.toUpperCase(), icon: '👤', color: 'text-gray-400', border: 'border-gray-500/50', bg: 'bg-gray-500/10' };
 
             // Xử lý link mạng xã hội (Discord & Tự động nhận diện Website/FB/YT/TikTok)
@@ -1347,7 +1380,7 @@ async function renderForum(filterMode = 'approved') {
         return;
     }
 
-    const isStaff = ['admin', 'dev', 'staff', 'helper', 'media'].includes(currentRole);
+    const isStaff = ['admin', 'dev', 'mod', 'staff', 'helper', 'media'].includes(currentRole);
 
     if (posts.length === 0) {
         let emptyMsg = "Chưa có bài viết nào.";
@@ -1462,7 +1495,7 @@ async function renderAdminTable() {
         tbody.innerHTML = users.map(u => {
             const isMe = currentUser && currentUser.uid === u.id;
             const avatar = u.photoURL || `https://mc-heads.net/avatar/${u.username}`;
-            const roles = ['member', 'vip', 'media', 'helper', 'staff', 'dev', 'admin'];
+            const roles = ['member', 'vip', 'media', 'helper', 'staff', 'mod', 'dev', 'admin'];
 
             return `
             <tr class="hover:bg-white/5 transition border-b border-purple-500/10 user-row" data-search="${(u.username || '').toLowerCase()} ${(u.email || '').toLowerCase()}">
@@ -1509,7 +1542,7 @@ async function renderGiveaways() {
     if (!container) return;
 
     // Hiện nút Tạo Sự kiện nếu là Ban Quản Trị
-    if (['admin', 'dev', 'staff', 'media'].includes(currentRole)) {
+    if (['admin', 'dev', 'mod', 'staff', 'media'].includes(currentRole)) {
         document.getElementById('admin-giveaway-controls')?.classList.remove('hidden');
     } else {
         document.getElementById('admin-giveaway-controls')?.classList.add('hidden');
@@ -1732,7 +1765,7 @@ function handleAuthUI(user, role, dbData) {
                     
                     <button id="btn-profile" class="block w-full text-left px-4 py-3 text-sm text-gray-300 hover:bg-purple-500/20 hover:text-white border-b border-white/5 transition">👤 Hồ sơ</button>
                     
-                    ${['admin', 'dev', 'staff', 'media', 'helper'].includes(role) ? `<a href="internal.html" class="block w-full text-left px-4 py-3 text-sm text-cyan-400 hover:bg-cyan-500/20 font-bold border-b border-white/5 no-underline transition">🏢 Khu Vực Nội Bộ</a>` : ''}
+                    ${['admin', 'dev', 'mod', 'staff', 'media', 'helper'].includes(role) ? `<a href="internal.html" class="block w-full text-left px-4 py-3 text-sm text-cyan-400 hover:bg-cyan-500/20 font-bold border-b border-white/5 no-underline transition">🏢 Khu Vực Nội Bộ</a>` : ''}
                     
                     ${['admin'].includes(role) ? `<button id="btn-admin" class="block w-full text-left px-4 py-3 text-sm text-orange-400 hover:bg-orange-500/20 font-bold border-b border-white/5 transition">👥 Quản Lý User</button>` : ''}
                     
@@ -1857,7 +1890,7 @@ function handleAuthUI(user, role, dbData) {
         }
 
         // Thêm 'member' vào danh sách cho phép
-        if (['admin', 'dev', 'staff', 'helper', 'media', 'member'].includes(role)) {
+        if (['admin', 'dev', 'mod', 'staff', 'helper', 'media', 'member'].includes(role)) {
             const btn = document.getElementById('create-post-trigger');
             if (btn) btn.classList.remove('hidden');
         }

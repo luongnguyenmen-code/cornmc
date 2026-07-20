@@ -93,7 +93,7 @@ function setupRoleBasedUI() {
         if (adminStatisticsBtn) adminStatisticsBtn.classList.remove('hidden');
     }
 
-    if (['media', 'helper', 'staff', 'dev', 'admin'].includes(currentRole)) {
+    if (['media', 'helper', 'staff', 'mod', 'dev', 'admin'].includes(currentRole)) {
         if (timeTrackingWidget) timeTrackingWidget.classList.remove('hidden');
     }
 }
@@ -673,7 +673,7 @@ async function loadWorkReports() {
         // Populate select if empty
         const searchSelect = document.getElementById('search-report-name');
         if (searchSelect && searchSelect.tagName === 'SELECT' && searchSelect.options.length <= 1) {
-            users.filter(u => ['admin', 'dev', 'staff', 'media', 'helper'].includes(u.role)).forEach(u => {
+            users.filter(u => ['admin', 'dev', 'mod', 'staff', 'media', 'helper'].includes(u.role)).forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = u.username.toLowerCase();
                 opt.textContent = u.username;
@@ -1084,7 +1084,7 @@ async function loadPayrollAdmin() {
 
     try {
         const users = await fetchAllUsers();
-        const staffUsers = users.filter(u => ['admin', 'dev', 'staff', 'media', 'helper'].includes(u.role));
+        const staffUsers = users.filter(u => ['admin', 'dev', 'mod', 'staff', 'media', 'helper'].includes(u.role));
         
         const optionsHtml = staffUsers.map(u => 
             `<option value="${u.id}" class="bg-gray-900 text-white">${u.username} - [${u.role.toUpperCase()}]</option>`
@@ -1240,7 +1240,7 @@ async function loadTimeLogs() {
         const searchSelect = document.getElementById('time-log-search');
         if (searchSelect && searchSelect.options.length <= 1) {
             const users = await fetchAllUsers();
-            users.filter(u => ['admin', 'dev', 'staff', 'media', 'helper'].includes(u.role)).forEach(u => {
+            users.filter(u => ['admin', 'dev', 'mod', 'staff', 'media', 'helper'].includes(u.role)).forEach(u => {
                 const opt = document.createElement('option');
                 opt.value = u.username.toLowerCase();
                 opt.textContent = u.username;
@@ -1469,7 +1469,7 @@ async function loadAdminUserBalances() {
 
         const userBalances = {};
 
-        const staffUsers = users.filter(u => ['admin', 'dev', 'staff', 'media', 'helper'].includes(u.role));
+        const staffUsers = users.filter(u => ['admin', 'dev', 'mod', 'staff', 'media', 'helper'].includes(u.role));
         staffUsers.forEach(u => {
             userBalances[u.id] = {
                 username: u.username,

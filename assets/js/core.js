@@ -186,7 +186,7 @@ export async function fetchAllUsers() {
 
 // Lấy danh sách thành viên Staff (Media, Helper, Dev, Admin)
 export async function fetchStaffMembers() {
-    const staffRoles = ['media', 'helper', 'staff','dev', 'admin'];
+    const staffRoles = ['media', 'helper', 'staff', 'mod', 'dev', 'admin'];
     const q = query(collection(db, "users"), where("role", "in", staffRoles), orderBy("role", "desc"), orderBy("joinedAt", "asc"));
     const snap = await getDocs(q);
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -486,7 +486,7 @@ export async function fetchTasksForRole(role) {
     const allTasks = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     
     // Nếu là Admin/Manager xem hết, nếu là nhân viên thì chỉ xem việc của bộ phận mình hoặc việc chung
-    if (['admin', 'dev', 'staff'].includes(role)) return allTasks;
+    if (['admin', 'dev', 'mod', 'staff'].includes(role)) return allTasks;
     return allTasks.filter(t => t.targetRole === role || t.targetRole === 'all');
 }
 
