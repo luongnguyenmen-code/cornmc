@@ -1785,7 +1785,7 @@ window.openActiveHoursChart = async () => {
         activeHoursChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: Array.from({length: 24}, (_, i) => \`\${i}h\`),
+                labels: Array.from({length: 24}, (_, i) => `${i}h`),
                 datasets: [{
                     label: 'Tổng số phút hoạt động',
                     data: hourData,
