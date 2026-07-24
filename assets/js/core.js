@@ -759,13 +759,73 @@ export async function clockOut(logId) {
     if (data.clockInTime) {
         const inDate = new Date(data.clockInTime.seconds * 1000);
         const outDate = new Date(); // Lấy time client để tính tạm
-        durationMins = Math.round((outDate - inDate) / 60000); 
+        
+        // --- XỬ LÝ NHÂN ĐÔI (x2) THỜI GIAN ---
+        let finalMinutes = 0;
+        try {
+            const settings = await getTimeTrackingSettings();
+            const x2Days = settings.x2_days || [];
+            const x2Hours = settings.x2_hours || [];
+            
+            // Tính từng phút một từ inDate đến outDate
+            let currentTime = new Date(inDate.getTime());
+            while (currentTime < outDate) {
+                const day = currentTime.getDay();
+                const hour = currentTime.getHours();
+                
+                // Nếu giờ hoặc ngày hiện tại nằm trong danh sách x2 thì +2, ngược lại +1
+                if (x2Days.includes(day) || x2Hours.includes(hour)) {
+                    finalMinutes += 2;
+                } else {
+                    finalMinutes += 1;
+                }
+                
+                // Cộng thêm 1 phút
+                currentTime.setMinutes(currentTime.getMinutes() + 1);
+            }
+        } catch(e) {
+            console.error("Lỗi khi tính giờ x2, sử dụng cách tính thường:", e);
+            finalMinutes = Math.round((outDate - inDate) / 60000); 
+        }
+        
+        durationMins = finalMinutes;
     }
 
     await updateDoc(logRef, {
         clockOutTime: serverTimestamp(),
         durationMinutes: durationMins,
         status: 'offline'
+    });
+}
+
+// ---------------- CẤU HÌNH x2 & CỘNG GIỜ ----------------
+export async function getTimeTrackingSettings() {
+    const settingsRef = doc(db, "settings", "time_tracking");
+    const snap = await getDoc(settingsRef);
+    if (!snap.exists()) return { x2_days: [], x2_hours: [] };
+    return snap.data();
+}
+
+export async function updateTimeTrackingSettings(x2Days, x2Hours) {
+    const settingsRef = doc(db, "settings", "time_tracking");
+    await setDoc(settingsRef, {
+        x2_days: x2Days,
+        x2_hours: x2Hours,
+        updatedAt: serverTimestamp()
+    }, { merge: true });
+}
+
+export async function addManualTimeLog(uid, username, role, minutes, reason) {
+    return await addDoc(collection(db, "time_logs"), {
+        uid: uid,
+        username: username,
+        role: role,
+        clockInTime: serverTimestamp(), // Vẫn lưu để query theo tháng
+        clockOutTime: serverTimestamp(),
+        durationMinutes: Number(minutes),
+        status: 'approved', // Duyệt luôn
+        isManual: true,
+        reason: reason
     });
 }
 

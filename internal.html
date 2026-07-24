@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .sidebar-link.active {
             background: rgba(34, 211, 238, 0.15);
@@ -393,6 +394,11 @@
                     <h2 class="text-4xl font-black title-font neon-text">THỐNG KÊ GIỜ LÀM</h2>
                     
                     <div class="flex flex-wrap items-center gap-4">
+                        <div class="flex flex-wrap items-center gap-2 mb-4 w-full" id="admin-time-log-tools" style="display:none;">
+                            <button onclick="window.openX2SettingsModal()" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg font-bold transition shadow-[0_0_15px_rgba(168,85,247,0.3)]">⚙️ Cài đặt x2 Giờ làm</button>
+                            <button onclick="window.openManualTimeModal()" class="bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg font-bold transition shadow-[0_0_15px_rgba(34,197,94,0.3)]">➕ Cộng giờ thủ công</button>
+                            <button onclick="window.openActiveHoursChart()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg font-bold transition shadow-[0_0_15px_rgba(59,130,246,0.3)]">📊 Thống kê Khung giờ</button>
+                        </div>
                         <div class="flex items-center bg-black/50 p-1 rounded-lg border border-white/10" id="time-log-filters">
                             <button onclick="filterTimeLogs('all')" id="tl-filter-all" class="tl-filter-btn bg-cyan-600 text-white shadow-[0_0_10px_rgba(34,211,238,0.4)] border-cyan-400 px-4 py-1.5 rounded text-sm font-bold transition">Tất Cả</button>
                             <button onclick="filterTimeLogs('media')" id="tl-filter-media" class="tl-filter-btn text-gray-400 border-transparent hover:text-white px-4 py-1.5 rounded text-sm font-bold transition">Media</button>
@@ -490,6 +496,81 @@
                     </div>
                     <div id="history-content" class="modal-body overflow-y-auto custom-scrollbar p-6 space-y-4">
                         <!-- Nội dung được js nạp vào -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL CÀI ĐẶT x2 GIỜ LÀM -->
+            <div id="x2-settings-modal" class="modal">
+                <div class="modal-content glass-intense rounded-2xl modal-md border border-purple-500/50 flex flex-col h-[90vh] sm:h-auto sm:max-h-[90vh]">
+                    <div class="modal-header border-b border-purple-500/30 bg-black/40 rounded-t-2xl p-4 flex justify-between items-center">
+                        <h2 class="text-2xl font-black title-font neon-text text-purple-400">CÀI ĐẶT x2 GIỜ LÀM</h2>
+                        <button class="close-modal text-gray-400 hover:text-red-400 transition text-xl font-bold">✕</button>
+                    </div>
+                    <div class="modal-body overflow-y-auto custom-scrollbar p-6">
+                        <form id="x2-settings-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-bold mb-2 uppercase text-purple-300">Khung giờ được x2 (0 - 23)</label>
+                                <div class="grid grid-cols-6 gap-2 text-sm text-gray-300" id="x2-hours-grid">
+                                    <!-- Sẽ được điền bằng JS -->
+                                </div>
+                            </div>
+                            <div class="mt-4">
+                                <label class="block text-sm font-bold mb-2 uppercase text-purple-300">Ngày trong tuần được x2</label>
+                                <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 text-sm text-gray-300" id="x2-days-grid">
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="1" class="x2-day-cb"> Thứ 2</label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="2" class="x2-day-cb"> Thứ 3</label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="3" class="x2-day-cb"> Thứ 4</label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="4" class="x2-day-cb"> Thứ 5</label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="5" class="x2-day-cb"> Thứ 6</label>
+                                    <label class="flex items-center gap-2"><input type="checkbox" value="6" class="x2-day-cb"> Thứ 7</label>
+                                    <label class="flex items-center gap-2 text-red-400 font-bold"><input type="checkbox" value="0" class="x2-day-cb"> Chủ Nhật</label>
+                                </div>
+                            </div>
+                            <button type="submit" class="cyber-btn w-full py-3 rounded-xl font-black title-font text-lg mt-4">LƯU CẤU HÌNH</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL CỘNG GIỜ THỦ CÔNG -->
+            <div id="manual-time-modal" class="modal">
+                <div class="modal-content glass-intense rounded-2xl modal-md border border-green-500/50 flex flex-col">
+                    <div class="modal-header border-b border-green-500/30 bg-black/40 rounded-t-2xl p-4 flex justify-between items-center">
+                        <h2 class="text-2xl font-black title-font neon-text text-green-400">CỘNG GIỜ THỦ CÔNG</h2>
+                        <button class="close-modal text-gray-400 hover:text-red-400 transition text-xl font-bold">✕</button>
+                    </div>
+                    <div class="modal-body p-6">
+                        <form id="manual-time-form" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold mb-1 uppercase text-green-300">Chọn Nhân Sự</label>
+                                <select id="manual-time-uid" class="cyber-input w-full p-3 rounded-lg font-bold" required></select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-1 uppercase text-green-300">Số phút cộng thêm</label>
+                                <input type="number" id="manual-time-minutes" min="1" class="cyber-input w-full p-3 rounded-lg font-bold text-green-400 text-xl" placeholder="VD: 60" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold mb-1 uppercase text-green-300">Lý do</label>
+                                <input type="text" id="manual-time-reason" class="cyber-input w-full p-3 rounded-lg" placeholder="VD: Bù giờ lỗi mạng" required>
+                            </div>
+                            <button type="submit" class="bg-green-600 hover:bg-green-500 text-white w-full py-3 rounded-xl font-black title-font text-lg shadow-[0_0_15px_rgba(34,197,94,0.3)] transition">CỘNG GIỜ </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- MODAL THỐNG KÊ KHUNG GIỜ -->
+            <div id="active-hours-chart-modal" class="modal">
+                <div class="modal-content glass-intense rounded-2xl modal-lg border border-blue-500/50 flex flex-col h-[90vh]">
+                    <div class="modal-header border-b border-blue-500/30 bg-black/40 rounded-t-2xl p-4 flex justify-between items-center">
+                        <h2 class="text-2xl font-black title-font neon-text text-blue-400">BIỂU ĐỒ HOẠT ĐỘNG</h2>
+                        <button class="close-modal text-gray-400 hover:text-red-400 transition text-xl font-bold">✕</button>
+                    </div>
+                    <div class="modal-body p-6 flex-1 flex flex-col items-center justify-center">
+                        <div class="w-full h-full relative flex items-center justify-center">
+                            <canvas id="activeHoursChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
