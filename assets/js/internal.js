@@ -25,7 +25,6 @@ import {
     fetchMyWithdraws,
     fetchAllWithdraws,
     updateWithdrawStatus,
-    updateWithdrawStatus,
     approveTimeLogStatus,
     rejectTimeLogStatus,
     fetchAllPayroll,
