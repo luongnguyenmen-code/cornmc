@@ -1355,6 +1355,7 @@ async function loadTimeLogs() {
                 } else if (l.status === 'online') {
                     adminAction = `
                         <div class="flex gap-1 justify-center">
+                            <button onclick="window.forceClockOutTimeLog('${l.id}')" class="bg-yellow-600 hover:bg-yellow-500 text-white text-[10px] px-2 py-1.5 rounded-lg border border-yellow-500/50 transition font-bold" title="Kết thúc/Tạm dừng phiên làm việc này">Tạm Dừng</button>
                             <button onclick="window.rejectTimeLog('${l.id}')" class="bg-red-600 hover:bg-red-500 text-white text-[10px] px-2 py-1.5 rounded-lg border border-red-500/50 transition font-bold" title="Hủy bỏ phiên làm việc này ngay lập tức">Hủy Phiên (X)</button>
                         </div>
                     `;
@@ -1400,6 +1401,18 @@ window.rejectTimeLog = async (logId) => {
         try {
             await rejectTimeLogStatus(logId);
             showCustomModal("THÀNH CÔNG", "Đã từ chối giờ làm!", "info");
+            loadTimeLogs();
+        } catch (e) {
+            showCustomModal("LỖI", "Lỗi: " + getFirebaseErrorMessage(e), "danger");
+        }
+    });
+};
+
+window.forceClockOutTimeLog = async (logId) => {
+    showCustomModal("XÁC NHẬN", "Bạn có chắc chắn muốn tạm dừng (kết thúc) phiên làm việc này để nhân viên giữ lại thời gian đã làm?", "confirm", async () => {
+        try {
+            await clockOut(logId);
+            showCustomModal("THÀNH CÔNG", "Đã tạm dừng phiên làm việc thành công!", "info");
             loadTimeLogs();
         } catch (e) {
             showCustomModal("LỖI", "Lỗi: " + getFirebaseErrorMessage(e), "danger");
