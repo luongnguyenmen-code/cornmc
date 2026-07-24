@@ -1649,3 +1649,176 @@ async function loadStatistics() {
 window.loadStatistics = loadStatistics;
 window.loadWorkReports = loadWorkReports;
 window.loadTimeLogs = loadTimeLogs;
+
+// ==========================================
+// THÊM: LOGIC CÀI ĐẶT x2 VÀ CỘNG GIỜ
+// ==========================================
+
+window.openX2SettingsModal = async () => {
+    // Generate hours grid
+    const hoursGrid = document.getElementById('x2-hours-grid');
+    hoursGrid.innerHTML = '';
+    for(let i = 0; i <= 23; i++) {
+        hoursGrid.innerHTML += `<label class="flex items-center gap-1 bg-black/40 p-2 rounded border border-white/10 hover:bg-white/10 cursor-pointer"><input type="checkbox" value="${i}" class="x2-hour-cb"> ${i}h</label>`;
+    }
+    
+    // Load current settings
+    try {
+        const settings = await getTimeTrackingSettings();
+        const x2Days = settings.x2_days || [];
+        const x2Hours = settings.x2_hours || [];
+        
+        document.querySelectorAll('.x2-day-cb').forEach(cb => {
+            cb.checked = x2Days.includes(Number(cb.value));
+        });
+        document.querySelectorAll('.x2-hour-cb').forEach(cb => {
+            cb.checked = x2Hours.includes(Number(cb.value));
+        });
+        
+        document.getElementById('x2-settings-modal').classList.add('active');
+    } catch(e) {
+        showCustomModal("LỖI", "Lỗi lấy cấu hình: " + getFirebaseErrorMessage(e), "danger");
+    }
+};
+
+document.getElementById('x2-settings-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.innerText = "⏳ ĐANG LƯU...";
+    btn.disabled = true;
+    
+    const x2Days = Array.from(document.querySelectorAll('.x2-day-cb:checked')).map(cb => Number(cb.value));
+    const x2Hours = Array.from(document.querySelectorAll('.x2-hour-cb:checked')).map(cb => Number(cb.value));
+    
+    try {
+        await updateTimeTrackingSettings(x2Days, x2Hours);
+        showCustomModal("THÀNH CÔNG", "Đã lưu cấu hình x2 giờ làm!", "info");
+        document.getElementById('x2-settings-modal').classList.remove('active');
+    } catch(err) {
+        showCustomModal("LỖI", "Lỗi lưu cấu hình: " + getFirebaseErrorMessage(err), "danger");
+    } finally {
+        btn.innerText = "LƯU CẤU HÌNH";
+        btn.disabled = false;
+    }
+});
+
+// ==========================================
+// CỘNG GIỜ THỦ CÔNG
+// ==========================================
+window.openManualTimeModal = async () => {
+    const select = document.getElementById('manual-time-uid');
+    select.innerHTML = '<option value="">Đang tải danh sách...</option>';
+    document.getElementById('manual-time-modal').classList.add('active');
+    
+    try {
+        const users = await fetchAllUsers();
+        const staffUsers = users.filter(u => ['admin', 'dev', 'mod', 'staff', 'media', 'helper'].includes(u.role));
+        select.innerHTML = staffUsers.map(u => `<option value="${u.id}" data-username="${u.username}" data-role="${u.role}" class="bg-gray-900">${u.username} - [${u.role.toUpperCase()}]</option>`).join('');
+    } catch(e) {
+        select.innerHTML = '<option value="">Lỗi tải danh sách</option>';
+    }
+};
+
+document.getElementById('manual-time-form')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const select = document.getElementById('manual-time-uid');
+    const option = select.options[select.selectedIndex];
+    if(!option) return;
+    
+    const uid = option.value;
+    const username = option.getAttribute('data-username');
+    const role = option.getAttribute('data-role');
+    const minutes = document.getElementById('manual-time-minutes').value;
+    const reason = document.getElementById('manual-time-reason').value.trim();
+    
+    const btn = e.target.querySelector('button');
+    btn.innerText = "⏳ ĐANG XỬ LÝ...";
+    btn.disabled = true;
+    
+    try {
+        await addManualTimeLog(uid, username, role, minutes, reason);
+        showCustomModal("THÀNH CÔNG", "Đã cộng thêm giờ làm thành công!", "info");
+        document.getElementById('manual-time-modal').classList.remove('active');
+        e.target.reset();
+        loadTimeLogs();
+    } catch(err) {
+        showCustomModal("LỖI", "Lỗi cộng giờ: " + getFirebaseErrorMessage(err), "danger");
+    } finally {
+        btn.innerText = "CỘNG GIỜ";
+        btn.disabled = false;
+    }
+});
+
+// ==========================================
+// BIỂU ĐỒ HOẠT ĐỘNG
+// ==========================================
+let activeHoursChartInstance = null;
+
+window.openActiveHoursChart = async () => {
+    document.getElementById('active-hours-chart-modal').classList.add('active');
+    const ctx = document.getElementById('activeHoursChart').getContext('2d');
+    
+    try {
+        const logs = await fetchAllTimeLogs();
+        
+        // Mảng chứa tổng số phút theo từng giờ (0 - 23)
+        const hourData = new Array(24).fill(0);
+        
+        logs.forEach(l => {
+            if (l.status === 'approved' && l.clockInTime && !l.isManual) {
+                const inDate = new Date(l.clockInTime.seconds * 1000);
+                const outDate = l.clockOutTime ? new Date(l.clockOutTime.seconds * 1000) : new Date(); // Nếu đang online thì tính tới hiện tại
+                
+                let currentTime = new Date(inDate.getTime());
+                while(currentTime < outDate) {
+                    const h = currentTime.getHours();
+                    hourData[h] += 1;
+                    currentTime.setMinutes(currentTime.getMinutes() + 1);
+                }
+            }
+        });
+        
+        // Nếu đã có chart thì hủy trước khi vẽ lại
+        if (activeHoursChartInstance) {
+            activeHoursChartInstance.destroy();
+        }
+        
+        activeHoursChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => \`\${i}h\`),
+                datasets: [{
+                    label: 'Tổng số phút hoạt động',
+                    data: hourData,
+                    backgroundColor: 'rgba(34, 211, 238, 0.5)',
+                    borderColor: 'rgba(34, 211, 238, 1)',
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                        ticks: { color: '#9ca3af' }
+                    },
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: '#9ca3af' }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: { color: '#fff' }
+                    }
+                }
+            }
+        });
+        
+    } catch(e) {
+        showCustomModal("LỖI", "Không thể tạo biểu đồ: " + getFirebaseErrorMessage(e), "danger");
+    }
+};
