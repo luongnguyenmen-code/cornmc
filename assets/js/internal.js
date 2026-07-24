@@ -25,10 +25,14 @@ import {
     fetchMyWithdraws,
     fetchAllWithdraws,
     updateWithdrawStatus,
+    updateWithdrawStatus,
     approveTimeLogStatus,
     rejectTimeLogStatus,
     fetchAllPayroll,
-    updatePayrollAmount
+    updatePayrollAmount,
+    getTimeTrackingSettings,
+    updateTimeTrackingSettings,
+    addManualTimeLog
 } from './core.js';
 
 let currentUser = null;
@@ -1316,6 +1320,11 @@ async function loadTimeLogs() {
         const role = localStorage.getItem('cached_user_role') || 'member';
         const isAdmin = role === 'admin' || role === 'manager' || role === 'owner';
         
+        if (isAdmin) {
+            const adminTools = document.getElementById('admin-time-log-tools');
+            if (adminTools) adminTools.style.display = 'flex';
+        }
+        
         const thead = document.getElementById('time-logs-head');
         if (thead) {
             thead.innerHTML = `
@@ -1332,8 +1341,8 @@ async function loadTimeLogs() {
         }
 
         tbody.innerHTML = filteredLogs.map(l => {
-            const inTime = l.clockInTime ? new Date(l.clockInTime.seconds * 1000).toLocaleString('vi-VN') : 'N/A';
-            const outTime = l.clockOutTime ? new Date(l.clockOutTime.seconds * 1000).toLocaleString('vi-VN') : '--';
+            const inTime = l.clockInTime ? new Date(l.clockInTime.seconds * 1000).toLocaleString('vi-VN') : (l.isManual ? 'Cộng thủ công' : 'N/A');
+            const outTime = l.clockOutTime && !l.isManual ? new Date(l.clockOutTime.seconds * 1000).toLocaleString('vi-VN') : '--';
             
             let statusHtml = '';
             if (l.status === 'online') statusHtml = '<span class="text-green-400 font-bold text-xs bg-green-500/10 px-2 py-1 rounded border border-green-500/30">ONLINE</span>';
